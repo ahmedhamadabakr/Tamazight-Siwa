@@ -16,7 +16,7 @@ export function HeroSection() {
 
       {/* Content */}
       <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
-        <h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance">Experience Siwa</h1>
+        <h1 className="text-5xl md:text-7xl font-bold mb-6 text-balance">Siwa With us</h1>
         <p className="text-xl md:text-2xl mb-8 text-pretty opacity-90">
           Discover the magic of Siwa Oasis through authentic eco-tourism and cultural heritage experiences
         </p>
