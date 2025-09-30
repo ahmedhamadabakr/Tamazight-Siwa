@@ -21,7 +21,7 @@ export default function RootLayout({
     <html lang="en">
       <body >
         <Suspense fallback={null}>{children}</Suspense>
-        <Analytics />
+       {/*  <Analytics /> */}
       </body>
     </html>
   )
