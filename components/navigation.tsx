@@ -41,12 +41,19 @@ export function Navigation() {
 
           {/* Contact & Book Button */}
           <div className="hidden md:flex items-center space-x-4">
-            <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+            <a
+              href="tel:+20123456789"
+              className="flex items-center space-x-2 text-sm text-muted-foreground hover:text-primary transition"
+            >
               <Phone className="w-4 h-4" />
               <span>+20 123 456 789</span>
-            </div>
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Book Your Trip</Button>
+            </a>
+
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+              Book Your Trip
+            </Button>
           </div>
+
 
           {/* Mobile menu button */}
           <button

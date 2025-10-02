@@ -1,47 +1,12 @@
 import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
 import { MapPin, Clock, Users } from "lucide-react"
-
-const tours = [
-  {
-    id: 1,
-    title: "Siwa Tour Packages",
-    description: "Explore the ancient oasis with guided tours through palm groves and natural springs",
-    image: "/siwa-oasis-palm-trees-and-natural-springs.jpg",
-    duration: "3 Days",
-    groupSize: "2-8 People",
-    location: "Siwa Oasis",
-  },
-  {
-    id: 2,
-    title: "White and Black Desert Tour",
-    description: "Journey through Egypt's most spectacular desert landscapes and rock formations",
-    image: "/white-desert-rock-formations-and-black-desert-land.jpg",
-    duration: "2 Days",
-    groupSize: "4-12 People",
-    location: "Western Desert",
-  },
-  {
-    id: 3,
-    title: "Transportation Services",
-    description: "Comfortable and safe transportation to and from Siwa with experienced drivers",
-    image: "/desert-road-with-4x4-vehicle-in-siwa-landscape.jpg",
-    duration: "Flexible",
-    groupSize: "1-15 People",
-    location: "Cairo to Siwa",
-  },
-  {
-    id: 4,
-    title: "Cultural Heritage Tours",
-    description: "Immerse yourself in Siwa's rich Berber culture and ancient traditions",
-    image: "/traditional-siwa-berber-architecture-and-cultural-.jpg",
-    duration: "1-2 Days",
-    groupSize: "2-10 People",
-    location: "Siwa Town",
-  },
-]
+import { tours } from "@/app/data/tours"
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export function FeaturedTours() {
+
+  const firstFourItems = tours.slice(0, 4);
   return (
     <section className="py-20 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -54,7 +19,7 @@ export function FeaturedTours() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {tours.map((tour) => (
+          {firstFourItems.map((tour) => (
             <Card key={tour.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300">
               <div className="relative overflow-hidden">
                 <img
@@ -81,7 +46,9 @@ export function FeaturedTours() {
                     <span>{tour.location}</span>
                   </div>
                 </div>
-                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">Learn More</Button>
+                <Link href={`/tours/${tour.title.toLowerCase().replace(/\s+/g, "-")}`} className="w-full">
+                  <Button variant="outline" className="w-full">Learn More</Button>
+                </Link>
               </CardContent>
             </Card>
           ))}
