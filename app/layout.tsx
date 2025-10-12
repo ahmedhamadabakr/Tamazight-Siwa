@@ -4,6 +4,8 @@ import type { Metadata } from "next"
 import { Analytics } from "@vercel/analytics/next"
 import { Suspense } from "react"
 import "./globals.css"
+import Loading from "./loading"
+import { AuthProvider } from "@/components/auth-provider"
 
 export const metadata: Metadata = {
   title: "Tamazight Siwa - Authentic Desert Experiences in Siwa Oasis",
@@ -20,16 +22,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body >
-        <Suspense fallback={null}>{children}</Suspense>
-       {/*  <Analytics /> */}
+        <Suspense fallback={<Loading />}>
+          <AuthProvider>
+            {children}
+          </AuthProvider>
+        </Suspense>
+         <Analytics />
       </body>
     </html>
   )
 }
-
-/* 
-import { GeistSans } from "geist/font/sans"
-import { GeistMono } from "geist/font/mono"
-
-className={`font-sans ${GeistSans.variable} ${GeistMono.variable}`}
-*/

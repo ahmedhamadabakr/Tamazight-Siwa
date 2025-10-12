@@ -2,11 +2,21 @@
 
 import { useState } from "react"
 import Link from "next/link"
+import { useSession, signOut } from "next-auth/react"
 import { Button } from "@/components/ui/button"
-import { Menu, X, Phone } from "lucide-react"
+import { Menu, X, Phone, User, LogOut } from "lucide-react"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const { data: session, status } = useSession()
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-background/95 backdrop-blur-sm border-b border-border">
@@ -37,6 +47,48 @@ export function Navigation() {
             <Link href="/contact" className="text-foreground hover:text-primary transition-colors">
               Contact
             </Link>
+
+            {/* Auth Section */}
+            {status === 'loading' ? (
+              <div className="w-8 h-8 bg-gray-200 rounded-full animate-pulse" />
+            ) : session ? (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="flex items-center space-x-2">
+                    <User className="w-4 h-4" />
+                    <span>{session.user?.name}</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuLabel>حسابي</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href="/dashboard">لوحة التحكم</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link href="/profile">الملف الشخصي</Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => signOut()}>
+                    <LogOut className="w-4 h-4 mr-2" />
+                    تسجيل الخروج
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            ) : (
+              <div className="flex items-center space-x-4">
+                <Link href="/login">
+                  <Button variant="ghost" className="text-foreground hover:text-primary">
+                    Login
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
+                    Register
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
 
           {/* Contact & Book Button */}
@@ -83,6 +135,45 @@ export function Navigation() {
               <Link href="/contact" className="text-foreground hover:text-primary transition-colors">
                 Contact
               </Link>
+
+              {/* Mobile Auth Section */}
+              {status === 'loading' ? (
+                <div className="w-full h-10 bg-gray-200 rounded animate-pulse" />
+              ) : session ? (
+                <div className="space-y-2">
+                  <div className="flex items-center space-x-2 p-2 bg-muted rounded">
+                    <User className="w-4 h-4" />
+                    <span className="text-sm">{session.user?.name}</span>
+                  </div>
+                  <Link href="/dashboard">
+                    <Button variant="outline" className="w-full">
+                      لوحة التحكم
+                    </Button>
+                  </Link>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => signOut()}
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    تسجيل الخروج
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex space-x-2">
+                  <Link href="/login" className="flex-1">
+                    <Button variant="outline" className="w-full">
+                      Login
+                    </Button>
+                  </Link>
+                  <Link href="/register" className="flex-1">
+                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                      Register
+                    </Button>
+                  </Link>
+                </div>
+              )}
+
               <div className="pt-4 border-t border-border">
                 <div className="flex items-center space-x-2 text-sm text-muted-foreground mb-4">
                   <Phone className="w-4 h-4" />
