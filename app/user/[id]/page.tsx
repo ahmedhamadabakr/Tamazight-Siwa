@@ -95,34 +95,42 @@ export default function UserDashboard({ params }: UserDashboardProps) {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    try {
-      const res = await fetch(`/api/users/${params.id}`, {
-        method: 'PUT',
-        headers: { 
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${session?.accessToken}`
-        },
-        body: JSON.stringify(formData),
-        
-      })
-      
-      const data = await res.json()
-      
-      if (data.success) {
-        setUser(data.data)
-        setEditMode(false)
-        // Force a refresh to get the latest data
-        router.refresh()
-        alert('تم تحديث الملف الشخصي بنجاح ✅')
-      } else {
-        alert(`خطأ في تحديث الملف الشخصي ❌: ${data.message || 'حدث خطأ غير معروف'}`)
-      }
-    } catch (err) {
-      console.error('Error updating profile:', err)
-      alert('حدث خطأ في تحديث الملف الشخصي. الرجاء المحاولة مرة أخرى لاحقاً.')
+  e.preventDefault()
+  try {
+    // Create a copy of formData without the email field
+    const { email, ...updateData } = formData;
+    
+    const res = await fetch(`/api/users/${params.id}`, {
+      method: 'PUT',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${session?.accessToken}`
+      },
+      body: JSON.stringify(updateData), // Only send name and phone
+    })
+    
+    const data = await res.json()
+    
+    if (data.success) {
+    setUser(prev => {
+  if (!prev) return null; // Handle the case where prev is null
+  return {
+    ...prev,
+    ...updateData,
+    email: prev.email // email is guaranteed to exist if prev is not null
+  };
+});
+      setEditMode(false)
+      router.refresh()
+      alert('تم تحديث الملف الشخصي بنجاح ✅')
+    } else {
+      alert(`خطأ في تحديث الملف الشخصي ❌: ${data.message || 'حدث خطأ غير معروف'}`)
     }
+  } catch (err) {
+    console.error('Error updating profile:', err)
+    alert('حدث خطأ في تحديث الملف الشخصي. الرجاء المحاولة مرة أخرى لاحقاً.')
   }
+}
 
   const cancelTrip = async (tripId: string) => {
     if (!confirm('Are you sure you want to cancel this trip?')) return
@@ -288,7 +296,7 @@ export default function UserDashboard({ params }: UserDashboardProps) {
                     </label>
                     <input
                       type="text"
-                      name="fullName"
+                      name="name"
                       value={formData.name}
                       onChange={handleInputChange}
                       required
