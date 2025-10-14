@@ -40,7 +40,7 @@ export default function RegisterPage() {
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError('كلمات المرور غير متطابقة');
+      setError('Passwords do not match');
       setLoading(false);
       return;
     }
@@ -61,57 +61,59 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (data.success) {
-        // Store registration data for verification step
         localStorage.setItem('registrationData', JSON.stringify({
           name: formData.fullName,
           email: formData.email,
           password: formData.password,
         }));
 
-        // Redirect to verification page
         const redirectUrl = `/verify-code?email=${encodeURIComponent(formData.email)}`;
         router.push(redirectUrl);
       } else {
-        setError(data.error || 'فشل في إرسال رمز التحقق');
+        setError(data.error || 'Failed to send verification code');
       }
     } catch (error) {
-      setError('حدث خطأ في الشبكة. يرجى المحاولة مرة أخرى');
+      setError('Network error. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-4 py-12">
       <div className="max-w-md w-full space-y-8">
+        {/* Logo + Title */}
         <div className="text-center">
-          <Link href="/" className="flex items-center justify-center space-x-2 mb-8">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-              <span className="text-primary-foreground font-bold text-lg">TS</span>
+          <Link href="/" className="flex items-center justify-center gap-2 mb-6">
+            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-md">
+              <span className="text-primary-foreground font-bold text-xl">TS</span>
             </div>
-            <span className="font-bold text-2xl text-foreground">Tamazight Siwa</span>
+            <span className="font-bold text-2xl text-foreground tracking-tight">Tamazight Siwa</span>
           </Link>
-          <h2 className="text-3xl font-bold text-gray-900">إنشاء حساب جديد</h2>
+
+          <h2 className="text-3xl font-extrabold text-gray-900">Create a new account</h2>
           <p className="mt-2 text-sm text-gray-600">
-            أو{' '}
-            <Link href="/login" className="font-medium text-primary hover:text-primary/80">
-              تسجيل الدخول لحساب موجود
+            Already have an account?{' '}
+            <Link href="/login" className="font-medium text-primary hover:underline">
+              Sign in
             </Link>
           </p>
         </div>
 
-        <Card>
+        {/* Register Card */}
+        <Card className="shadow-lg border border-gray-200">
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <UserPlus className="w-5 h-5" />
-              انضم إلينا اليوم
+            <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-800">
+              <UserPlus className="w-5 h-5 text-primary" />
+              Join us today
             </CardTitle>
             <CardDescription>
-              أنشئ حسابك وابدأ في استكشاف تجاربنا السياحية الفريدة
+              Create your account and start exploring our unique travel experiences
             </CardDescription>
           </CardHeader>
+
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
+            <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
                 <Alert variant="destructive">
                   <AlertDescription>{error}</AlertDescription>
@@ -124,8 +126,9 @@ export default function RegisterPage() {
                 </Alert>
               )}
 
+              {/* Full name */}
               <div>
-                <Label htmlFor="fullName">الاسم الكامل</Label>
+                <Label htmlFor="fullName">Full Name</Label>
                 <Input
                   id="fullName"
                   name="fullName"
@@ -133,13 +136,14 @@ export default function RegisterPage() {
                   value={formData.fullName}
                   onChange={handleChange}
                   required
-                  placeholder="أدخل اسمك الكامل"
+                  placeholder="Enter your full name"
                   className="mt-1"
                 />
               </div>
 
+              {/* Email */}
               <div>
-                <Label htmlFor="email">البريد الإلكتروني</Label>
+                <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   name="email"
@@ -147,13 +151,14 @@ export default function RegisterPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  placeholder="أدخل بريدك الإلكتروني"
+                  placeholder="Enter your email"
                   className="mt-1"
                 />
               </div>
 
+              {/* Phone */}
               <div>
-                <Label htmlFor="phone">رقم الهاتف</Label>
+                <Label htmlFor="phone">Phone Number</Label>
                 <Input
                   id="phone"
                   name="phone"
@@ -161,13 +166,14 @@ export default function RegisterPage() {
                   value={formData.phone}
                   onChange={handleChange}
                   required
-                  placeholder="أدخل رقم هاتفك"
+                  placeholder="Enter your phone number"
                   className="mt-1"
                 />
               </div>
 
+              {/* Password */}
               <div>
-                <Label htmlFor="password">كلمة المرور</Label>
+                <Label htmlFor="password">Password</Label>
                 <div className="relative mt-1">
                   <Input
                     id="password"
@@ -176,24 +182,26 @@ export default function RegisterPage() {
                     value={formData.password}
                     onChange={handleChange}
                     required
-                    placeholder="أدخل كلمة مرور قوية"
+                    placeholder="Enter a strong password"
                     minLength={6}
+                    className="pr-10"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
                 <p className="text-xs text-gray-500 mt-1">
-                  يجب أن تكون كلمة المرور 6 أحرف على الأقل
+                  Password must be at least 6 characters
                 </p>
               </div>
 
+              {/* Confirm Password */}
               <div>
-                <Label htmlFor="confirmPassword">تأكيد كلمة المرور</Label>
+                <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative mt-1">
                   <Input
                     id="confirmPassword"
@@ -202,38 +210,40 @@ export default function RegisterPage() {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     required
-                    placeholder="أعد إدخال كلمة المرور"
+                    placeholder="Re-enter your password"
                     minLength={6}
+                    className="pr-10"
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
+              {/* Submit Button */}
               <Button
                 type="submit"
-                className="w-full"
+                className="w-full font-semibold text-base"
                 disabled={loading}
               >
-                {loading ? 'جاري إنشاء الحساب...' : 'إنشاء الحساب'}
+                {loading ? 'Creating account...' : 'Create Account'}
               </Button>
             </form>
 
             <div className="mt-6 text-center text-sm text-gray-600">
               <p>
-                بالضغط على "إنشاء الحساب" أنت توافق على{' '}
-                <Link href="/terms" className="text-primary hover:text-primary/80">
-                  الشروط والأحكام
+                By clicking “Create Account”, you agree to our{' '}
+                <Link href="/terms" className="text-primary hover:underline">
+                  Terms of Service
                 </Link>{' '}
-                و{' '}
-                <Link href="/privacy" className="text-primary hover:text-primary/80">
-                  سياسة الخصوصية
-                </Link>
+                and{' '}
+                <Link href="/privacy" className="text-primary hover:underline">
+                  Privacy Policy
+                </Link>.
               </p>
             </div>
           </CardContent>
