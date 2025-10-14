@@ -7,7 +7,7 @@ import bcrypt from "bcryptjs"
 // Type alias for NextAuth configuration
 type NextAuthOptions = {
   providers: any[]
-  session?: { strategy: string }
+  session?: { strategy: "jwt" | "database" }
   callbacks?: any
   pages?: { signIn?: string }
 }
@@ -54,7 +54,8 @@ export async function getAuthOptions(): Promise<NextAuthOptions> {
             return {
               id: user._id.toString(),
               email: user.email,
-              name: user.name,
+              name: user.fullName || user.name, // Use fullName if available, fallback to name
+              image: user.image || null, // Include user image
               role: 'user',
             }
           } catch (error) {
@@ -71,6 +72,7 @@ export async function getAuthOptions(): Promise<NextAuthOptions> {
       async jwt({ token, user }: { token: JWT; user?: any }): Promise<JWT> {
         if (user) {
           token.role = user.role
+          token.image = user.image // Include user image in JWT
         }
         return token
       },
@@ -78,6 +80,7 @@ export async function getAuthOptions(): Promise<NextAuthOptions> {
         if (token && session.user) {
           (session.user as any).id = token.sub!
           ;(session.user as any).role = token.role
+          ;(session.user as any).image = token.image // Include user image in session
         }
         return session
       },

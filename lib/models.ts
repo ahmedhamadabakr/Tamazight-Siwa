@@ -5,8 +5,11 @@ import dbConnect from './mongodb';
 export interface IUser {
   _id?: ObjectId;
   name: string;
+  fullName?: string; // Added full name field for profile display
   email: string;
   password: string;
+  image?: string; // Added profile image field
+  phone?: string;
   emailVerified?: Date;
   isActive: boolean;
   createdAt?: Date;
@@ -48,6 +51,7 @@ export class Database {
     const now = new Date();
     const user: IUser = {
       ...userData,
+      fullName: userData.fullName || userData.name, // Use fullName if provided, otherwise use name
       createdAt: now,
       updatedAt: now,
       role: userData.role || "user", // Default role to 'user'
@@ -75,6 +79,16 @@ export class Database {
       { returnDocument: 'after' }
     );
     return result.value;
+  }
+
+  // Migration function to add fullName field for existing users
+  async migrateUsersAddFullName(): Promise<void> {
+    const db = await this.db;
+    // Update users who don't have fullName field to use name as fullName
+    await db.collection('users').updateMany(
+      { fullName: { $exists: false } },
+      { $set: { fullName: '$name', updatedAt: new Date() } }
+    );
   }
 
   // VerificationToken operations

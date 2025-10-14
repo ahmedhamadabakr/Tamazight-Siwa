@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth'
+import { getServerSession } from 'next-auth/next'
 import { getAuthOptions } from '@/lib/auth'
 import { getMongoClient } from '@/lib/mongodb'
 import { ObjectId } from 'mongodb'
@@ -7,7 +7,7 @@ import { bookingCollectionName } from '@/models/Booking'
 
 export async function POST(req: Request) {
   try {
-    const session = await getServerSession(getAuthOptions())
+    const session = await getServerSession(await getAuthOptions()) as any
     
     if (!session?.user?.id) {
       return NextResponse.json(

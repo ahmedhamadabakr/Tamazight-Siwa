@@ -8,9 +8,9 @@ import { motion } from 'framer-motion'
 
 interface User {
   _id: string
-  fullName: string
+  name: string
   email: string
-  phone: string
+  phone?: string
   role: string
   status: string
   createdAt: string
@@ -44,14 +44,15 @@ export default function UserDashboard({ params }: UserDashboardProps) {
   const [loading, setLoading] = useState(true)
   const [editMode, setEditMode] = useState(false)
   const [formData, setFormData] = useState({
-    fullName: '',
+    name: '',
     email: '',
     phone: '',
   })
 
   useEffect(() => {
-    if (status === 'unauthenticated') router.push('/login')
-    else if (status === 'authenticated' && userId) {
+    if (status === 'unauthenticated') {
+      router.push('/login')
+    } else if (status === 'authenticated' && userId) {
       fetchUserData(userId)
       fetchUserTrips(userId)
     }
@@ -64,7 +65,7 @@ export default function UserDashboard({ params }: UserDashboardProps) {
       if (data.success) {
         setUser(data.data)
         setFormData({
-          fullName: data.data.fullName,
+          name: data.data.name,
           email: data.data.email,
           phone: data.data.phone || '',
         })
@@ -80,7 +81,9 @@ export default function UserDashboard({ params }: UserDashboardProps) {
     try {
       const res = await fetch(`/api/bookings/user/${userId}`)
       const data = await res.json()
-      if (data.success) setTrips(data.data || [])
+      if (data.success) {
+        setTrips(data.data || [])
+      }
     } catch (err) {
       console.error(err)
     }
@@ -94,26 +97,35 @@ export default function UserDashboard({ params }: UserDashboardProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     try {
-      const res = await fetch('/api/users/me', {
+      const res = await fetch(`/api/users/${params.id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session?.accessToken}`
+        },
         body: JSON.stringify(formData),
+        
       })
+      
       const data = await res.json()
+      
       if (data.success) {
         setUser(data.data)
         setEditMode(false)
-        alert('تم تحديث البيانات بنجاح ✅')
+        // Force a refresh to get the latest data
+        router.refresh()
+        alert('تم تحديث الملف الشخصي بنجاح ✅')
       } else {
-        alert('حدث خطأ أثناء تحديث البيانات ❌')
+        alert(`خطأ في تحديث الملف الشخصي ❌: ${data.message || 'حدث خطأ غير معروف'}`)
       }
     } catch (err) {
-      console.error(err)
+      console.error('Error updating profile:', err)
+      alert('حدث خطأ في تحديث الملف الشخصي. الرجاء المحاولة مرة أخرى لاحقاً.')
     }
   }
 
   const cancelTrip = async (tripId: string) => {
-    if (!confirm('هل أنت متأكد من إلغاء هذه الرحلة؟')) return
+    if (!confirm('Are you sure you want to cancel this trip?')) return
     try {
       const res = await fetch(`/api/bookings/${tripId}`, {
         method: 'PUT',
@@ -123,8 +135,10 @@ export default function UserDashboard({ params }: UserDashboardProps) {
       const data = await res.json()
       if (data.success) {
         fetchUserTrips(userId)
-        alert('تم إلغاء الرحلة بنجاح ✅')
-      } else alert('حدث خطأ أثناء إلغاء الحجز ❌')
+        alert('Trip cancelled successfully ✅')
+      } else {
+        alert('Error cancelling the trip ❌')
+      }
     } catch (err) {
       console.error(err)
     }
@@ -137,14 +151,12 @@ export default function UserDashboard({ params }: UserDashboardProps) {
       completed: 'bg-blue-100 text-blue-800',
       cancelled: 'bg-red-100 text-red-800',
     }
-
     const labelMap: Record<string, string> = {
-      pending: 'قيد الانتظار',
-      confirmed: 'مؤكد',
-      completed: 'مكتمل',
-      cancelled: 'ملغي',
+      pending: 'Pending',
+      confirmed: 'Confirmed',
+      completed: 'Completed',
+      cancelled: 'Cancelled',
     }
-
     return (
       <span
         className={`px-2 py-1 text-xs font-medium rounded-full ${colorMap[status]}`}
@@ -154,71 +166,72 @@ export default function UserDashboard({ params }: UserDashboardProps) {
     )
   }
 
-  if (loading)
+  if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500" />
       </div>
     )
+  }
 
-  if (!user)
+  if (!user) {
     return (
       <div className="text-center py-10">
         <h2 className="text-xl font-semibold text-gray-700">
-          حدث خطأ في تحميل البيانات
+          Error loading data
         </h2>
         <button
           onClick={() => window.location.reload()}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 text-sm"
         >
-          إعادة تحميل الصفحة
+          Reload Page
         </button>
       </div>
     )
+  }
 
-  const getInitial = () => user?.fullName?.charAt(0).toUpperCase() || 'U'
+  const getInitial = () => user?.name?.charAt(0)?.toUpperCase() || ''
+
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-6">
         {/* Sidebar */}
-        <div className="w-full md:w-64 bg-white rounded-2xl shadow p-4 border border-gray-100">
+        <div className="w-full md:w-64 bg-white rounded-2xl shadow border border-gray-200 p-5">
           <div className="text-center mb-6">
-            <div className="w-24 h-24 mx-auto bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-3xl font-semibold mb-3">
+            <div className="w-20 h-20 mx-auto bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-3xl font-semibold mb-3">
               {getInitial()}
             </div>
-            <h3 className="font-semibold text-lg">{user.fullName}</h3>
+            <h3 className="font-semibold text-lg text-gray-800">{user.  name}</h3>
             <p className="text-gray-500 text-sm">{user.email}</p>
           </div>
 
           <div className="space-y-2">
             <button
               onClick={() => setActiveTab('profile')}
-              className={`flex items-center justify-end gap-2 w-full px-4 py-2 rounded-md text-sm font-medium transition ${
+              className={`flex items-center justify-start gap-2 w-full px-4 py-2 rounded-md text-sm font-medium transition ${
                 activeTab === 'profile'
                   ? 'bg-blue-100 text-blue-700 font-semibold'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
               }`}
             >
-              الملف الشخصي <User size={16} />
+              <User size={18} /> Profile
             </button>
-
             <button
               onClick={() => setActiveTab('trips')}
-              className={`flex items-center justify-end gap-2 w-full px-4 py-2 rounded-md text-sm font-medium transition ${
+              className={`flex items-center justify-start gap-2 w-full px-4 py-2 rounded-md text-sm font-medium transition ${
                 activeTab === 'trips'
                   ? 'bg-blue-100 text-blue-700 font-semibold'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
               }`}
             >
-              رحلاتي <Plane size={16} />
+              <Plane size={18} /> My Trips
             </button>
-
             <button
               onClick={() => signOut({ callbackUrl: '/' })}
-              className="flex items-center justify-end gap-2 w-full px-4 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 transition"
+              className="flex items-center justify-start gap-2 w-full px-4 py-2 rounded-md text-sm font-medium text-red-600 hover:bg-red-50 transition"
             >
-              تسجيل الخروج <LogOut size={16} />
+              <LogOut size={18} /> Logout
             </button>
           </div>
         </div>
@@ -229,20 +242,18 @@ export default function UserDashboard({ params }: UserDashboardProps) {
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="flex-1 bg-white rounded-2xl shadow p-6 border border-gray-100"
+          className="flex-1 bg-white rounded-2xl shadow border border-gray-200 p-6"
         >
           {activeTab === 'profile' && (
             <>
               <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-semibold text-gray-800">
-                  الملف الشخصي
-                </h2>
+                <h2 className="text-xl font-semibold text-gray-800">Profile</h2>
                 {!editMode ? (
                   <button
                     onClick={() => setEditMode(true)}
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm"
                   >
-                    تعديل
+                    Edit
                   </button>
                 ) : (
                   <div className="flex gap-2">
@@ -250,20 +261,20 @@ export default function UserDashboard({ params }: UserDashboardProps) {
                       onClick={handleSubmit}
                       className="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-md text-sm"
                     >
-                      حفظ
+                      Save
                     </button>
                     <button
                       onClick={() => {
                         setEditMode(false)
                         setFormData({
-                          fullName: user.fullName,
+                          name: user.name,
                           email: user.email,
                           phone: user.phone || '',
                         })
                       }}
                       className="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 rounded-md text-sm"
                     >
-                      إلغاء
+                      Cancel
                     </button>
                   </div>
                 )}
@@ -273,12 +284,12 @@ export default function UserDashboard({ params }: UserDashboardProps) {
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      الاسم الكامل
+                      Full Name
                     </label>
                     <input
                       type="text"
                       name="fullName"
-                      value={formData.fullName}
+                      value={formData.name}
                       onChange={handleInputChange}
                       required
                       className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
@@ -286,7 +297,7 @@ export default function UserDashboard({ params }: UserDashboardProps) {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      البريد الإلكتروني
+                      Email
                     </label>
                     <input
                       type="email"
@@ -299,7 +310,7 @@ export default function UserDashboard({ params }: UserDashboardProps) {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      رقم الهاتف
+                      Phone
                     </label>
                     <input
                       type="tel"
@@ -311,25 +322,25 @@ export default function UserDashboard({ params }: UserDashboardProps) {
                   </div>
                 </form>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-5">
                   <div>
-                    <p className="text-sm text-gray-500">الاسم الكامل</p>
-                    <p className="text-gray-800 font-medium">{user.fullName}</p>
+                    <p className="text-sm text-gray-500">Full Name</p>
+                    <p className="text-gray-800 font-medium">{user.name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">البريد الإلكتروني</p>
+                    <p className="text-sm text-gray-500">Email</p>
                     <p className="text-gray-800 font-medium">{user.email}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">رقم الهاتف</p>
+                    <p className="text-sm text-gray-500">Phone</p>
                     <p className="text-gray-800 font-medium">
-                      {user.phone || 'غير مضبوط'}
+                      {user.phone || 'Not set'}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">تاريخ التسجيل</p>
+                    <p className="text-sm text-gray-500">Joined On</p>
                     <p className="text-gray-800 font-medium">
-                      {new Date(user.createdAt).toLocaleDateString('ar-EG')}
+                      {new Date(user.createdAt).toLocaleDateString('en-US')}
                     </p>
                   </div>
                 </div>
@@ -339,30 +350,28 @@ export default function UserDashboard({ params }: UserDashboardProps) {
 
           {activeTab === 'trips' && (
             <>
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
-                رحلاتي
-              </h2>
+              <h2 className="text-xl font-semibold text-gray-800 mb-4">My Trips</h2>
               {trips.length === 0 ? (
                 <div className="text-center py-10">
-                  <p className="text-gray-500 mb-4">لا توجد رحلات بعد</p>
+                  <p className="text-gray-500 mb-4">No trips yet</p>
                   <button
                     onClick={() => router.push('/tours')}
                     className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm"
                   >
-                    تصفح الرحلات
+                    Browse Trips
                   </button>
                 </div>
               ) : (
-                <div className="overflow-x-auto rounded-lg border border-gray-100">
-                  <table className="min-w-full text-sm text-right">
+                <div className="overflow-x-auto rounded-lg border border-gray-200">
+                  <table className="min-w-full text-sm text-left">
                     <thead className="bg-gray-100 text-gray-700">
                       <tr>
-                        <th className="px-6 py-3">الوجهة</th>
-                        <th className="px-6 py-3">تاريخ الحجز</th>
-                        <th className="px-6 py-3">الفترة</th>
-                        <th className="px-6 py-3">السعر</th>
-                        <th className="px-6 py-3">الحالة</th>
-                        <th className="px-6 py-3">إجراءات</th>
+                        <th className="px-6 py-3">Destination</th>
+                        <th className="px-6 py-3">Booking Date</th>
+                        <th className="px-6 py-3">Duration</th>
+                        <th className="px-6 py-3">Price</th>
+                        <th className="px-6 py-3">Status</th>
+                        <th className="px-6 py-3">Actions</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
@@ -375,38 +384,28 @@ export default function UserDashboard({ params }: UserDashboardProps) {
                         >
                           <td className="px-6 py-3">{trip.destination}</td>
                           <td className="px-6 py-3">
-                            {new Date(trip.bookingDate).toLocaleDateString(
-                              'ar-EG'
-                            )}
+                            {new Date(trip.bookingDate).toLocaleDateString('en-US')}
                           </td>
                           <td className="px-6 py-3">
-                            {new Date(trip.startDate).toLocaleDateString(
-                              'ar-EG'
-                            )}{' '}
-                            -{' '}
-                            {new Date(trip.endDate).toLocaleDateString('ar-EG')}
+                            {new Date(trip.startDate).toLocaleDateString('en-US')} -{' '}
+                            {new Date(trip.endDate).toLocaleDateString('en-US')}
                           </td>
-                          <td className="px-6 py-3">{trip.price} ج.م</td>
-                          <td className="px-6 py-3">
-                            {getStatusBadge(trip.status)}
-                          </td>
-                          <td className="px-6 py-3 text-sm">
-                            {trip.status === 'pending' ||
-                            trip.status === 'confirmed' ? (
+                          <td className="px-6 py-3">${trip.price}</td>
+                          <td className="px-6 py-3">{getStatusBadge(trip.status)}</td>
+                          <td className="px-6 py-3 text-sm space-x-2">
+                            {(trip.status === 'pending' || trip.status === 'confirmed') && (
                               <button
                                 onClick={() => cancelTrip(trip._id)}
-                                className="text-red-600 hover:text-red-900 mr-3"
+                                className="text-red-600 hover:text-red-900"
                               >
-                                إلغاء
+                                Cancel
                               </button>
-                            ) : null}
+                            )}
                             <button
-                              onClick={() =>
-                                router.push(`/bookings/${trip._id}`)
-                              }
+                              onClick={() => router.push(`/bookings/${trip._id}`)}
                               className="text-blue-600 hover:text-blue-900"
                             >
-                              التفاصيل
+                              Details
                             </button>
                           </td>
                         </tr>
