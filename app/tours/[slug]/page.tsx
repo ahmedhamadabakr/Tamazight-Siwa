@@ -4,11 +4,26 @@ import { useParams } from "next/navigation"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
-import { Clock, Users, Star } from "lucide-react"
+import { Clock, Users, Star, User } from "lucide-react"
 import Link from "next/link"
 import { tours } from "@/app/data/tours"   // ✅ نفس المصدر
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import { useSession } from "next-auth/react"
+import { BookingForm } from '@/components/BookingForm'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
+
+// Inside your component
 
 export default function TourDetailsPage() {
+  const [isBookingOpen, setIsBookingOpen] = useState(false)
+  const router = useRouter()
+  const session = useSession()
   const { slug } = useParams()
   const tour = tours.find((t) => t.title.toLowerCase().replace(/\s+/g, "-") === slug)
 
@@ -48,7 +63,37 @@ export default function TourDetailsPage() {
           <div className="w-full md:w-72 p-6 border rounded-lg shadow-md bg-card">
             <div className="text-3xl font-bold text-primary mb-2">{tour.price}</div>
             <p className="text-muted-foreground mb-6">per person</p>
-            <Button className="w-full mb-3">Book Now</Button>
+       <>
+  <Button 
+    className="w-full mb-3"
+    onClick={() => {
+      if (!session) {
+        router.push(`/login?callbackUrl=/tours/${slug}`)
+        return
+      }
+      setIsBookingOpen(true)
+    }}
+  >
+    <User className="ml-2 h-4 w-4" />
+    احجز الآن
+  </Button>
+
+  <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
+    <DialogContent className="sm:max-w-[425px] rtl">
+      <DialogHeader>
+        <DialogTitle>حجز الرحلة</DialogTitle>
+      </DialogHeader>
+      <BookingForm 
+        tourId={tour.id}
+        price={parseFloat(tour.price.replace(/[^0-9.]/g, ''))}
+        onSuccess={() => {
+          setIsBookingOpen(false)
+          router.push(`/user/${session?.data?.user?.id}`)
+        }}
+      />
+    </DialogContent>
+  </Dialog>
+</>
             <Link href="/contact">
               <Button variant="outline" className="w-full">Contact Us</Button>
             </Link>

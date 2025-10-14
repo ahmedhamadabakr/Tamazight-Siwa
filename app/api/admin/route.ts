@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
 
     // Build query for admins only
     const query: any = {
-      role: { $in: ['مدير عام', 'مدير'] }
+      role: { $in: ['manager', 'admin'] }
     };
 
     if (search) {

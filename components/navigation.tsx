@@ -85,7 +85,7 @@ export function Navigation() {
                       <Link href={`/dashboard/${typedSession?.user?.id}/user`} className="w-full cursor-pointer">لوحة التحكم</Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
-                      <Link href={`/dashboard/${typedSession?.user?.id}/user/profile`} className="w-full cursor-pointer">الملف الشخصي</Link>
+                      <Link href={`/user/${typedSession?.user?.id}/`} className="w-full cursor-pointer">الملف الشخصي</Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={() => signOut()} className="cursor-pointer">

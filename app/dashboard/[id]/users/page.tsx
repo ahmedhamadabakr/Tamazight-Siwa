@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/sidebar';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 interface User {
   _id: string;
@@ -20,9 +22,24 @@ export default function Users() {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
 
+  const { data: session, status: sessionStatus } = useSession();
+  const router = useRouter();
+
   useEffect(() => {
     fetchUsers();
   }, []);
+
+
+useEffect(() => {
+    if (sessionStatus === 'loading') return; // Wait for session to load
+
+    if (!session || session.user?.role !== 'manager') {
+      // Redirect to home or an unauthorized page
+      router.push('/');
+    } else {
+      fetchUsers();
+    }
+  }, [sessionStatus, session, router]);
 
   const fetchUsers = async () => {
     try {

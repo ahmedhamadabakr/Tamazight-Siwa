@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/sidebar';
-
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 interface Admin {
   _id: string;
   fullName: string;
@@ -18,30 +19,23 @@ export default function Admins() {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
-  const [userRole, setUserRole] = useState('');
+  const { data: session, status: sessionStatus } = useSession();
+  const router = useRouter();
 
   useEffect(() => {
-    checkUserPermission();
     fetchAdmins();
   }, []);
+useEffect(() => {
+    if (sessionStatus === 'loading') return; // Wait for session to load
 
-  const checkUserPermission = async () => {
-    try {
-      // Check if current user is a general manager
-      const role = localStorage.getItem('userRole') || 'user';
-      setUserRole(role);
-      
-      // If not a general manager, redirect or show error
-      if (role !== 'مدير عام') {
-        alert('ليس لديك صلاحية للوصول إلى هذه الصفحة');
-        window.location.href = '/dashboard';
-        return;
-      }
-    } catch (error) {
-      console.error('Error checking permissions:', error);
-      window.location.href = '/dashboard';
+    if (!session || session.user?.role !== 'manager') {
+      // Redirect to home or an unauthorized page
+      router.push('/');
+    } else {
+      fetchAdmins();
     }
-  };
+  }, [sessionStatus, session, router]);
+
 
   const fetchAdmins = async () => {
     try {
@@ -210,9 +204,9 @@ export default function Admins() {
                     <td className="px-6 py-4">{admin.email}</td>
                     <td className="px-6 py-4">
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                        admin.role === 'مدير عام'
+                        admin.role === 'manager'
                           ? 'bg-purple-100 text-purple-800'
-                          : admin.role === 'مدير'
+                          : admin.role === 'admin'
                           ? 'bg-blue-100 text-blue-800'
                           : 'bg-green-100 text-green-800'
                       }`}>

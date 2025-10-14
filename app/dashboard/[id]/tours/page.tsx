@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/sidebar';
 import { Tour } from '@/types/tour';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 export default function Tours() {
     const [tours, setTours] = useState<Tour[]>([]);
@@ -10,11 +12,24 @@ export default function Tours() {
     const [searchTerm, setSearchTerm] = useState('');
     const [showAddModal, setShowAddModal] = useState(false);
     const [editingTour, setEditingTour] = useState<Tour | null>(null);
+      const { data: session, status: sessionStatus } = useSession();
+    const router = useRouter();
 
     useEffect(() => {
         fetchTours();
     }, []);
 
+useEffect(() => {
+    if (sessionStatus === 'loading') return; // Wait for session to load
+
+    if (!session || session.user?.role !== 'manager') {
+      // Redirect to home or an unauthorized page
+      router.push('/');
+    } else {
+      fetchTours();
+    }
+  }, [sessionStatus, session, router]);
+    
     const fetchTours = async () => {
         try {
             const response = await fetch(`/api/tours?title=${searchTerm}`);
