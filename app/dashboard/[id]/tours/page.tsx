@@ -5,12 +5,12 @@ import { DashboardLayout } from '@/components/dashboard/sidebar';
 import { Tour } from '@/types/tour';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Tours() {
     const [tours, setTours] = useState<Tour[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
-    const [showAddModal, setShowAddModal] = useState(false);
     const [editingTour, setEditingTour] = useState<Tour | null>(null);
       const { data: session, status: sessionStatus } = useSession();
     const router = useRouter();
@@ -108,12 +108,12 @@ useEffect(() => {
         <div className="p-6">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold">إدارة الرحلات السياحية</h1>
-                <button
-                    onClick={() => setShowAddModal(true)}
+                <Link
+                    href={`/dashboard/${session?.user?.id}/tours/new-trip`}
                     className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
                 >
                     إضافة رحلة جديدة
-                </button>
+                </Link>
             </div>
 
             {/* Statistics Cards */}
@@ -171,7 +171,7 @@ useEffect(() => {
                                     {tour.images && tour.images.length > 0 ? (
                                         <img
                                             src={tour.images[0]}
-                                            alt={tour.titleAr}
+                                            alt={tour.title}
                                             className="w-16 h-12 object-cover rounded"
                                         />
                                     ) : (
@@ -182,8 +182,8 @@ useEffect(() => {
                                 </td>
                                 <td className="px-6 py-4">
                                     <div>
-                                        <div className="font-medium">{tour.titleAr}</div>
-                                        <div className="text-sm text-gray-500">{tour.titleEn}</div>
+                                        <div className="font-medium">{tour.title}</div>
+                                        <div className="text-sm text-gray-500">{tour.title}</div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4">{tour.category}</td>
@@ -241,12 +241,7 @@ useEffect(() => {
             </div>
 
             {/* Add/Edit Modal would go here */}
-            {showAddModal && (
-                <AddTourModal
-                    onClose={() => setShowAddModal(false)}
-                    onSuccess={refreshTours}
-                />
-            )}
+          
 
             {editingTour && (
                 <EditTourModal
@@ -258,261 +253,15 @@ useEffect(() => {
         </div>
         </DashboardLayout>
     );
-}
 
-// Add Tour Modal Component
-function AddTourModal({ onClose, onSuccess }: { onClose: () => void; onSuccess: () => void }) {
-    const [formData, setFormData] = useState({
-        titleAr: '',
-        titleEn: '',
-        descriptionAr: '',
-        descriptionEn: '',
-        duration: '',
-        price: '',
-        location: '',
-        category: '',
-        featured: false,
-    });
-    const [images, setImages] = useState<string[]>([]);
-    const [uploading, setUploading] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        try {
-            const response = await fetch('/api/tours', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ ...formData, images }),
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                onSuccess();
-                onClose();
-            } else {
-                alert(data.error || 'فشل في إضافة الرحلة');
-            }
-        } catch (error) {
-            console.error('Error adding tour:', error);
-            alert('فشل في إضافة الرحلة');
-        }
-    };
-
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        setUploading(true);
-        try {
-            const uploadFormData = new FormData();
-            uploadFormData.append('image', file);
-
-            const response = await fetch('/api/tours/upload', {
-                method: 'POST',
-                body: uploadFormData,
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                setImages(prev => [...prev, data.data.url]);
-            } else {
-                alert(data.error || 'فشل في رفع الصورة');
-            }
-        } catch (error) {
-            console.error('Error uploading image:', error);
-            alert('فشل في رفع الصورة');
-        } finally {
-            setUploading(false);
-        }
-    };
-
-    const removeImage = (index: number) => {
-        setImages(prev => prev.filter((_, i) => i !== index));
-    };
-
-    return (
-        <DashboardLayout>
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <h2 className="text-xl font-bold mb-4">إضافة رحلة جديدة</h2>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">العنوان بالعربية</label>
-                            <input
-                                type="text"
-                                value={formData.titleAr}
-                                onChange={(e) => setFormData({ ...formData, titleAr: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">العنوان بالإنجليزية</label>
-                            <input
-                                type="text"
-                                value={formData.titleEn}
-                                onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">الوصف بالعربية</label>
-                            <textarea
-                                value={formData.descriptionAr}
-                                onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                rows={3}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">الوصف بالإنجليزية</label>
-                            <textarea
-                                value={formData.descriptionEn}
-                                onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                rows={3}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">المدة</label>
-                            <input
-                                type="text"
-                                value={formData.duration}
-                                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                placeholder="مثال: 3 أيام"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">السعر</label>
-                            <input
-                                type="number"
-                                value={formData.price}
-                                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">الموقع</label>
-                            <input
-                                type="text"
-                                value={formData.location}
-                                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">الفئة</label>
-                            <select
-                                value={formData.category}
-                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                required
-                            >
-                                <option value="">اختر الفئة</option>
-                                <option value="مغامرات">مغامرات</option>
-                                <option value="ثقافي">ثقافي</option>
-                                <option value="طبيعي">طبيعي</option>
-                                <option value="شاطئي">شاطئي</option>
-                                <option value="تاريخي">تاريخي</option>
-                            </select>
-                        </div>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                id="featured"
-                                checked={formData.featured}
-                                onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                                className="mr-2"
-                            />
-                            <label htmlFor="featured" className="text-sm font-medium">رحلة مميزة</label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">صور الرحلة</label>
-                        <div className="space-y-4">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                                disabled={uploading}
-                                className="w-full p-2 border rounded"
-                            />
-                            {uploading && <p className="text-blue-600">جاري رفع الصورة...</p>}
-
-                            {images.length > 0 && (
-                                <div className="grid grid-cols-3 gap-4 mt-4">
-                                    {images.map((image, index) => (
-                                        <div key={index} className="relative group">
-                                            <img
-                                                src={image}
-                                                alt={`صورة ${index + 1}`}
-                                                className="w-full h-24 object-cover rounded border"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => removeImage(index)}
-                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="flex justify-end space-x-2">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 text-gray-600 border rounded hover:bg-gray-50"
-                        >
-                            إلغاء
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                        >
-                            إضافة الرحلة
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-        </DashboardLayout>  
-    );
+   
 }
 
 // Edit Tour Modal Component
 function EditTourModal({ tour, onClose, onSuccess }: { tour: Tour; onClose: () => void; onSuccess: () => void }) {
     const [formData, setFormData] = useState({
-        titleAr: tour.titleAr,
-        titleEn: tour.titleEn,
-        descriptionAr: tour.descriptionAr,
-        descriptionEn: tour.descriptionEn,
+        title: tour.title,
+        description: tour.description,
         duration: tour.duration,
         price: tour.price.toString(),
         location: tour.location,
@@ -592,8 +341,8 @@ function EditTourModal({ tour, onClose, onSuccess }: { tour: Tour; onClose: () =
                             <label className="block text-sm font-medium mb-1">العنوان بالعربية</label>
                             <input
                                 type="text"
-                                value={formData.titleAr}
-                                onChange={(e) => setFormData({ ...formData, titleAr: e.target.value })}
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 className="w-full p-2 border rounded"
                                 required
                             />
@@ -602,8 +351,8 @@ function EditTourModal({ tour, onClose, onSuccess }: { tour: Tour; onClose: () =
                             <label className="block text-sm font-medium mb-1">العنوان بالإنجليزية</label>
                             <input
                                 type="text"
-                                value={formData.titleEn}
-                                onChange={(e) => setFormData({ ...formData, titleEn: e.target.value })}
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                                 className="w-full p-2 border rounded"
                                 required
                             />
@@ -614,8 +363,8 @@ function EditTourModal({ tour, onClose, onSuccess }: { tour: Tour; onClose: () =
                         <div>
                             <label className="block text-sm font-medium mb-1">الوصف بالعربية</label>
                             <textarea
-                                value={formData.descriptionAr}
-                                onChange={(e) => setFormData({ ...formData, descriptionAr: e.target.value })}
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 className="w-full p-2 border rounded"
                                 rows={3}
                                 required
@@ -624,8 +373,8 @@ function EditTourModal({ tour, onClose, onSuccess }: { tour: Tour; onClose: () =
                         <div>
                             <label className="block text-sm font-medium mb-1">الوصف بالإنجليزية</label>
                             <textarea
-                                value={formData.descriptionEn}
-                                onChange={(e) => setFormData({ ...formData, descriptionEn: e.target.value })}
+                                value={formData.description}
+                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 className="w-full p-2 border rounded"
                                 rows={3}
                                 required

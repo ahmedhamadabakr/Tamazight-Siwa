@@ -1,10 +1,39 @@
+"use client"
 import { Card, CardContent } from "@/components/ui/card"
 import { MapPin, Clock, Users } from "lucide-react"
-import { tours } from "@/app/data/tours"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { useEffect, useState } from "react"
+
+interface Tour {
+  id: string;
+  title: string;
+  description: string;
+  duration: string;
+  groupSize: string;
+  location: string;
+  image: string;
+}
 
 export function FeaturedTours() {
+
+const [tours, setTours] = useState<Tour[]>([]);
+
+useEffect(() => {
+    fetchTours();
+}, []);
+
+const fetchTours = async () => {
+    try {
+        const response = await fetch(`/api/tours`);
+        const data = await response.json();
+        if (data.success) {
+            setTours(data.data || []);
+        }
+    } catch (error) {
+        console.error('Error fetching tours:', error);
+    }
+};
 
   const firstFourItems = tours.slice(0, 4);
   return (

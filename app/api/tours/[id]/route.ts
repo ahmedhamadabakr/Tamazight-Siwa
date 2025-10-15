@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
+import { title } from 'process';
 
 // GET a single tour by ID
 export async function GET(
@@ -10,15 +11,20 @@ export async function GET(
   try {
     const db = await dbConnect();
     const { id } = params;
-
-    if (!ObjectId.isValid(id)) {
-      return NextResponse.json(
-        { success: false, error: 'معرف الرحلة غير صالح' },
-        { status: 400 }
-      );
+    
+    let query: any = {};
+    
+    // Check if the ID is a valid MongoDB ObjectId
+    if (ObjectId.isValid(id)) {
+      query._id = new ObjectId(id);
+    } else {
+      // If not a valid ObjectId, search by slug
+      query.slug = id;
     }
 
-    const tour = await db.collection('tours').findOne({ _id: new ObjectId(id) });
+    console.log('Searching for tour with query:', JSON.stringify(query));
+    const tour = await db.collection('tours').findOne(query);
+    console.log('Found tour:', tour);
 
     if (!tour) {
       return NextResponse.json(
@@ -55,10 +61,8 @@ export async function PUT(
     }
 
     const {
-      titleAr,
-      titleEn,
-      descriptionAr,
-      descriptionEn,
+      title,
+      description,
       duration,
       price,
       location,
@@ -69,7 +73,7 @@ export async function PUT(
     } = body;
 
     // Basic validation
-    if (!titleAr || !titleEn || !descriptionAr || !descriptionEn || !duration || !price || !location || !category) {
+    if (!title || !description || !duration || !price || !location || !category) {
       return NextResponse.json(
         { success: false, error: 'جميع الحقول مطلوبة' },
         { status: 400 }
@@ -77,10 +81,8 @@ export async function PUT(
     }
 
     const updateData = {
-      titleAr,
-      titleEn,
-      descriptionAr,
-      descriptionEn,
+      title,
+      description,
       duration,
       price: Number(price),
       location,

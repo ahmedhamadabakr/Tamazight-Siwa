@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
+import { title } from 'process';
 
 // GET all tours or search by name
 export async function GET(request: NextRequest) {
@@ -52,10 +53,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
 
     const {
-      titleAr,
-      titleEn,
-      descriptionAr,
-      descriptionEn,
+      title,
+      description,
       duration,
       price,
       location,
@@ -66,7 +65,7 @@ export async function POST(request: NextRequest) {
     } = body;
 
     // Basic validation
-    if (!titleAr || !titleEn || !descriptionAr || !descriptionEn || !duration || !price || !location || !category) {
+    if (!title || !description || !duration || !price || !location || !category) {
       return NextResponse.json(
         { success: false, error: 'جميع الحقول مطلوبة' },
         { status: 400 }
@@ -74,10 +73,8 @@ export async function POST(request: NextRequest) {
     }
 
     const tourData = {
-      titleAr,
-      titleEn,
-      descriptionAr,
-      descriptionEn,
+      title,
+      description,
       duration,
       price: Number(price),
       location,

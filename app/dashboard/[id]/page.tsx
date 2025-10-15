@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/sidebar';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Analytics from '@/components/dashboard/analytics';
+
 
 interface User {
   _id: string;
@@ -26,8 +28,6 @@ export default function Users() {
 
   useEffect(() => {
     if (sessionStatus === 'loading') return; // Wait for session to load
-
-console.log(session?.user);
 
     if (!session?.user || session.user.role !== 'manager') {
       // Redirect to home or an unauthorized page
@@ -158,130 +158,175 @@ console.log(session?.user);
     <div>
       <h1 className="text-3xl font-bold mb-6">إدارة المستخدمين</h1>
 
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-4 gap-6 mb-8">
-        <div className="bg-white shadow p-6 rounded-lg">
-          <h2 className="text-lg font-semibold text-gray-700">إجمالي المستخدمين</h2>
-          <p className="text-4xl font-bold text-blue-600 mt-2">{stats.total}</p>
-        </div>
-        <div className="bg-white shadow p-6 rounded-lg">
-          <h2 className="text-lg font-semibold text-gray-700">المستخدمين النشطين</h2>
-          <p className="text-4xl font-bold text-green-600 mt-2">{stats.active}</p>
-        </div>
-        <div className="bg-white shadow p-6 rounded-lg">
-          <h2 className="text-lg font-semibold text-gray-700">المستخدمين غير النشطين</h2>
-          <p className="text-4xl font-bold text-red-600 mt-2">{stats.inactive}</p>
-        </div>
-        <div className="bg-white shadow p-6 rounded-lg">
-          <h2 className="text-lg font-semibold text-gray-700">المستخدمين في الانتظار</h2>
-          <p className="text-4xl font-bold text-yellow-600 mt-2">{stats.pending}</p>
-        </div>
-      </div>
+      {/* Statistics Cards - Responsive Grid */}
+  <Analytics
+          active={stats.active}
+          total={stats.total}
+          inactive={stats.inactive}
+          pending={stats.pending}
+        />
 
-      {/* Filters */}
-      <div className="mb-6 space-y-4">
-        <div className="flex gap-4">
+      {/* Filters - Responsive */}
+      <div className="mb-6">
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             placeholder="البحث في المستخدمين..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="flex-1 p-3 border rounded-lg"
+            className="flex-1 p-2 sm:p-3 border rounded-lg text-sm sm:text-base"
           />
-          <select
-            value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value)}
-            className="p-3 border rounded-lg"
-          >
-            <option value="">جميع الحالات</option>
-            <option value="active">نشط</option>
-            <option value="inactive">غير نشط</option>
-            <option value="pending">في الانتظار</option>
-          </select>
-          <button
-            onClick={refreshUsers}
-            className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600"
-          >
-            بحث
-          </button>
+          <div className="grid grid-cols-2 sm:flex gap-2">
+            <select
+              value={statusFilter}
+              onChange={(e) => setStatusFilter(e.target.value)}
+              className="p-2 sm:p-3 border rounded-lg text-sm sm:text-base flex-1"
+            >
+              <option value="">جميع الحالات</option>
+              <option value="active">نشط</option>
+              <option value="inactive">غير نشط</option>
+              <option value="pending">في الانتظار</option>
+            </select>
+            <button
+              onClick={refreshUsers}
+              className="bg-gray-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-gray-600 text-sm sm:text-base"
+            >
+              بحث
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Users Table */}
+      {/* Users Table - Responsive */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
-        <div className="p-6 border-b">
-          <h2 className="text-xl font-semibold">قائمة المستخدمين</h2>
+        <div className="p-4 sm:p-6 border-b">
+          <h2 className="text-lg sm:text-xl font-semibold">قائمة المستخدمين</h2>
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-6 py-4 text-right font-semibold">الاسم</th>
-                <th className="px-6 py-4 text-right font-semibold">البريد الإلكتروني</th>
-                <th className="px-6 py-4 text-right font-semibold">الهاتف</th>
-                <th className="px-6 py-4 text-right font-semibold">الدور</th>
-                <th className="px-6 py-4 text-right font-semibold">الحالة</th>
-                <th className="px-6 py-4 text-right font-semibold">تاريخ التسجيل</th>
-                <th className="px-6 py-4 text-right font-semibold">الإجراءات</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200">
+          <div className="min-w-full">
+            <div className="hidden sm:block">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">الاسم</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">البريد الإلكتروني</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">الهاتف</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">الدور</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">الحالة</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">التاريخ</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">الإجراءات</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {users.map((user) => (
+                    <tr key={user._id} className="hover:bg-gray-50">
+                      <td className="px-4 py-3 text-xs sm:text-sm">{user.name}</td>
+                      <td className="px-4 py-3 text-xs sm:text-sm text-gray-600">{user.email}</td>
+                      <td className="px-4 py-3 text-xs sm:text-sm">{user.phone}</td>
+                      <td className="px-4 py-3">
+                        <select
+                          value={user.role}
+                          onChange={(e) => handleRoleChange(user._id, e.target.value)}
+                          className="p-1 sm:p-2 border rounded text-xs sm:text-sm bg-white w-full"
+                        >
+                          <option value="user">مستخدم</option>
+                          <option value="admin">مدير</option>
+                          <option value="moderator">مشرف</option>
+                        </select>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                          user.status === 'active'
+                            ? 'bg-green-100 text-green-800'
+                            : user.status === 'inactive'
+                            ? 'bg-red-100 text-red-800'
+                            : 'bg-yellow-100 text-yellow-800'
+                        }`}>
+                          {user.status === 'active' ? 'نشط' :
+                          user.status === 'inactive' ? 'غير نشط' : 'في الانتظار'}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-xs sm:text-sm whitespace-nowrap">
+                        {new Date(user.createdAt).toLocaleDateString('ar-EG')}
+                      </td>
+                      <td className="px-4 py-3 space-x-1 sm:space-x-2 whitespace-nowrap">
+                        <button
+                          onClick={() => handleStatusToggle(user._id, user.status)}
+                          className={`px-2 sm:px-3 py-1 sm:py-2 rounded text-xs sm:text-sm font-medium ${
+                            user.status === 'active'
+                              ? 'bg-red-500 text-white hover:bg-red-600'
+                              : 'bg-green-500 text-white hover:bg-green-600'
+                          }`}
+                        >
+                          {user.status === 'active' ? 'إيقاف' : 'تفعيل'}
+                        </button>
+                        <button
+                          onClick={() => handleDelete(user._id)}
+                          className="px-2 sm:px-3 py-1 sm:py-2 bg-red-600 text-white rounded text-xs sm:text-sm font-medium hover:bg-red-700"
+                        >
+                          حذف
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile View */}
+            <div className="sm:hidden">
               {users.map((user) => (
-                <tr key={user._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 font-medium">{user.fullName}</td>
-                  <td className="px-6 py-4">{user.email}</td>
-                  <td className="px-6 py-4">{user.phone}</td>
-                  <td className="px-6 py-4">
+                <div key={user._id} className="border-b p-4">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="font-medium">{user.name}</h3>
+                    <span className={`text-xs px-2 py-1 rounded-full ${
+                      user.status === 'active' ? 'bg-green-100 text-green-800' :
+                      user.status === 'inactive' ? 'bg-red-100 text-red-800' :
+                      'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {user.status === 'active' ? 'نشط' :
+                       user.status === 'inactive' ? 'غير نشط' : 'في الانتظار'}
+                    </span>
+                  </div>
+                  <p className="text-sm text-gray-600 mb-2">{user.email}</p>
+                  <p className="text-sm mb-3">{user.phone}</p>
+                  <div className="flex flex-wrap gap-2">
                     <select
                       value={user.role}
                       onChange={(e) => handleRoleChange(user._id, e.target.value)}
-                      className="p-2 border rounded text-sm bg-white"
+                      className="p-1 border rounded text-xs w-full mb-2"
                     >
                       <option value="user">مستخدم</option>
                       <option value="admin">مدير</option>
                       <option value="moderator">مشرف</option>
                     </select>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                      user.status === 'active'
-                        ? 'bg-green-100 text-green-800'
-                        : user.status === 'inactive'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {user.status === 'active' ? 'نشط' :
-                       user.status === 'inactive' ? 'غير نشط' : 'في الانتظار'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">{new Date(user.createdAt).toLocaleDateString('ar-EG')}</td>
-                  <td className="px-6 py-4 space-x-2">
                     <button
                       onClick={() => handleStatusToggle(user._id, user.status)}
-                      className={`px-3 py-2 rounded text-sm font-medium ${
+                      className={`flex-1 px-2 py-1.5 rounded text-xs font-medium ${
                         user.status === 'active'
                           ? 'bg-red-500 text-white hover:bg-red-600'
                           : 'bg-green-500 text-white hover:bg-green-600'
                       }`}
                     >
-                      {user.status === 'active' ? 'إلغاء تفعيل' : 'تفعيل'}
+                      {user.status === 'active' ? 'إيقاف' : 'تفعيل'}
                     </button>
                     <button
                       onClick={() => handleDelete(user._id)}
-                      className="px-3 py-2 bg-red-600 text-white rounded text-sm font-medium hover:bg-red-700"
+                      className="flex-1 px-2 py-1.5 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700"
                     >
                       حذف
                     </button>
-                  </td>
-                </tr>
+                  </div>
+                </div>
               ))}
-            </tbody>
-          </table>
-          {users.length === 0 && (
-            <div className="text-center py-12 text-gray-500">
-              لا يوجد مستخدمون حالياً
             </div>
-          )}
+
+            {users.length === 0 && (
+              <div className="text-center py-8 text-gray-500 text-sm sm:text-base">
+                لا يوجد مستخدمون حالياً
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

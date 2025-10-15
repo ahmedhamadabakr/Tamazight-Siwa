@@ -1,9 +1,7 @@
 export interface Tour {
   _id?: string;
-  titleAr: string;
-  titleEn: string;
-  descriptionAr: string;
-  descriptionEn: string;
+  title: string;
+  description: string;
   duration: string;
   price: number;
   location: string;
@@ -16,10 +14,8 @@ export interface Tour {
 }
 
 export interface CreateTourData {
-  titleAr: string;
-  titleEn: string;
-  descriptionAr: string;
-  descriptionEn: string;
+  title: string;
+  description: string;
   duration: string;
   price: number;
   location: string;

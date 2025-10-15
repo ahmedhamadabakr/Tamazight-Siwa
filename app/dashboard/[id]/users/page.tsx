@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { DashboardLayout } from '@/components/dashboard/sidebar';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import Analytics from '@/components/dashboard/analytics';
 
 interface User {
   _id: string;
@@ -30,7 +31,7 @@ export default function Users() {
   }, []);
 
 
-useEffect(() => {
+  useEffect(() => {
     if (sessionStatus === 'loading') return; // Wait for session to load
 
     if (!session || session.user?.role !== 'manager') {
@@ -145,25 +146,12 @@ useEffect(() => {
           <h1 className="text-2xl font-bold">إدارة المستخدمين</h1>
         </div>
 
-        {/* Statistics Cards */}
-        <div className="grid grid-cols-4 gap-4 mb-6">
-          <div className="bg-white shadow p-4 rounded">
-            <h2 className="text-lg font-semibold">إجمالي المستخدمين</h2>
-            <p className="text-3xl text-blue-600">{stats.total}</p>
-          </div>
-          <div className="bg-white shadow p-4 rounded">
-            <h2 className="text-lg font-semibold">المستخدمين النشطين</h2>
-            <p className="text-3xl text-green-600">{stats.active}</p>
-          </div>
-          <div className="bg-white shadow p-4 rounded">
-            <h2 className="text-lg font-semibold">المستخدمين غير النشطين</h2>
-            <p className="text-3xl text-red-600">{stats.inactive}</p>
-          </div>
-          <div className="bg-white shadow p-4 rounded">
-            <h2 className="text-lg font-semibold">المستخدمين في الانتظار</h2>
-            <p className="text-3xl text-yellow-600">{stats.pending}</p>
-          </div>
-        </div>
+        <Analytics
+          active={stats.active}
+          total={stats.total}
+          inactive={stats.inactive}
+          pending={stats.pending}
+        />
 
         {/* Filters */}
         <div className="mb-4 space-y-4">
@@ -226,26 +214,24 @@ useEffect(() => {
                     </select>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded text-xs ${
-                      user.status === 'active'
+                    <span className={`px-2 py-1 rounded text-xs ${user.status === 'active'
                         ? 'bg-green-100 text-green-800'
                         : user.status === 'inactive'
-                        ? 'bg-red-100 text-red-800'
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
                       {user.status === 'active' ? 'نشط' :
-                       user.status === 'inactive' ? 'غير نشط' : 'في الانتظار'}
+                        user.status === 'inactive' ? 'غير نشط' : 'في الانتظار'}
                     </span>
                   </td>
                   <td className="px-6 py-4">{new Date(user.createdAt).toLocaleDateString('ar-EG')}</td>
                   <td className="px-6 py-4 space-x-2">
                     <button
                       onClick={() => handleStatusToggle(user._id, user.status)}
-                      className={`px-2 py-1 rounded text-xs ${
-                        user.status === 'active'
+                      className={`px-2 py-1 rounded text-xs ${user.status === 'active'
                           ? 'bg-red-500 text-white hover:bg-red-600'
                           : 'bg-green-500 text-white hover:bg-green-600'
-                      }`}
+                        }`}
                     >
                       {user.status === 'active' ? 'إلغاء تفعيل' : 'تفعيل'}
                     </button>
@@ -268,5 +254,5 @@ useEffect(() => {
         </div>
       </div>
     </DashboardLayout>
-  );    
+  );
 }
