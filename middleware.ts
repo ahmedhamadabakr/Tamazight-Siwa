@@ -6,20 +6,28 @@ export async function middleware(request: NextRequest) {
   const token = await getToken({ req: request });
   const { pathname } = request.nextUrl;
 
-  // Define admin routes that require authentication
-  const adminRoutes = ['/dashboard', '/admin'];
-  const isAdminRoute = adminRoutes.some(route => pathname.startsWith(route));
+  // Define protected routes
+  const protectedRoutes = ['/dashboard', '/user'];
+  const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
 
-  // If it's an admin route and user is not authenticated, redirect to login
-  if (isAdminRoute && !token) {
+  // Redirect unauthenticated users to login
+  if (isProtectedRoute && !token) {
     const url = new URL('/login', request.url);
     url.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(url);
   }
 
-  // If it's an admin route and user is not an admin, redirect to home
-  if (isAdminRoute && token?.role !== 'admin') {
-    return NextResponse.redirect(new URL('/', request.url));
+  // Handle role-based access
+  if (token && token.role) {
+    // Manager routes - only accessible by managers
+    if (pathname.startsWith(`/dashboard/${token.id}`) && token.role !== 'manager') {
+      return NextResponse.redirect(new URL('/user', request.url));
+    }
+
+    // User routes - only accessible by regular users
+    if (pathname.startsWith(`/user/${token.id}`) && token.role !== 'user') {
+      return NextResponse.redirect(new URL('/user', request.url));
+    }
   }
 
   return NextResponse.next();
@@ -28,6 +36,6 @@ export async function middleware(request: NextRequest) {
 export const config = {
   matcher: [
     '/dashboard/:path*',
-    '/admin/:path*',
+    '/user/:path*',
   ],
 };

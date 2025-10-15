@@ -22,32 +22,37 @@ export default function LoginPage() {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
+ const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setLoading(true);
+  setError('');
 
-    try {
-      const result = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-      });
+  try {
+    const result = await signIn('credentials', {
+      email: formData.email,
+      password: formData.password,
+      redirect: false,
+    });
 
-      if (result?.error) {
-        setError('Invalid email or password');
-      } else {
-        const session = await getSession();
-        if (session) {
-          router.push('/'); // Redirect to home page after login
-        }
-      }
-    } catch (err) {
-      setError('Network error. Please try again.');
-    } finally {
-      setLoading(false);
+    if (result?.error) {
+      setError('Invalid email or password');
+      return;
     }
-  };
+
+    // Get the session which includes the user's role
+    const session = await getSession();
+    if (session?.user) {
+      // Redirect based on user role
+      const redirectPath = session.user.role === 'manager' ? `/dashboard/${session.user.id}` : '/';
+      router.push(redirectPath);
+    }
+  } catch (err) {
+    console.error('Login error:', err);
+    setError('An error occurred during login. Please try again.');
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-4 py-12">

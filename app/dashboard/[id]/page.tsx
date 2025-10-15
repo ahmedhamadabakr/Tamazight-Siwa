@@ -27,13 +27,16 @@ export default function Users() {
   useEffect(() => {
     if (sessionStatus === 'loading') return; // Wait for session to load
 
-    if (!session || session.user.role !== 'manager') {
+console.log(session?.user);
+
+    if (!session?.user || session.user.role !== 'manager') {
       // Redirect to home or an unauthorized page
       router.push('/');
-    } else {
-      fetchUsers();
+      return;
     }
-  }, [sessionStatus, session, router]);
+    
+    fetchUsers();
+  }, [session, sessionStatus, router]);
 
   const fetchUsers = async () => {
     try {

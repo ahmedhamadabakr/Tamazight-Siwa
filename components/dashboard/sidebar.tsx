@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { signOut } from 'next-auth/react';
+import { handleSignOut } from '@/lib/auth-utils';
 import { BarChart3, Users, MapPin, Settings, LogOut } from 'lucide-react';
 
 interface SidebarProps {
@@ -97,7 +97,7 @@ export function DashboardLayout({ children }: SidebarProps) {
         {/* Logout Button */}
         <div className="absolute bottom-6 left-6 right-6">
           <button
-            onClick={() => signOut()}
+            onClick={() => handleSignOut('/')}
             className="flex items-center space-x-3 px-4 py-3 w-full text-right rounded-lg text-red-600 hover:bg-red-50 transition-colors"
           >
             <LogOut className="w-5 h-5" />

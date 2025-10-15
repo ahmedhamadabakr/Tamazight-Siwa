@@ -19,6 +19,8 @@ interface BookingResponse {
   paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed';
   totalAmount: number;
   numberOfTravelers: number;
+  user: string;
+  role: string;
   specialRequests?: string;
 }
 
@@ -81,6 +83,7 @@ export async function GET(
             totalAmount: 1,
             numberOfTravelers: 1,
             specialRequests: 1,
+            
             createdAt: 1,
             updatedAt: 1
           }

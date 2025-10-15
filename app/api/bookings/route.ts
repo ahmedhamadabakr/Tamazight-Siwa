@@ -56,6 +56,7 @@ export async function POST(req: Request) {
         ...booking,
         _id: result.insertedId.toString(),
         user: session.user.id,
+        role: session.user.role,
         tour: tourId
       }
     })
