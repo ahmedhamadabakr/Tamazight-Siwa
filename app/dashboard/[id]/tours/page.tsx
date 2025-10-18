@@ -239,7 +239,7 @@ export default function ToursPage({ params }: ToursPageProps) {
                                     {/* Actions */}
                                     <div className="flex space-x-2">
                                         <button
-                                            onClick={() => router.push(`/dashboard/${params.id}/tours/edit-simple/${tour._id}`)}
+                                            onClick={() => router.push(`/dashboard/${params.id}/tours/edit/${tour._id}`)}
                                             className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                                         >
                                             <FiEdit className="w-4 h-4 mr-1" />

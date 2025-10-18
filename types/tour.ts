@@ -1,6 +1,8 @@
 export interface Tour {
   _id?: string;
+  id?: string; // Add id field for frontend compatibility
   title: string;
+  slug?: string; // Add slug field
   description: string;
   duration: string;
   price: number;
@@ -15,6 +17,7 @@ export interface Tour {
 
 export interface CreateTourData {
   title: string;
+  slug?: string; // Add slug field
   description: string;
   duration: string;
   price: number;

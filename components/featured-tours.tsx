@@ -8,6 +8,7 @@ import { useEffect, useState } from "react"
 interface Tour {
   id: string;
   title: string;
+  slug?: string; // Add slug field
   description: string;
   duration: string;
   groupSize: string;
@@ -75,7 +76,7 @@ const fetchTours = async () => {
                     <span>{tour.location}</span>
                   </div>
                 </div>
-                <Link href={`/tours/${tour.title.toLowerCase().replace(/\s+/g, "-")}`} className="w-full">
+                <Link href={`/tours/${tour.slug || tour.id}`} className="w-full">
                   <Button variant="outline" className="w-full">Learn More</Button>
                 </Link>
               </CardContent>

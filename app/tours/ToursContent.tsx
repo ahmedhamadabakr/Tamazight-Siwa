@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
+import React from "react"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
@@ -16,14 +17,13 @@ const categories = ["All", "Cultural", "Adventure", "Wellness", "Photography", "
 
 export default function ToursContent() {
   const [activeCategory, setActiveCategory] = useState("All")
-
-
   const [tour, setTour] = useState<Tour[]>([])
   const [loading, setLoading] = useState(true)
- const fetchTour = async () => {
+
+  const fetchTour = async () => {
     try {
       const params = new URLSearchParams();
-      if (activeCategory) params.append('category', activeCategory as string);
+      if (activeCategory !== "All") params.append('category', activeCategory as string);
 
       const response = await fetch(`/api/tours?${params.toString()}`);
       const data = await response.json();
@@ -31,11 +31,16 @@ export default function ToursContent() {
         setTour(data.data || []);
       }
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching tours:', error);
     } finally {
       setLoading(false);
     }
   };
+
+  // استدعاء fetchTour عند تحميل الكومبوننت
+  React.useEffect(() => {
+    fetchTour();
+  }, [activeCategory]);
 
   if (!tour) {
     return <div className="p-10 text-center text-red-500">Tour not found!</div>
@@ -64,10 +69,10 @@ export default function ToursContent() {
                   <CardContent>
                     <p className="text-muted-foreground mb-4">{tour.description}</p>
                     <div className="flex gap-2">
-                      <Link href={`/tours/${tour.title.toLowerCase().replace(/\s+/g, "-")}`} className="flex-1">
+                      <Link href={`/tours/${tour.slug || tour._id}`} className="flex-1">
                         <Button className="w-full bg-primary">Book Now</Button>
                       </Link>
-                      <Link href={`/tours/${tour.title.concat("-").toLowerCase().replace(/\s+/g, "-")}`} className="flex-1">
+                      <Link href={`/tours/${tour.slug || tour._id}`} className="flex-1">
                         <Button variant="outline" className="w-full">Learn More</Button>
                       </Link>
                     </div>

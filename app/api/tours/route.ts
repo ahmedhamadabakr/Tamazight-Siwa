@@ -1,6 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
-import { title } from 'process';
+
+// Helper function to generate slug from title
+function generateSlug(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+    .replace(/-+/g, '-') // Replace multiple hyphens with single
+    .trim();
+}
 
 // GET all tours or search by name
 export async function GET(request: NextRequest) {
@@ -17,8 +26,7 @@ export async function GET(request: NextRequest) {
     if (title) {
       // Search for tours by title (case-insensitive, partial match)
       query.$or = [
-        { titleAr: { $regex: title, $options: 'i' } },
-        { titleEn: { $regex: title, $options: 'i' } }
+        { title: { $regex: title, $options: 'i' } }
       ];
     }
 
@@ -36,7 +44,14 @@ export async function GET(request: NextRequest) {
       .sort({ createdAt: -1 })
       .toArray();
 
-    return NextResponse.json({ success: true, data: tours });
+    // Add id field for frontend compatibility
+    const serializedTours = tours.map(tour => ({
+      ...tour,
+      id: tour._id.toString(),
+      _id: tour._id.toString()
+    }));
+
+    return NextResponse.json({ success: true, data: serializedTours });
   } catch (error) {
     console.error('Error fetching tours:', error);
     return NextResponse.json(
@@ -72,8 +87,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Generate slug from title
+    const baseSlug = generateSlug(title);
+    
+    // Check if slug already exists and make it unique
+    let slug = baseSlug;
+    let counter = 1;
+    while (await db.collection('tours').findOne({ slug })) {
+      slug = `${baseSlug}-${counter}`;
+      counter++;
+    }
+
     const tourData = {
       title,
+      slug, // Add slug field
       description,
       duration,
       price: Number(price),
@@ -87,7 +114,11 @@ export async function POST(request: NextRequest) {
     };
 
     const result = await db.collection('tours').insertOne(tourData);
-    const newTour = { _id: result.insertedId, ...tourData };
+    const newTour = { 
+      ...tourData, 
+      id: result.insertedId.toString(),
+      _id: result.insertedId.toString() 
+    };
 
     return NextResponse.json({ success: true, data: newTour }, { status: 201 });
   } catch (error) {

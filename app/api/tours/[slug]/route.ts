@@ -8,35 +8,25 @@ export async function GET(
   { params }: { params: { slug: string } }
 ) {
   try {
-    console.log('GET /api/tours/[slug] - Received slug:', params.slug);
-    console.log('Request headers:', Object.fromEntries(request.headers.entries()));
-    
     const db = await dbConnect();
-    console.log('Database connected successfully');
-    
+
     const { slug } = params;
-    
+
     let query: any = {};
-    
+
     // Check if the slug is a valid MongoDB ObjectId
     if (ObjectId.isValid(slug) && String(new ObjectId(slug)) === slug) {
       query._id = new ObjectId(slug);
-      console.log('Using ObjectId query:', query);
     } else {
       // If not a valid ObjectId, search by slug
       query.slug = slug;
-      console.log('Using slug query:', query);
     }
 
-    console.log('Searching for tour with query:', query);
-    
-    // Check if collection exists and has documents
-    const collectionStats = await db.collection('tours').countDocuments();
-    console.log('Total tours in collection:', collectionStats);
-    
+
+
     const tour = await db.collection('tours').findOne(query);
-    console.log('Found tour:', tour ? 'Yes' : 'No');
-    
+
+
     if (tour) {
       console.log('Tour details:', {
         _id: tour._id,
@@ -66,9 +56,10 @@ export async function GET(
       );
     }
 
-    // Convert ObjectId to string for JSON serialization
+    // Convert ObjectId to string for JSON serialization and add id field
     const serializedTour = {
       ...tour,
+      id: tour._id.toString(), // Add id field for frontend compatibility
       _id: tour._id.toString(),
       createdAt: tour.createdAt?.toISOString(),
       updatedAt: tour.updatedAt?.toISOString()
@@ -103,6 +94,7 @@ export async function PUT(
 
     const {
       title,
+      slug: tourSlug,
       description,
       duration,
       price,
@@ -126,6 +118,7 @@ export async function PUT(
 
     const updateData = {
       title,
+      slug: tourSlug,
       description,
       duration,
       price: Number(price),

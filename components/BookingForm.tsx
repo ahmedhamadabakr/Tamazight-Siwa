@@ -24,7 +24,7 @@ export function BookingForm({ tourId, price, onSuccess }: BookingFormProps) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (status === 'unauthenticated') {
       router.push(`/login?callbackUrl=/tours/${tourId}`)
       return
@@ -98,9 +98,9 @@ export function BookingForm({ tourId, price, onSuccess }: BookingFormProps) {
       </div>
 
       <div className="pt-2">
-        <Button 
-          type="submit" 
-          className="w-full" 
+        <Button
+          type="submit"
+          className="w-full"
           disabled={isLoading}
         >
           {isLoading ? (
