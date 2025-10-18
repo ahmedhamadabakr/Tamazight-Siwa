@@ -82,11 +82,7 @@ export function Navigation() {
               <div className="flex items-center space-x-4 ml-4">
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="relative h-12 w-12 rounded-full border-2 border-gray-200 bg-white p-0 overflow-hidden hover:border-primary/50 transition-colors"
-                      asChild
-                    >
+        
                       <Link href={profileLink} className="block h-full w-full">
                         {user.image ? (
                           <img
@@ -101,7 +97,7 @@ export function Navigation() {
                         )}
                         <span className="sr-only">View profile</span>
                       </Link>
-                    </Button>
+         
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56">
                     <div className="px-2 py-1.5">

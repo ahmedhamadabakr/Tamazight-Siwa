@@ -9,6 +9,7 @@ import Link from "next/link"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
+import { Session } from "next-auth";
 import { BookingForm } from '@/components/BookingForm'
 import {
   Dialog,
@@ -22,7 +23,7 @@ import {
 export default function TourDetailsPage() {
   const [isBookingOpen, setIsBookingOpen] = useState(false)
   const router = useRouter()
-  const session = useSession()
+  const session = useSession() as { data: Session | null; status: "loading" | "authenticated" | "unauthenticated" };
   const { slug } = useParams()
   const [tour, setTour] = useState<Tour | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,11 +35,12 @@ export default function TourDetailsPage() {
     duration: string;
     groupSize: string;
     category: string;
-    price: string;
+    price: number; // Changed from string to number
     featured: boolean;
     status: string;
     location: string;
-    image: string;
+    images: string[];
+    highlights: string[];
   }
 
 
@@ -51,34 +53,24 @@ export default function TourDetailsPage() {
     try {
       setIsLoading(true);
       const apiUrl = `/api/tours/${slug}`;
-      console.log('API URL:', apiUrl);
-      
       const response = await fetch(apiUrl);
-      console.log('Response status:', response.status);
-      
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Error response:', errorText);
         throw new Error(`HTTP error! status: ${response.status}, body: ${errorText}`);
       }
-      
+
       const data = await response.json();
-      console.log('API Response data:', data);
-      
       if (data.success) {
         if (data.data) {
-          console.log('Tour data found:', data.data);
+
           setTour(data.data);
         } else {
-          console.error('API returned success but no data:', data);
           setTour(null);
         }
       } else {
-        console.error('API returned error:', data.error || 'Unknown error');
         setTour(null);
       }
     } catch (error) {
-      console.error('Error in fetchTour:', error);
       setTour(null);
     } finally {
       setIsLoading(false);
@@ -97,7 +89,7 @@ export default function TourDetailsPage() {
     <div className="min-h-screen bg-background">
       {/* Hero Image */}
       <section className="relative h-[50vh]">
-        <Image src={tour.image} alt={tour.title} fill className="object-cover" />
+        <Image src={tour.images[0]} alt={tour.title} fill className="object-cover" />
         <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
           <h1 className="text-4xl md:text-6xl font-bold text-white">{tour.title}</h1>
         </div>
@@ -147,10 +139,15 @@ export default function TourDetailsPage() {
                   </DialogHeader>
                   <BookingForm
                     tourId={tour.id}
-                    price={parseFloat(tour.price.replace(/[^0-9.]/g, ''))}
+                    price={tour.price}
                     onSuccess={() => {
                       setIsBookingOpen(false)
-                      router.push(`/user/${session?.data?.user?.id}`)
+                      if (session.data?.user?.id) {
+                        router.push(`/user/${session.data.user.id}`)
+                      } else {
+                        // Handle the case where user ID is not available, e.g., redirect to login or show an error
+                        router.push('/login') // Example: redirect to login if ID is missing
+                      }
                     }}
                   />
                 </DialogContent>

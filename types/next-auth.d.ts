@@ -2,10 +2,11 @@ import NextAuth, { DefaultSession } from "next-auth"
 
 declare module "next-auth" {
   interface Session {
-    accessToken?: string;
+    accessToken: string;
     user: {
       id: string
       role: string
+      accessToken: string
       image?: string | null
       name?: string | null
       email?: string | null
@@ -16,6 +17,7 @@ declare module "next-auth" {
   interface User {
     id: string
     role: string
+    accessToken: string
     image?: string | null
     name?: string | null
     email?: string | null

@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { JWT } from "next-auth/jwt"
 import { getMongoClient } from "@/lib/mongodb"
 import bcrypt from "bcryptjs"
+import jwt from "jsonwebtoken"
 
 // Type alias for NextAuth configuration
 type NextAuthOptions = {
@@ -69,10 +70,20 @@ export async function getAuthOptions(): Promise<NextAuthOptions> {
       strategy: "jwt",
     },
     callbacks: {
-      async jwt({ token, user }: { token: JWT; user?: any }): Promise<JWT> {
+      async jwt({ token, user, account }: { token: JWT; user?: any; account?: any }): Promise<JWT> {
         if (user) {
           token.role = user.role
           token.image = user.image
+          // Generate a persistent access token
+          token.accessToken = jwt.sign(
+            {
+              userId: user.id,
+              email: user.email,
+              role: user.role
+            },
+            process.env.JWT_SECRET || 'fallback-secret',
+            { expiresIn: '30d' } // Long-lived token
+          )
         }
         return token
       },
@@ -81,6 +92,8 @@ export async function getAuthOptions(): Promise<NextAuthOptions> {
           (session.user as any).id = token.sub!
           ;(session.user as any).role = token.role
           ;(session.user as any).image = token.image
+          ;(session.user as any).accessToken = token.accessToken as string
+          session.accessToken = token.accessToken as string
         }
         return session
       },

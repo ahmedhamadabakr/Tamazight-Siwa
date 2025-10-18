@@ -1,41 +1,64 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { DashboardLayout } from '@/components/dashboard/sidebar';
-import { Tour } from '@/types/tour';
-import { useSession } from 'next-auth/react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { useAuthSession } from '@/hooks/useAuthSession';
+import {
+    FiPlus,
+    FiEdit,
+    FiTrash2,
+    FiEye,
+    FiMapPin,
+    FiClock,
+    FiUsers,
+    FiDollarSign
+} from 'react-icons/fi';
 import Link from 'next/link';
 
-export default function Tours() {
+type Tour = {
+    _id: string;
+    title: string;
+    duration: string;
+    groupSize: string;
+    price: string;
+    description: string;
+    difficulty: string;
+    category: string;
+    location: string;
+    images: string[];
+    image?: string; // الصورة الرئيسية
+};
+
+interface ToursPageProps {
+    params: {
+        id: string;
+    };
+}
+
+export default function ToursPage({ params }: ToursPageProps) {
+    const { session } = useAuthSession();
+    const router = useRouter();
     const [tours, setTours] = useState<Tour[]>([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
-    const [editingTour, setEditingTour] = useState<Tour | null>(null);
-      const { data: session, status: sessionStatus } = useSession();
-    const router = useRouter();
 
-    useEffect(() => {
-        fetchTours();
-    }, []);
-
-useEffect(() => {
-    if (sessionStatus === 'loading') return; // Wait for session to load
-
-    if (!session || session.user?.role !== 'manager') {
-      // Redirect to home or an unauthorized page
-      router.push('/');
-    } else {
-      fetchTours();
-    }
-  }, [sessionStatus, session, router]);
-    
+    // Fetch tours
     const fetchTours = async () => {
         try {
-            const response = await fetch(`/api/tours?title=${searchTerm}`);
-            const data = await response.json();
-            if (data.success) {
-                setTours(data.data || []);
+            setLoading(true);
+            const res = await fetch('/api/tours', {
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(session?.user?.accessToken && {
+                        'Authorization': `Bearer ${session.user.accessToken}`
+                    })
+                }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                if (data.success && data.data) {
+                    setTours(data.data);
+                }
             }
         } catch (error) {
             console.error('Error fetching tours:', error);
@@ -44,476 +67,198 @@ useEffect(() => {
         }
     };
 
-    const handleDelete = async (id: string) => {
+    useEffect(() => {
+        fetchTours();
+    }, [session]);
+
+    // Delete tour
+    const handleDelete = async (tourId: string) => {
         if (!confirm('هل أنت متأكد من حذف هذه الرحلة؟')) return;
 
         try {
-            const response = await fetch(`/api/tours/${id}`, {
+            const res = await fetch(`/api/tours/${tourId}`, {
                 method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${session?.user?.accessToken}`
+                }
             });
-            const data = await response.json();
-            if (data.success) {
-                setTours(tours.filter(tour => tour._id !== id));
+
+            if (res.ok) {
+                setTours(tours.filter(tour => tour._id !== tourId));
+                alert('تم حذف الرحلة بنجاح');
             } else {
                 alert('فشل في حذف الرحلة');
             }
         } catch (error) {
             console.error('Error deleting tour:', error);
-            alert('فشل في حذف الرحلة');
+            alert('حدث خطأ أثناء حذف الرحلة');
         }
-    };
-
-    const handleStatusToggle = async (id: string, currentStatus: string) => {
-        const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
-
-        try {
-            const response = await fetch(`/api/tours/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ status: newStatus }),
-            });
-            const data = await response.json();
-            if (data.success) {
-                setTours(tours.map(tour =>
-                    tour._id === id ? { ...tour, status: newStatus } : tour
-                ));
-            }
-        } catch (error) {
-            console.error('Error updating tour status:', error);
-        }
-    };
-
-    const refreshTours = () => {
-        fetchTours();
-    };
-
-    const stats = {
-        total: tours.length,
-        active: tours.filter(t => t.status === 'active').length,
-        featured: tours.filter(t => t.featured).length,
     };
 
     if (loading) {
         return (
-            <div className="p-6">
-                <div className="text-center">جاري التحميل...</div>
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-2">جاري تحميل الرحلات</h2>
+                    <p className="text-gray-500">يرجى الانتظار...</p>
+                </div>
             </div>
         );
     }
 
     return (
-        <DashboardLayout>
-        <div className="p-6">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">إدارة الرحلات السياحية</h1>
-                <Link
-                    href={`/dashboard/${session?.user?.id}/tours/new-trip`}
-                    className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-                >
-                    إضافة رحلة جديدة
-                </Link>
-            </div>
-
-            {/* Statistics Cards */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
-                <div className="bg-white shadow p-4 rounded">
-                    <h2 className="text-lg font-semibold">إجمالي الرحلات</h2>
-                    <p className="text-3xl text-blue-600">{stats.total}</p>
+        <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-7xl mx-auto">
+                {/* Header */}
+                <div className="mb-8">
+                    <div className="flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">إدارة الرحلات</h1>
+                            <p className="mt-2 text-gray-600">قم بإدارة وتعديل رحلاتك السياحية</p>
+                        </div>
+                        <Link
+                            href={`/dashboard/${params.id}/tours/new-trip`}
+                            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                            <FiPlus className="mr-2 h-4 w-4" />
+                            إضافة رحلة جديدة
+                        </Link>
+                    </div>
                 </div>
-                <div className="bg-white shadow p-4 rounded">
-                    <h2 className="text-lg font-semibold">الرحلات النشطة</h2>
-                    <p className="text-3xl text-green-600">{stats.active}</p>
-                </div>
-                <div className="bg-white shadow p-4 rounded">
-                    <h2 className="text-lg font-semibold">الرحلات المميزة</h2>
-                    <p className="text-3xl text-yellow-600">{stats.featured}</p>
-                </div>
-            </div>
 
-            {/* Search */}
-            <div className="mb-4">
-                <input
-                    type="text"
-                    placeholder="البحث في الرحلات..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full p-2 border rounded"
-                />
-                <button
-                    onClick={refreshTours}
-                    className="mt-2 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
-                >
-                    بحث
-                </button>
-            </div>
-
-            {/* Tours Table */}
-            <div className="bg-white shadow rounded overflow-hidden">
-                <table className="w-full">
-                    <thead className="bg-gray-50">
-                        <tr>
-                            <th className="px-6 py-3 text-right">الصورة</th>
-                            <th className="px-6 py-3 text-right">العنوان</th>
-                            <th className="px-6 py-3 text-right">الفئة</th>
-                            <th className="px-6 py-3 text-right">المدة</th>
-                            <th className="px-6 py-3 text-right">السعر</th>
-                            <th className="px-6 py-3 text-right">الحالة</th>
-                            <th className="px-6 py-3 text-right">مميز</th>
-                            <th className="px-6 py-3 text-right">الإجراءات</th>
-                        </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-200">
+                {/* Tours Grid */}
+                {tours.length === 0 ? (
+                    <div className="text-center py-12">
+                        <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <FiMapPin className="w-12 h-12 text-gray-400" />
+                        </div>
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد رحلات</h3>
+                        <p className="text-gray-500 mb-6">ابدأ بإضافة رحلتك الأولى</p>
+                        <Link
+                              href={`/dashboard/${params.id}/tours/new-trip`}
+                            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                        >
+                            <FiPlus className="mr-2 h-4 w-4" />
+                            إضافة رحلة جديدة
+                        </Link>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {tours.map((tour) => (
-                            <tr key={tour._id}>
-                                <td className="px-6 py-4">
-                                    {tour.images && tour.images.length > 0 ? (
+                            <div key={tour._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                                {/* Tour Image */}
+                                <div className="h-48 bg-gray-200 relative">
+                                    {tour.images && tour.images.length > 0 && tour.images[0] ? (
                                         <img
                                             src={tour.images[0]}
                                             alt={tour.title}
-                                            className="w-16 h-12 object-cover rounded"
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                                // إذا فشل تحميل الصورة، اعرض placeholder
+                                                const target = e.target as HTMLImageElement;
+                                                target.style.display = 'none';
+                                                const parent = target.parentElement;
+                                                if (parent) {
+                                                    parent.innerHTML = `
+                            <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                              <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                              </svg>
+                            </div>
+                          `;
+                                                }
+                                            }}
+                                        />
+                                    ) : tour.image ? (
+                                        <img
+                                            src={tour.image}
+                                            alt={tour.title}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => {
+                                                const target = e.target as HTMLImageElement;
+                                                target.style.display = 'none';
+                                                const parent = target.parentElement;
+                                                if (parent) {
+                                                    parent.innerHTML = `
+                            <div class="w-full h-full flex items-center justify-center bg-gray-100">
+                              <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                              </svg>
+                            </div>
+                          `;
+                                                }
+                                            }}
                                         />
                                     ) : (
-                                        <div className="w-16 h-12 bg-gray-200 rounded flex items-center justify-center text-gray-400 text-xs">
-                                            بدون صورة
+                                        <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                                            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
                                         </div>
                                     )}
-                                </td>
-                                <td className="px-6 py-4">
-                                    <div>
-                                        <div className="font-medium">{tour.title}</div>
-                                        <div className="text-sm text-gray-500">{tour.title}</div>
+
+                                    {/* Category Badge */}
+                                    <div className="absolute top-3 left-3">
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            {tour.category}
+                                        </span>
                                     </div>
-                                </td>
-                                <td className="px-6 py-4">{tour.category}</td>
-                                <td className="px-6 py-4">{tour.duration}</td>
-                                <td className="px-6 py-4">{tour.price} ريال</td>
-                                <td className="px-6 py-4">
-                                    <span className={`px-2 py-1 rounded text-xs ${
-                                        tour.status === 'active'
-                                            ? 'bg-green-100 text-green-800'
-                                            : 'bg-red-100 text-red-800'
-                                    }`}>
-                                        {tour.status === 'active' ? 'نشط' : 'غير نشط'}
-                                    </span>
-                                </td>
-                                <td className="px-6 py-4">
-                                    {tour.featured ? (
-                                        <span className="text-yellow-600">⭐ مميز</span>
-                                    ) : (
-                                        <span className="text-gray-400">غير مميز</span>
-                                    )}
-                                </td>
-                                <td className="px-6 py-4 space-x-2">
-                                    <button
-                                        onClick={() => setEditingTour(tour)}
-                                        className="text-blue-600 hover:text-blue-900"
-                                    >
-                                        تعديل
-                                    </button>
-                                    <button
-                                        onClick={() => handleStatusToggle(tour._id!, tour.status)}
-                                        className={`${
-                                            tour.status === 'active'
-                                                ? 'text-red-600 hover:text-red-900'
-                                                : 'text-green-600 hover:text-green-900'
-                                        }`}
-                                    >
-                                        {tour.status === 'active' ? 'إلغاء تفعيل' : 'تفعيل'}
-                                    </button>
-                                    <button
-                                        onClick={() => handleDelete(tour._id!)}
-                                        className="text-red-600 hover:text-red-900"
-                                    >
-                                        حذف
-                                    </button>
-                                </td>
-                            </tr>
+                                </div>
+
+                                {/* Tour Content */}
+                                <div className="p-6">
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                                        {tour.title}
+                                    </h3>
+
+                                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                                        {tour.description}
+                                    </p>
+
+                                    {/* Tour Details */}
+                                    <div className="space-y-2 mb-4">
+                                        <div className="flex items-center text-sm text-gray-500">
+                                            <FiMapPin className="w-4 h-4 mr-2" />
+                                            {tour.location}
+                                        </div>
+                                        <div className="flex items-center text-sm text-gray-500">
+                                            <FiClock className="w-4 h-4 mr-2" />
+                                            {tour.duration}
+                                        </div>
+                                        <div className="flex items-center text-sm text-gray-500">
+                                            <FiUsers className="w-4 h-4 mr-2" />
+                                            {tour.groupSize}
+                                        </div>
+                                        <div className="flex items-center text-sm font-semibold text-green-600">
+                                            <FiDollarSign className="w-4 h-4 mr-2" />
+                                            ${tour.price}
+                                        </div>
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="flex space-x-2">
+                                        <button
+                                            onClick={() => router.push(`/dashboard/${params.id}/tours/edit-simple/${tour._id}`)}
+                                            className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        >
+                                            <FiEdit className="w-4 h-4 mr-1" />
+                                            تعديل
+                                        </button>
+
+                                        <button
+                                            onClick={() => handleDelete(tour._id)}
+                                            className="inline-flex items-center justify-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                        >
+                                            <FiTrash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         ))}
-                    </tbody>
-                </table>
-                {tours.length === 0 && (
-                    <div className="text-center py-8 text-gray-500">
-                        لا توجد رحلات حالياً
                     </div>
                 )}
             </div>
-
-            {/* Add/Edit Modal would go here */}
-          
-
-            {editingTour && (
-                <EditTourModal
-                    tour={editingTour}
-                    onClose={() => setEditingTour(null)}
-                    onSuccess={refreshTours}
-                />
-            )}
         </div>
-        </DashboardLayout>
-    );
-
-   
-}
-
-// Edit Tour Modal Component
-function EditTourModal({ tour, onClose, onSuccess }: { tour: Tour; onClose: () => void; onSuccess: () => void }) {
-    const [formData, setFormData] = useState({
-        title: tour.title,
-        description: tour.description,
-        duration: tour.duration,
-        price: tour.price.toString(),
-        location: tour.location,
-        category: tour.category,
-        featured: tour.featured,
-        status: tour.status,
-        images: tour.images || [],
-    });
-    const [uploading, setUploading] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-
-        try {
-            const response = await fetch(`/api/tours/${tour._id}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                onSuccess();
-                onClose();
-            } else {
-                alert(data.error || 'فشل في تحديث الرحلة');
-            }
-        } catch (error) {
-            console.error('Error updating tour:', error);
-            alert('فشل في تحديث الرحلة');
-        }
-    };
-
-    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        setUploading(true);
-        try {
-            const uploadFormData = new FormData();
-            uploadFormData.append('image', file);
-
-            const response = await fetch('/api/tours/upload', {
-                method: 'POST',
-                body: uploadFormData,
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                setFormData(prev => ({ ...prev, images: [...prev.images, data.data.url] }));
-            } else {
-                alert(data.error || 'فشل في رفع الصورة');
-            }
-        } catch (error) {
-            console.error('Error uploading image:', error);
-            alert('فشل في رفع الصورة');
-        } finally {
-            setUploading(false);
-        }
-    };
-
-    const removeImage = (index: number) => {
-        setFormData(prev => ({ ...prev, images: prev.images.filter((_, i) => i !== index) }));
-    };
-
-    return (
-        <DashboardLayout>
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-            <div className="bg-white p-6 rounded-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-                <h2 className="text-xl font-bold mb-4">تعديل الرحلة</h2>
-
-                <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">العنوان بالعربية</label>
-                            <input
-                                type="text"
-                                value={formData.title}
-                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">العنوان بالإنجليزية</label>
-                            <input
-                                type="text"
-                                value={formData.title}
-                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">الوصف بالعربية</label>
-                            <textarea
-                                value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                rows={3}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">الوصف بالإنجليزية</label>
-                            <textarea
-                                value={formData.description}
-                                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                rows={3}
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">المدة</label>
-                            <input
-                                type="text"
-                                value={formData.duration}
-                                onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">السعر</label>
-                            <input
-                                type="number"
-                                value={formData.price}
-                                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium mb-1">الموقع</label>
-                            <input
-                                type="text"
-                                value={formData.location}
-                                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                required
-                            />
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium mb-1">الفئة</label>
-                            <select
-                                value={formData.category}
-                                onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                className="w-full p-2 border rounded"
-                                required
-                            >
-                                <option value="">اختر الفئة</option>
-                                <option value="مغامرات">مغامرات</option>
-                                <option value="ثقافي">ثقافي</option>
-                                <option value="طبيعي">طبيعي</option>
-                                <option value="شاطئي">شاطئي</option>
-                                <option value="تاريخي">تاريخي</option>
-                            </select>
-                        </div>
-                        <div className="flex items-center">
-                            <input
-                                type="checkbox"
-                                id="featured"
-                                checked={formData.featured}
-                                onChange={(e) => setFormData({ ...formData, featured: e.target.checked })}
-                                className="mr-2"
-                            />
-                            <label htmlFor="featured" className="text-sm font-medium">رحلة مميزة</label>
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">صور الرحلة</label>
-                        <div className="space-y-4">
-                            <input
-                                type="file"
-                                accept="image/*"
-                                onChange={handleImageUpload}
-                                disabled={uploading}
-                                className="w-full p-2 border rounded"
-                            />
-                            {uploading && <p className="text-blue-600">جاري رفع الصورة...</p>}
-
-                            {formData.images.length > 0 && (
-                                <div className="grid grid-cols-3 gap-4 mt-4">
-                                    {formData.images.map((image, index) => (
-                                        <div key={index} className="relative group">
-                                            <img
-                                                src={image}
-                                                alt={`صورة ${index + 1}`}
-                                                className="w-full h-24 object-cover rounded border"
-                                            />
-                                            <button
-                                                type="button"
-                                                onClick={() => removeImage(index)}
-                                                className="absolute top-1 right-1 bg-red-500 text-white rounded-full w-6 h-6 text-xs opacity-0 group-hover:opacity-100 transition-opacity"
-                                            >
-                                                ×
-                                            </button>
-                                        </div>
-                                    ))}
-                                </div>
-                            )}
-                        </div>
-                    </div>
-
-                    <div>
-                        <label className="block text-sm font-medium mb-1">الحالة</label>
-                        <select
-                            value={formData.status}
-                            onChange={(e) => setFormData({ ...formData, status: e.target.value as 'active' | 'inactive' })}
-                            className="w-full p-2 border rounded"
-                        >
-                            <option value="active">نشط</option>
-                            <option value="inactive">غير نشط</option>
-                        </select>
-                    </div>
-
-                    <div className="flex justify-end space-x-2">
-                        <button
-                            type="button"
-                            onClick={onClose}
-                            className="px-4 py-2 text-gray-600 border rounded hover:bg-gray-50"
-                        >
-                            إلغاء
-                        </button>
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-                        >
-                            حفظ التغييرات
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </DashboardLayout>
     );
 }
-
-
-
-
-

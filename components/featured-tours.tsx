@@ -12,7 +12,7 @@ interface Tour {
   duration: string;
   groupSize: string;
   location: string;
-  image: string;
+  images: string[];
 }
 
 export function FeaturedTours() {
@@ -52,7 +52,7 @@ const fetchTours = async () => {
             <Card key={tour.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300">
               <div className="relative overflow-hidden">
                 <img
-                  src={tour.image || "/placeholder.svg"}
+                  src={tour.images[0] || "/placeholder.svg"}
                   alt={tour.title}
                   className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
                 />
