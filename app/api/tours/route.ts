@@ -14,6 +14,18 @@ function generateSlug(title: string): string {
 // GET all tours or search by name
 export async function GET(request: NextRequest) {
   try {
+    // Check if we're in build time - use multiple indicators
+    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
+                       !process.env.MONGODB_URI ||
+                       process.env.NODE_ENV === 'production' && !process.env.VERCEL;
+
+    if (isBuildTime) {
+      return NextResponse.json({
+        success: false,
+        error: 'API routes are not available during build time'
+      }, { status: 503 });
+    }
+
     const { searchParams } = new URL(request.url);
     const title = searchParams.get('title');
     const category = searchParams.get('category');
@@ -64,6 +76,18 @@ export async function GET(request: NextRequest) {
 // POST a new tour
 export async function POST(request: NextRequest) {
   try {
+    // Check if we're in build time - use multiple indicators
+    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
+                       !process.env.MONGODB_URI ||
+                       process.env.NODE_ENV === 'production' && !process.env.VERCEL;
+
+    if (isBuildTime) {
+      return NextResponse.json({
+        success: false,
+        error: 'API routes are not available during build time'
+      }, { status: 503 });
+    }
+
     const db = await dbConnect();
     const body = await request.json();
 

@@ -8,8 +8,12 @@ export async function GET(
     { params }: { params: { id: string } }
 ) {
     try {
-        // Skip database operations during build time
-        if (process.env.NEXT_PHASE === 'phase-production-build') {
+        // Check if we're in build time - use multiple indicators
+        const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
+                           !process.env.MONGODB_URI ||
+                           process.env.NODE_ENV === 'production' && !process.env.VERCEL;
+
+        if (isBuildTime) {
             return NextResponse.json({
                 success: false,
                 error: 'API routes are not available during build time'
@@ -57,8 +61,12 @@ export async function PUT(
     { params }: { params: { id: string } }
 ) {
     try {
-        // Skip database operations during build time
-        if (process.env.NEXT_PHASE === 'phase-production-build') {
+        // Check if we're in build time - use multiple indicators
+        const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
+                           !process.env.MONGODB_URI ||
+                           process.env.NODE_ENV === 'production' && !process.env.VERCEL;
+
+        if (isBuildTime) {
             return NextResponse.json({
                 success: false,
                 error: 'API routes are not available during build time'
@@ -110,8 +118,12 @@ export async function DELETE(
     { params }: { params: { id: string } }
 ) {
     try {
-        // Skip database operations during build time
-        if (process.env.NEXT_PHASE === 'phase-production-build') {
+        // Check if we're in build time - use multiple indicators
+        const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
+                           !process.env.MONGODB_URI ||
+                           process.env.NODE_ENV === 'production' && !process.env.VERCEL;
+
+        if (isBuildTime) {
             return NextResponse.json({
                 success: false,
                 error: 'API routes are not available during build time'

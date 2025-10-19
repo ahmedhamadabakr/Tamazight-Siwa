@@ -5,8 +5,20 @@ import { getFolderStats } from '@/lib/cloudinary'
 
 export async function GET(request: NextRequest) {
   try {
+    // Check if we're in build time - use multiple indicators
+    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
+                       !process.env.MONGODB_URI ||
+                       process.env.NODE_ENV === 'production' && !process.env.VERCEL;
+
+    if (isBuildTime) {
+      return NextResponse.json({
+        success: false,
+        error: 'API routes are not available during build time'
+      }, { status: 503 });
+    }
+
     const authOptions = await getAuthOptions()
-    const session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions) as any
     
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
