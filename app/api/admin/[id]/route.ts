@@ -10,13 +10,20 @@ export async function GET(
     try {
         // Check if we're in build time - use multiple indicators
         const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
-                           !process.env.MONGODB_URI ||
-                           process.env.NODE_ENV === 'production' && !process.env.VERCEL;
+                           process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === undefined;
 
         if (isBuildTime) {
             return NextResponse.json({
                 success: false,
                 error: 'API routes are not available during build time'
+            }, { status: 503 });
+        }
+
+        // Only connect to DB if not in build time
+        if (!process.env.MONGODB_URI) {
+            return NextResponse.json({
+                success: false,
+                error: 'Database connection not configured'
             }, { status: 503 });
         }
 
@@ -63,13 +70,20 @@ export async function PUT(
     try {
         // Check if we're in build time - use multiple indicators
         const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
-                           !process.env.MONGODB_URI ||
-                           process.env.NODE_ENV === 'production' && !process.env.VERCEL;
+                           process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === undefined;
 
         if (isBuildTime) {
             return NextResponse.json({
                 success: false,
                 error: 'API routes are not available during build time'
+            }, { status: 503 });
+        }
+
+        // Only connect to DB if not in build time
+        if (!process.env.MONGODB_URI) {
+            return NextResponse.json({
+                success: false,
+                error: 'Database connection not configured'
             }, { status: 503 });
         }
 
@@ -120,13 +134,20 @@ export async function DELETE(
     try {
         // Check if we're in build time - use multiple indicators
         const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
-                           !process.env.MONGODB_URI ||
-                           process.env.NODE_ENV === 'production' && !process.env.VERCEL;
+                           process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === undefined;
 
         if (isBuildTime) {
             return NextResponse.json({
                 success: false,
                 error: 'API routes are not available during build time'
+            }, { status: 503 });
+        }
+
+        // Only connect to DB if not in build time
+        if (!process.env.MONGODB_URI) {
+            return NextResponse.json({
+                success: false,
+                error: 'Database connection not configured'
             }, { status: 503 });
         }
 

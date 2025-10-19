@@ -18,6 +18,14 @@ if (!cached) {
 }
 
 async function dbConnect(): Promise<Db> {
+  // Check if we're in build time and throw a specific error
+  const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
+    process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === undefined;
+
+  if (isBuildTime) {
+    throw new Error('Database connection not available during build time');
+  }
+
   if (cached.conn) {
     return cached.conn;
   }
@@ -49,6 +57,14 @@ let mongoClient: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
 async function getMongoClient(): Promise<MongoClient> {
+  // Check if we're in build time and throw a specific error
+  const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
+    process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === undefined;
+
+  if (isBuildTime) {
+    throw new Error('Database connection not available during build time');
+  }
+
   if (!mongoClient) {
     if (!clientPromise) {
       const opts = {
