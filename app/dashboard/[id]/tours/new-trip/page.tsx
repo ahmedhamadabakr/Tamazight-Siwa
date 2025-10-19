@@ -8,7 +8,19 @@ import { useSession } from 'next-auth/react'
 export default function NewTrip() {
   const router = useRouter()
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    description: string;
+    duration: string;
+    price: string;
+    location: string;
+    category: string;
+    featured: boolean;
+    groupSize: string;
+    difficulty: string;
+    highlights: string[];
+    images: string[];
+  }>({
     title: '',
     description: '',
     duration: '',
@@ -16,10 +28,15 @@ export default function NewTrip() {
     location: '',
     category: '',
     featured: false,
+    groupSize: '',
+    difficulty: 'Easy',
+    highlights: [],
+    images: [],
   })
 
   const [images, setImages] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
+  const [newHighlight, setNewHighlight] = useState('')
 
 
   const { data: session } = useSession();
@@ -85,6 +102,23 @@ export default function NewTrip() {
     setImages(prev => prev.filter((_, i) => i !== index))
   }
 
+  const handleAddHighlight = () => {
+    if (newHighlight.trim() && !formData.highlights.includes(newHighlight.trim())) {
+      setFormData(prev => ({
+        ...prev,
+        highlights: [...prev.highlights, newHighlight.trim()]
+      }))
+      setNewHighlight('')
+    }
+  }
+
+  const handleRemoveHighlight = (index: number) => {
+    setFormData(prev => ({
+      ...prev,
+      highlights: prev.highlights.filter((_, i) => i !== index)
+    }))
+  }
+
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-gray-50 py-10 px-6">
@@ -95,7 +129,7 @@ export default function NewTrip() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title Fields */}
             <div className="grid md:grid-cols-2 gap-6">
-              
+
               <div>
                 <label className="text-sm font-medium text-gray-600 block mb-1">
                   Title (English)
@@ -112,7 +146,7 @@ export default function NewTrip() {
 
             {/* Description Fields */}
             <div className="grid md:grid-cols-2 gap-6">
-              
+
               <div>
                 <label className="text-sm font-medium text-gray-600 block mb-1">
                   Description (English)
@@ -195,7 +229,74 @@ export default function NewTrip() {
               </div>
             </div>
 
-            {/* Images */}
+            {/* Group Size & Difficulty */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="text-sm font-medium text-gray-600 block mb-1">Group Size</label>
+                <input
+                  type="text"
+                  value={formData.groupSize}
+                  onChange={e => setFormData({ ...formData, groupSize: e.target.value })}
+                  placeholder="e.g. 2-10 people"
+                  className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 block mb-1">Difficulty</label>
+                <select
+                  value={formData.difficulty}
+                  onChange={e => setFormData({ ...formData, difficulty: e.target.value })}
+                  className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                >
+                  <option value="Easy">Easy</option>
+                  <option value="Moderate">Moderate</option>
+                  <option value="Challenging">Challenging</option>
+                  <option value="Difficult">Difficult</option>
+                </select>
+              </div>
+            </div>
+
+            {/* Highlights */}
+            <div>
+              <label className="text-sm font-medium text-gray-600 block mb-1">Tour Highlights</label>
+              <div className="space-y-2">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={newHighlight}
+                    onChange={e => setNewHighlight(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddHighlight())}
+                    placeholder="Add a highlight..."
+                    className="flex-1 p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                  <button
+                    type="button"
+                    onClick={handleAddHighlight}
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                  >
+                    Add
+                  </button>
+                </div>
+                {formData.highlights.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.highlights.map((highlight, index) => (
+                      <div key={index} className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full flex items-center gap-2">
+                        <span>{highlight}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveHighlight(index)}
+                          className="text-blue-600 hover:text-blue-800"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            </div>
             <div>
               <label className="text-sm font-medium text-gray-600 block mb-1">Trip Images</label>
               <div className="space-y-4">

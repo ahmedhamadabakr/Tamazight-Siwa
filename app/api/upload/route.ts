@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح لك بهذا الإجراء' },
+        { success: false, message: 'You are not authorized to perform this action' },
         { status: 403 }
       );
     }
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json(
-        { success: false, message: 'لم يتم اختيار ملف' },
+        { success: false, message: 'No file attached' },
         { status: 400 }
       );
     }
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { success: false, message: 'نوع الملف غير مدعوم. يرجى اختيار صورة (JPG, PNG, GIF, WebP)' },
+        { success: false, message: 'File type not supported. Please select an image (JPG, PNG, GIF, WebP)' },
         { status: 400 }
       );
     }
@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
       return NextResponse.json(
-        { success: false, message: 'حجم الملف كبير جداً. الحد الأقصى 10MB' },
+        { success: false, message: 'File size must be less than 10MB' },
         { status: 400 }
       );
     }
@@ -71,13 +71,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       imageUrl,
-      message: 'تم رفع الصورة بنجاح'
+      message: 'Image uploaded successfully'
     });
 
   } catch (error) {
     console.error('Error uploading file:', error);
     return NextResponse.json(
-      { success: false, message: 'فشل في رفع الصورة' },
+      { success: false, message: 'Failed to upload image' },
       { status: 500 }
     );
   }

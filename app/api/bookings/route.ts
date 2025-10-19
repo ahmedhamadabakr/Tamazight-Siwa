@@ -11,7 +11,7 @@ export async function POST(req: Request) {
     
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح' },
+        { success: false, message: 'Unauthorized' },
         { status: 401 }
       )
     }
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
     // Validate input
     if (!tourId || !travelers || travelers < 1 || travelers > 5) {
       return NextResponse.json(
-        { success: false, message: 'بيانات غير صالحة' },
+        { success: false, message: 'Invalid data' },
         { status: 400 }
       )
     }
@@ -64,7 +64,7 @@ export async function POST(req: Request) {
   } catch (error) {
     console.error('Booking creation error:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ أثناء معالجة الطلب' },
+      { success: false, message: 'An error occurred while processing the request' },
       { status: 500 }
     )
   }

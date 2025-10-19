@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     // Input validation
     if (!email || !code || !name || !password) {
       return NextResponse.json(
-        { success: false, error: 'جميع الحقول مطلوبة' },
+        { success: false, error: 'All fields are required' },
         { status: 400 }
       );
     }
@@ -70,7 +70,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'رمز التحقق غير صحيح',
+          error: 'Invalid verification code',
           debug: 'Could not fetch verification codes'
         },
         { status: 400 }
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'انتهت صلاحية رمز التحقق. يرجى طلب رمز جديد.',
+          error: 'Verification code expired. Please request a new code.',
         },
         { status: 400 }
       );
@@ -93,7 +93,7 @@ export async function POST(req: Request) {
       return NextResponse.json(
         { 
           success: false, 
-          error: 'هذا الرمز مستخدم بالفعل. يرجى طلب رمز جديد إذا كنت بحاجة إلى التحقق مرة أخرى.',
+          error: 'This verification code has already been used. Please request a new code if you need to verify again.',
         },
         { status: 400 }
       );
@@ -103,7 +103,7 @@ export async function POST(req: Request) {
     const existingUser = await prisma.findUserByEmail(email);
     if (existingUser) {
       return NextResponse.json(
-        { success: false, error: 'هذا البريد الإلكتروني مستخدم بالفعل' },
+        { success: false, error: 'This email is already in use' },
         { status: 400 }
       );
     }
@@ -125,7 +125,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'تم إنشاء الحساب بنجاح! يمكنك الآن تسجيل الدخول.',
+      message: 'Account created successfully! You can now log in.',
       user: {
         id: user._id?.toString() || null,
         name: user.name,
@@ -137,7 +137,7 @@ export async function POST(req: Request) {
     console.error('Verification error:', error);
     return NextResponse.json({
       success: false,
-      error: 'حدث خطأ أثناء التحقق من الرمز',
+      error: 'An error occurred while verifying the code',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     }, { status: 500 });
   }

@@ -59,7 +59,7 @@ export default function GalleryDashboard() {
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm('هل أنت متأكد من حذف هذه الصورة؟')) return;
+        if (!confirm('Are you sure you want to delete this image?')) return;
 
         try {
             const response = await fetch(`/api/gallery/${id}`, {
@@ -69,11 +69,11 @@ export default function GalleryDashboard() {
             if (data.success) {
                 setImages(images.filter(img => img._id !== id));
             } else {
-                alert('فشل في حذف الصورة');
+                alert('Failed to delete image');
             }
         } catch (error) {
             console.error('Error deleting image:', error);
-            alert('فشل في حذف الصورة');
+            alert('Failed to delete image');
         }
     };
 
@@ -124,15 +124,15 @@ export default function GalleryDashboard() {
                 setEditingImage(null);
                 setShowAddModal(false);
             } else {
-                alert(data.message || 'فشل في حفظ الصورة');
+                alert(data.message || 'Failed to save image');
             }
         } catch (error) {
             console.error('Error saving image:', error);
-            alert('فشل في حفظ الصورة');
+            alert('Failed to save image');
         }
     };
 
-    const categories = ['طبيعة', 'تراث', 'مناظر', 'أنشطة', 'طعام', 'أخرى'];
+    const categories = ['Nature', 'Heritage', 'Scenery', 'Activities', 'Food', 'Other'];
 
     const stats = {
         total: images.length,
@@ -147,7 +147,7 @@ export default function GalleryDashboard() {
     if (loading || sessionStatus === 'loading') {
         return (
             <div className="flex items-center justify-center h-64">
-                <div className="text-center">جاري التحميل...</div>
+                <div className="text-center">Loading...</div>
             </div>
         );
     }
@@ -156,13 +156,13 @@ export default function GalleryDashboard() {
         <DashboardLayout>
             <div className="space-y-6">
                 <div className="flex justify-between items-center">
-                    <h1 className="text-3xl font-bold">إدارة معرض الصور</h1>
+                    <h1 className="text-3xl font-bold">Gallery Management</h1>
                     <button
                         onClick={() => setShowAddModal(true)}
                         className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
                     >
                         <Plus size={20} />
-                        إضافة صورة جديدة
+                        Add New Image
                     </button>
                 </div>
 
@@ -174,7 +174,7 @@ export default function GalleryDashboard() {
                                 <Eye className="h-6 w-6 text-blue-600" />
                             </div>
                             <div className="mr-4">
-                                <p className="text-sm font-medium text-gray-600">إجمالي الصور</p>
+                                <p className="text-sm font-medium text-gray-600">Total Images</p>
                                 <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
                             </div>
                         </div>
@@ -186,7 +186,7 @@ export default function GalleryDashboard() {
                                 <Eye className="h-6 w-6 text-green-600" />
                             </div>
                             <div className="mr-4">
-                                <p className="text-sm font-medium text-gray-600">الصور النشطة</p>
+                                <p className="text-sm font-medium text-gray-600">Active Images</p>
                                 <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
                             </div>
                         </div>
@@ -198,7 +198,7 @@ export default function GalleryDashboard() {
                                 <Eye className="h-6 w-6 text-red-600" />
                             </div>
                             <div className="mr-4">
-                                <p className="text-sm font-medium text-gray-600">الصور غير النشطة</p>
+                                <p className="text-sm font-medium text-gray-600">Inactive Images</p>
                                 <p className="text-2xl font-bold text-gray-900">{stats.inactive}</p>
                             </div>
                         </div>
@@ -210,7 +210,7 @@ export default function GalleryDashboard() {
                                 <Upload className="h-6 w-6 text-purple-600" />
                             </div>
                             <div className="mr-4">
-                                <p className="text-sm font-medium text-gray-600">الفئات</p>
+                                <p className="text-sm font-medium text-gray-600">Categories</p>
                                 <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
                             </div>
                         </div>
@@ -222,7 +222,7 @@ export default function GalleryDashboard() {
                     <div className="flex flex-col sm:flex-row gap-4">
                         <input
                             type="text"
-                            placeholder="البحث في الصور..."
+                            placeholder="Search images..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="flex-1 p-3 border rounded-lg"
@@ -232,7 +232,7 @@ export default function GalleryDashboard() {
                             onChange={(e) => setCategoryFilter(e.target.value)}
                             className="p-3 border rounded-lg"
                         >
-                            <option value="">جميع الفئات</option>
+                            <option value="">All Categories</option>
                             {categories.map(cat => (
                                 <option key={cat} value={cat}>{cat}</option>
                             ))}
@@ -241,7 +241,7 @@ export default function GalleryDashboard() {
                             onClick={fetchImages}
                             className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600"
                         >
-                            بحث
+                            Search
                         </button>
                     </div>
                 </div>
@@ -249,20 +249,20 @@ export default function GalleryDashboard() {
                 {/* Images Grid */}
                 <div className="bg-white rounded-lg shadow overflow-hidden">
                     <div className="p-6 border-b">
-                        <h2 className="text-xl font-semibold">معرض الصور</h2>
+                        <h2 className="text-xl font-semibold">Gallery</h2>
                     </div>
 
                     {images.length === 0 ? (
                         <div className="text-center py-12">
                             <Upload className="mx-auto h-12 w-12 text-gray-400" />
-                            <h3 className="mt-2 text-sm font-medium text-gray-900">لا توجد صور</h3>
-                            <p className="mt-1 text-sm text-gray-500">ابدأ بإضافة صور جديدة للمعرض</p>
+                            <h3 className="mt-2 text-sm font-medium text-gray-900">No images found</h3>
+                            <p className="mt-1 text-sm text-gray-500">Start by adding new images to the gallery</p>
                             <div className="mt-6">
                                 <button
                                     onClick={() => setShowAddModal(true)}
                                     className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                                 >
-                                    إضافة صورة جديدة
+                                    Add New Image
                                 </button>
                             </div>
                         </div>
@@ -279,10 +279,10 @@ export default function GalleryDashboard() {
                                         />
                                         <div className="absolute top-2 right-2">
                                             <span className={`px-2 py-1 text-xs rounded-full ${image.isActive
-                                                    ? 'bg-green-100 text-green-800'
-                                                    : 'bg-red-100 text-red-800'
+                                                ? 'bg-green-100 text-green-800'
+                                                : 'bg-red-100 text-red-800'
                                                 }`}>
-                                                {image.isActive ? 'نشط' : 'غير نشط'}
+                                                {image.isActive ? 'Active' : 'Inactive'}
                                             </span>
                                         </div>
                                     </div>
@@ -290,7 +290,7 @@ export default function GalleryDashboard() {
                                     <div className="p-4">
                                         <h3 className="font-medium text-gray-900 mb-1">{image.title}</h3>
                                         <p className="text-sm text-gray-600 mb-2">{image.description}</p>
-                                        <p className="text-xs text-gray-500 mb-3">الفئة: {image.category}</p>
+                                        <p className="text-xs text-gray-500 mb-3">Category: {image.category}</p>
 
                                         <div className="flex gap-2">
                                             <button
@@ -298,16 +298,16 @@ export default function GalleryDashboard() {
                                                 className="flex-1 bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600 flex items-center justify-center gap-1"
                                             >
                                                 <Edit size={14} />
-                                                تعديل
+                                                Edit
                                             </button>
                                             <button
                                                 onClick={() => handleStatusToggle(image._id, image.isActive)}
                                                 className={`flex-1 px-3 py-2 rounded text-sm ${image.isActive
-                                                        ? 'bg-yellow-500 text-white hover:bg-yellow-600'
-                                                        : 'bg-green-500 text-white hover:bg-green-600'
+                                                    ? 'bg-yellow-500 text-white hover:bg-yellow-600'
+                                                    : 'bg-green-500 text-white hover:bg-green-600'
                                                     }`}
                                             >
-                                                {image.isActive ? 'إخفاء' : 'إظهار'}
+                                                {image.isActive ? 'Hide' : 'Show'}
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(image._id)}

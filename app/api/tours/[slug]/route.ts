@@ -69,7 +69,7 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching tour:', error);
     return NextResponse.json(
-      { success: false, error: 'فشل في جلب الرحلة' },
+      { success: false, error: 'Failed to fetch tour' },
       { status: 500 }
     );
   }
@@ -87,7 +87,7 @@ export async function PUT(
 
     if (!ObjectId.isValid(slug)) {
       return NextResponse.json(
-        { success: false, error: 'معرف الرحلة غير صالح' },
+        { success: false, error: 'Tour ID is invalid' },
         { status: 400 }
       );
     }
@@ -111,7 +111,7 @@ export async function PUT(
     // Basic validation
     if (!title || !description || !duration || !price || !location || !category) {
       return NextResponse.json(
-        { success: false, error: 'جميع الحقول مطلوبة' },
+        { success: false, error: 'All fields are required' },
         { status: 400 }
       );
     }
@@ -140,7 +140,7 @@ export async function PUT(
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
-        { success: false, error: 'الرحلة غير موجودة' },
+        { success: false, error: 'Tour not found' },
         { status: 404 }
       );
     }
@@ -151,7 +151,7 @@ export async function PUT(
   } catch (error) {
     console.error('Error updating tour:', error);
     return NextResponse.json(
-      { success: false, error: 'فشل في تحديث الرحلة' },
+      { success: false, error: 'Failed to update tour' },
       { status: 500 }
     );
   }
@@ -168,7 +168,7 @@ export async function DELETE(
 
     if (!ObjectId.isValid(slug)) {
       return NextResponse.json(
-        { success: false, error: 'معرف الرحلة غير صالح' },
+        { success: false, error: 'Tour ID is invalid' },
         { status: 400 }
       );
     }
@@ -177,16 +177,16 @@ export async function DELETE(
 
     if (result.deletedCount === 0) {
       return NextResponse.json(
-        { success: false, error: 'الرحلة غير موجودة' },
+        { success: false, error: 'Tour not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, message: 'تم حذف الرحلة بنجاح' });
+    return NextResponse.json({ success: true, message: 'Tour deleted successfully' });
   } catch (error) {
     console.error('Error deleting tour:', error);
     return NextResponse.json(
-      { success: false, error: 'فشل في حذف الرحلة' },
+      { success: false, error: 'Failed to delete tour' },
       { status: 500 }
     );
   }

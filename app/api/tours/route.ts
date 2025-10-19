@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     // Basic validation
     if (!title || !description || !duration || !price || !location || !category) {
       return NextResponse.json(
-        { success: false, error: 'جميع الحقول مطلوبة' },
+        { success: false, error: 'All fields are required' },
         { status: 400 }
       );
     }
@@ -124,7 +124,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error creating tour:', error);
     return NextResponse.json(
-      { success: false, error: 'فشل في إنشاء الرحلة' },
+      { success: false, error: 'Failed to create tour' },
       { status: 500 }
     );
   }

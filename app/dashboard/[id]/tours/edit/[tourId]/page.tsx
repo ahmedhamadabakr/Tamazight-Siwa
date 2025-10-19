@@ -88,14 +88,10 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                 const data = await res.json();
                 if (data.success && data.data) {
                     const tourData = data.data;
-                    console.log('بيانات الرحلة المستلمة:', tourData);
-
+             
                     // معالجة الصور بطريقة شاملة
                     let processedImages: string[] = [];
 
-                    console.log('=== فحص بيانات الصور ===');
-                    console.log('tourData.images:', tourData.images);
-                    console.log('tourData.image:', tourData.image);
 
                     // جرب جميع الطرق الممكنة
                     if (tourData.images) {
@@ -122,14 +118,13 @@ export default function EditTourPage({ params }: EditTourPageProps) {
 
                     // إضافة صور تجريبية إذا لم نجد أي صور
                     if (processedImages.length === 0) {
-                        console.log('لم يتم العثور على صور، إضافة صور تجريبية');
+                    
                         processedImages = [
                             'https://via.placeholder.com/400x300/3B82F6/FFFFFF?text=صورة+تجريبية+1',
                             'https://via.placeholder.com/400x300/10B981/FFFFFF?text=صورة+تجريبية+2'
                         ];
                     }
 
-                    console.log('الصور النهائية:', processedImages);
 
                     setTour({
                         _id: tourData._id || '',
@@ -220,19 +215,16 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                         const data = await res.json();
                         if (data.success && data.data.url) {
                             newImages.push(data.data.url);
-                            console.log('تم رفع الصورة بنجاح:', data.data.url);
                         } else {
-                            console.error('لم يتم إرجاع URL صالح للصورة');
-                            alert(`فشل في رفع الصورة: ${data.error || 'خطأ غير معروف'}`);
+                            alert(`Failed to upload image: ${data.error || 'Unknown error'}`);
                         }
                     } else {
                         const errorData = await res.json();
-                        console.error('فشل رفع الصورة، الحالة:', res.status, errorData);
-                        alert(`فشل في رفع الصورة: ${errorData.error || 'خطأ في الخادم'}`);
+                        alert(`Failed to upload image: ${errorData.error || 'Server error'}`);
                     }
                 } catch (uploadError) {
-                    console.error('خطأ في رفع الصورة:', uploadError);
-                    alert('حدث خطأ أثناء رفع الصورة. تأكد من اتصال الإنترنت وحاول مرة أخرى.');
+               
+                    alert('Failed to upload image please try again later');
                 }
             }
 
@@ -246,8 +238,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
             }
 
         } catch (error) {
-            console.error('Error handling images:', error);
-            alert('حدث خطأ أثناء معالجة الصور');
+            alert('Failed to upload image please try again later');
         } finally {
             setUploading(false);
         }
@@ -270,7 +261,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
         e.preventDefault();
 
         if (!session?.user) {
-            alert('يجب تسجيل الدخول أولاً');
+            alert('Please login first');
             return;
         }
 
@@ -292,14 +283,14 @@ export default function EditTourPage({ params }: EditTourPageProps) {
             const data = await response.json();
 
             if (response.ok) {
-                alert('تم تحديث الرحلة بنجاح');
+                alert('Tour updated successfully');
                 router.push(`/dashboard/${params.id}/tours`);
             } else {
-                throw new Error(data.message || 'فشل في تحديث الرحلة');
+                throw new Error(data.message || 'Failed to update tour');
             }
         } catch (error: any) {
             console.error('Error updating tour:', error);
-            alert(error.message || 'حدث خطأ أثناء تحديث الرحلة');
+            alert(error.message || 'Failed to update tour');
         } finally {
             setSaving(false);
         }
@@ -310,8 +301,8 @@ export default function EditTourPage({ params }: EditTourPageProps) {
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <h2 className="text-xl font-semibold text-gray-700 mb-2">جاري تحميل بيانات الرحلة</h2>
-                    <p className="text-gray-500">يرجى الانتظار...</p>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-2">Loading tour data</h2>
+                    <p className="text-gray-500">Please wait...</p>
                 </div>
             </div>
         );
@@ -327,12 +318,12 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                     {/* Basic Information */}
                     <div className="bg-white shadow rounded-lg">
                         <div className="px-6 py-4 border-b border-gray-200">
-                            <h2 className="text-lg font-medium text-gray-900">المعلومات الأساسية</h2>
+                            <h2 className="text-lg font-medium text-gray-900">Basic Information</h2>
                         </div>
                         <div className="p-6 space-y-6">
                             <div>
                                 <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-2">
-                                    عنوان الرحلة *
+                                    Tour Title *
                                 </label>
                                 <input
                                     type="text"
@@ -348,7 +339,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
 
                             <div>
                                 <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
-                                    وصف الرحلة *
+                                    Tour Description *
                                 </label>
                                 <textarea
                                     id="description"
@@ -366,7 +357,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                 <div>
                                     <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-2">
                                         <FiClock className="inline w-4 h-4 mr-1" />
-                                        مدة الرحلة *
+                                        Tour Duration *
                                     </label>
                                     <input
                                         type="text"
@@ -383,7 +374,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                 <div>
                                     <label htmlFor="groupSize" className="block text-sm font-medium text-gray-700 mb-2">
                                         <FiUsers className="inline w-4 h-4 mr-1" />
-                                        حجم المجموعة *
+                                        Group Size *
                                     </label>
                                     <input
                                         type="text"
@@ -402,7 +393,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                 <div>
                                     <label htmlFor="price" className="block text-sm font-medium text-gray-700 mb-2">
                                         <FiDollarSign className="inline w-4 h-4 mr-1" />
-                                        السعر *
+                                        Tour Price *
                                     </label>
                                     <div className="relative">
                                         <input
@@ -423,7 +414,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
 
                                 <div>
                                     <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700 mb-2">
-                                        مستوى الصعوبة *
+                                        Difficulty *
                                     </label>
                                     <select
                                         id="difficulty"
@@ -433,16 +424,16 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         required
                                     >
-                                        <option value="Easy">سهل</option>
-                                        <option value="Moderate">متوسط</option>
-                                        <option value="Challenging">صعب</option>
-                                        <option value="Difficult">صعب جداً</option>
+                                        <option value="Easy">easy</option>
+                                        <option value="Moderate">moderate</option>
+                                        <option value="Challenging">challenging</option>
+                                        <option value="Difficult">difficult</option>
                                     </select>
                                 </div>
 
                                 <div>
                                     <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-2">
-                                        الفئة *
+                                        Category *
                                     </label>
                                     <select
                                         id="category"
@@ -452,11 +443,11 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                         required
                                     >
-                                        <option value="Cultural">ثقافية</option>
-                                        <option value="Adventure">مغامرة</option>
-                                        <option value="Wellness">استجمام</option>
-                                        <option value="Nature">طبيعة</option>
-                                        <option value="Luxury">فاخرة</option>
+                                        <option value="Cultural">cultural</option>
+                                        <option value="Adventure">adventure</option>
+                                        <option value="Wellness">wellness</option>
+                                        <option value="Nature">nature</option>
+                                        <option value="Luxury">luxury</option>
                                     </select>
                                 </div>
                             </div>
@@ -464,7 +455,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                             <div>
                                 <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
                                     <FiMapPin className="inline w-4 h-4 mr-1" />
-                                    الموقع *
+                                    Location *
                                 </label>
                                 <input
                                     type="text"
@@ -473,7 +464,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                     value={tour.location}
                                     onChange={handleChange}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    placeholder="مثال: واحة سيوة، مصر"
+                                    placeholder="Example: Siwa Oasis, Egypt"
                                     required
                                 />
                             </div>
@@ -483,7 +474,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                     {/* Highlights */}
                     <div className="bg-white shadow rounded-lg">
                         <div className="px-6 py-4 border-b border-gray-200">
-                            <h2 className="text-lg font-medium text-gray-900">مميزات الرحلة</h2>
+                            <h2 className="text-lg font-medium text-gray-900">Tour Highlights</h2>
                         </div>
                         <div className="p-6">
                             <div className="flex gap-2 mb-4">
@@ -492,7 +483,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                     value={newHighlight}
                                     onChange={(e) => setNewHighlight(e.target.value)}
                                     onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddHighlight())}
-                                    placeholder="أضف ميزة جديدة..."
+                                    placeholder="Add new highlight..."
                                     className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                                 />
                                 <button
@@ -500,7 +491,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                     onClick={handleAddHighlight}
                                     className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
-                                    إضافة
+                                    Add
                                 </button>
                             </div>
 
@@ -524,7 +515,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                     {/* Images */}
                     <div className="bg-white shadow rounded-lg">
                         <div className="px-6 py-4 border-b border-gray-200">
-                            <h2 className="text-lg font-medium text-gray-900">صور الرحلة</h2>
+                            <h2 className="text-lg font-medium text-gray-900">Tour Images</h2>
                         </div>
                         <div className="p-6">
                             {imagePreviews.length > 0 ? (
@@ -533,7 +524,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                         {imagePreviews[mainImageIndex] ? (
                                             <img
                                                 src={imagePreviews[mainImageIndex]}
-                                                alt="صورة الرحلة"
+                                                alt="Tour Image"
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {
                                                     const target = e.target as HTMLImageElement;
@@ -547,7 +538,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                 <svg class="w-16 h-16 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                 </svg>
-                                <p class="text-gray-500 text-sm">فشل في تحميل الصورة</p>
+                                <p class="text-gray-500 text-sm">Failed to load image</p>
                                 <p class="text-gray-400 text-xs mt-1">URL: ${imagePreviews[mainImageIndex].substring(0, 50)}...</p>
                               </div>
                             `;
@@ -559,7 +550,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                             <div className="w-full h-full flex items-center justify-center bg-gray-200">
                                                 <div className="text-center">
                                                     <FiImage className="w-16 h-16 text-gray-400 mx-auto mb-2" />
-                                                    <p className="text-gray-500 text-sm">لا توجد صورة</p>
+                                                    <p className="text-gray-500 text-sm">No image found</p>
                                                 </div>
                                             </div>
                                         )}
@@ -578,7 +569,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                                 {img ? (
                                                     <img
                                                         src={img}
-                                                        alt={`صورة ${idx + 1}`}
+                                                        alt={`Tour Image ${idx + 1}`}
                                                         className="w-full h-full object-cover"
                                                         onError={(e) => {
                                                             const target = e.target as HTMLImageElement;
@@ -613,7 +604,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                                     <FiTrash2 className="w-3 h-3" />
                                                 </button>
 
-                                                {/* رقم الصورة */}
+                                                {/* Image Number */}
                                                 <div className="absolute bottom-1 left-1 bg-black/50 text-white text-xs px-1 rounded">
                                                     {idx + 1}
                                                 </div>
@@ -626,8 +617,8 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                     <div className="w-full h-64 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center">
                                         <div className="text-center">
                                             <FiImage className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-                                            <h3 className="text-lg font-medium text-gray-700 mb-2">لا توجد صور</h3>
-                                            <p className="text-gray-500 text-sm">قم برفع صور للرحلة لعرضها هنا</p>
+                                            <h3 className="text-lg font-medium text-gray-700 mb-2">No images found</h3>
+                                            <p className="text-gray-500 text-sm">Upload images for the tour to display here</p>
                                         </div>
                                     </div>
                                 </div>
@@ -636,7 +627,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                             <div>
                                 <label className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 cursor-pointer">
                                     <FiUpload className="mr-2 h-4 w-4" />
-                                    {uploading ? 'جاري الرفع...' : 'رفع صور'}
+                                    {uploading ? 'Uploading...' : 'Upload Images'}
                                     <input
                                         type="file"
                                         className="hidden"
@@ -647,7 +638,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                     />
                                 </label>
                                 <p className="mt-2 text-xs text-gray-500">
-                                    يمكنك رفع عدة صور (JPG, PNG). الصورة الأولى ستكون الصورة الرئيسية.
+                                    You can upload multiple images (JPG, PNG). The first image will be the main image.
                                 </p>
                             </div>
                         </div>
@@ -661,7 +652,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                             className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
                             disabled={saving || uploading}
                         >
-                            إلغاء
+                            Cancel
                         </button>
                         <button
                             type="submit"
@@ -674,12 +665,12 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                                         <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                                     </svg>
-                                    جاري الحفظ...
+                                    Saving...
                                 </>
                             ) : (
                                 <>
                                     <FiSave className="-ml-1 mr-2 h-4 w-4" />
-                                    حفظ التغييرات
+                                    Save Changes
                                 </>
                             )}
                         </button>

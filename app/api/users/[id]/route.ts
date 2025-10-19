@@ -13,7 +13,7 @@ export async function GET(
 
     if (!ObjectId.isValid(id)) {
       return NextResponse.json(
-        { success: false, error: 'معرف المستخدم غير صالح' },
+        { success: false, error: 'User ID is invalid' },
         { status: 400 }
       );
     }
@@ -22,7 +22,7 @@ export async function GET(
 
     if (!user) {
       return NextResponse.json(
-        { success: false, error: 'المستخدم غير موجود' },
+        { success: false, error: 'User not found' },
         { status: 404 }
       );
     }
@@ -31,7 +31,7 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching user:', error);
     return NextResponse.json(
-      { success: false, error: 'فشل في جلب المستخدم' },
+      { success: false, error: 'Failed to fetch user' },
       { status: 500 }
     );
   }
@@ -49,7 +49,7 @@ export async function PUT(
 
     if (!ObjectId.isValid(id)) {
       return NextResponse.json(
-        { success: false, error: 'معرف المستخدم غير صالح' },
+        { success: false, error: 'User ID is invalid' },
         { status: 400 }
       );
     }
@@ -79,7 +79,7 @@ export async function PUT(
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
-        { success: false, error: 'المستخدم غير موجود' },
+        { success: false, error: 'User not found' },
         { status: 404 }
       );
     }
@@ -90,7 +90,7 @@ export async function PUT(
   } catch (error) {
     console.error('Error updating user:', error);
     return NextResponse.json(
-      { success: false, error: 'فشل في تحديث المستخدم' },
+      { success: false, error: 'Failed to update user' },
       { status: 500 }
     );
   }
@@ -107,7 +107,7 @@ export async function DELETE(
 
     if (!ObjectId.isValid(id)) {
       return NextResponse.json(
-        { success: false, error: 'معرف المستخدم غير صالح' },
+        { success: false, error: 'User ID is invalid' },
         { status: 400 }
       );
     }
@@ -116,16 +116,16 @@ export async function DELETE(
 
     if (result.deletedCount === 0) {
       return NextResponse.json(
-        { success: false, error: 'المستخدم غير موجود' },
+        { success: false, error: 'User not found' },
         { status: 404 }
       );
     }
 
-    return NextResponse.json({ success: true, message: 'تم حذف المستخدم بنجاح' });
+    return NextResponse.json({ success: true, message: 'User deleted successfully' });
   } catch (error) {
     console.error('Error deleting user:', error);
     return NextResponse.json(
-      { success: false, error: 'فشل في حذف المستخدم' },
+      { success: false, error: 'Failed to delete user' },
       { status: 500 }
     );
   }

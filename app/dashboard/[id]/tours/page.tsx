@@ -88,7 +88,7 @@ export default function ToursPage({ params }: ToursPageProps) {
 
     // Delete tour
     const handleDelete = async (tourId: string) => {
-        if (!confirm('هل أنت متأكد من حذف هذه الرحلة؟')) return;
+        if (!confirm('Are you sure you want to delete this tour?')) return;
 
         try {
             const res = await fetch(`/api/tours/${tourId}`, {
@@ -100,13 +100,13 @@ export default function ToursPage({ params }: ToursPageProps) {
 
             if (res.ok) {
                 setTours(tours.filter(tour => tour._id !== tourId));
-                alert('تم حذف الرحلة بنجاح');
+                alert('Tour deleted successfully!');
             } else {
-                alert('فشل في حذف الرحلة');
+                alert('Failed to delete tour');
             }
         } catch (error) {
             console.error('Error deleting tour:', error);
-            alert('حدث خطأ أثناء حذف الرحلة');
+            alert('Failed to delete tour');
         }
     };
 
@@ -115,8 +115,8 @@ export default function ToursPage({ params }: ToursPageProps) {
             <div className="flex items-center justify-center min-h-screen bg-gray-50">
                 <div className="text-center">
                     <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <h2 className="text-xl font-semibold text-gray-700 mb-2">جاري تحميل الرحلات</h2>
-                    <p className="text-gray-500">يرجى الانتظار...</p>
+                    <h2 className="text-xl font-semibold text-gray-700 mb-2">Loading tours...</h2>
+                    <p className="text-gray-500">Please wait...</p>
                 </div>
             </div>
         );
@@ -130,15 +130,15 @@ export default function ToursPage({ params }: ToursPageProps) {
                     <div className="mb-8">
                         <div className="flex justify-between items-center">
                             <div>
-                                <h1 className="text-3xl font-bold text-gray-900">إدارة الرحلات</h1>
-                                <p className="mt-2 text-gray-600">قم بإدارة وتعديل رحلاتك السياحية</p>
+                                <h1 className="text-3xl font-bold text-gray-900">Tour Management</h1>
+                                <p className="mt-2 text-gray-600">Manage and edit your tours</p>
                             </div>
                             <Link
                                 href={`/dashboard/${params.id}/tours/new-trip`}
                                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                             >
                                 <FiPlus className="mr-2 h-4 w-4" />
-                                إضافة رحلة جديدة
+                                Add New Tour
                             </Link>
                         </div>
                     </div>
@@ -149,14 +149,14 @@ export default function ToursPage({ params }: ToursPageProps) {
                             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <FiMapPin className="w-12 h-12 text-gray-400" />
                             </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد رحلات</h3>
-                            <p className="text-gray-500 mb-6">ابدأ بإضافة رحلتك الأولى</p>
+                            <h3 className="text-lg font-medium text-gray-900 mb-2">No tours found</h3>
+                            <p className="text-gray-500 mb-6">Start by adding your first tour</p>
                             <Link
                                 href={`/dashboard/${params.id}/tours/new-trip`}
                                 className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
                             >
                                 <FiPlus className="mr-2 h-4 w-4" />
-                                إضافة رحلة جديدة
+                                Add New Tour
                             </Link>
                         </div>
                     ) : (
@@ -171,7 +171,6 @@ export default function ToursPage({ params }: ToursPageProps) {
                                                 alt={tour.title}
                                                 className="w-full h-full object-cover"
                                                 onError={(e) => {
-                                                    // إذا فشل تحميل الصورة، اعرض placeholder
                                                     const target = e.target as HTMLImageElement;
                                                     target.style.display = 'none';
                                                     const parent = target.parentElement;

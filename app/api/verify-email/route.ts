@@ -8,7 +8,7 @@ export async function POST(req: Request) {
 
     if (!token) {
       return NextResponse.json(
-        { success: false, error: 'رمز التحقق مطلوب' },
+        { success: false, error: 'Verification code is required' },
         { status: 400 }
       );
     }
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
 
     if (!verificationToken) {
       return NextResponse.json(
-        { success: false, error: 'رابط التفعيل غير صالح أو منتهي الصلاحية' },
+        { success: false, error: 'Invalid or expired verification code' },
         { status: 400 }
       );
     }
@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     // Check if token is expired
     if (new Date() > verificationToken.expires) {
       return NextResponse.json(
-        { success: false, error: 'انتهت صلاحية رابط التفعيل' },
+        { success: false, error: 'Verification code expired' },
         { status: 400 }
       );
     }
@@ -52,13 +52,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'تم تفعيل الحساب بنجاح! يمكنك الآن تسجيل الدخول.'
+      message: 'Account activated successfully! You can now log in.'
     });
 
   } catch (error) {
     console.error('Email verification error:', error);
     return NextResponse.json(
-      { success: false, error: 'حدث خطأ أثناء التحقق من البريد الإلكتروني' },
+      { success: false, error: 'An error occurred while verifying the email' },
       { status: 500 }
     );
   }

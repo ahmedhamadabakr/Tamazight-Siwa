@@ -57,7 +57,7 @@ export default function Users() {
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
+    if (!confirm('Are you sure you want to delete this user?')) return;
 
     try {
       const response = await fetch(`/api/users/${id}`, {
@@ -67,11 +67,11 @@ export default function Users() {
       if (data.success) {
         setUsers(users.filter(user => user._id !== id));
       } else {
-        alert('فشل في حذف المستخدم');
+        alert('Failed to delete user');
       }
     } catch (error) {
       console.error('Error deleting user:', error);
-      alert('فشل في حذف المستخدم');
+      alert('Failed to delete user');
     }
   };
 
@@ -131,7 +131,7 @@ export default function Users() {
   if (loading || sessionStatus === 'loading') {
     return (
       <div className="flex items-center justify-center h-64">
-        <div className="text-center">جاري التحميل...</div>
+        <div className="text-center">Loading...</div>
       </div>
     );
   }
@@ -140,13 +140,13 @@ export default function Users() {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
         <div className="text-center p-8 bg-white shadow-lg rounded-lg">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">غير مصرح لك بالوصول</h1>
-          <p className="text-gray-700 mb-6">ليس لديك صلاحيات للوصول إلى لوحة التحكم هذه.</p>
+          <h1 className="text-2xl font-bold text-red-600 mb-4">You are not authorized to access this dashboard</h1>
+          <p className="text-gray-700 mb-6">You do not have permissions to access this dashboard.</p>
           <button
             onClick={() => signOut({ callbackUrl: '/' })}
             className="px-6 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            تسجيل الخروج والعودة للصفحة الرئيسية
+            Logout and return to the home page
           </button>
         </div>
       </div>
@@ -156,7 +156,7 @@ export default function Users() {
   return (
     <DashboardLayout>
     <div>
-      <h1 className="text-3xl font-bold mb-6">إدارة المستخدمين</h1>
+      <h1 className="text-3xl font-bold mb-6">User Management</h1>
 
       {/* Statistics Cards - Responsive Grid */}
   <Analytics
@@ -171,7 +171,7 @@ export default function Users() {
         <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
-            placeholder="البحث في المستخدمين..."
+            placeholder="Search users..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="flex-1 p-2 sm:p-3 border rounded-lg text-sm sm:text-base"
@@ -182,16 +182,16 @@ export default function Users() {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="p-2 sm:p-3 border rounded-lg text-sm sm:text-base flex-1"
             >
-              <option value="">جميع الحالات</option>
-              <option value="active">نشط</option>
-              <option value="inactive">غير نشط</option>
-              <option value="pending">في الانتظار</option>
+              <option value="">All statuses</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="pending">Pending</option>
             </select>
             <button
               onClick={refreshUsers}
               className="bg-gray-500 text-white px-4 py-2 sm:px-6 sm:py-3 rounded-lg hover:bg-gray-600 text-sm sm:text-base"
             >
-              بحث
+              Search
             </button>
           </div>
         </div>
@@ -200,7 +200,7 @@ export default function Users() {
       {/* Users Table - Responsive */}
       <div className="bg-white shadow rounded-lg overflow-hidden">
         <div className="p-4 sm:p-6 border-b">
-          <h2 className="text-lg sm:text-xl font-semibold">قائمة المستخدمين</h2>
+          <h2 className="text-lg sm:text-xl font-semibold">User List</h2>
         </div>
         <div className="overflow-x-auto">
           <div className="min-w-full">
@@ -208,13 +208,13 @@ export default function Users() {
               <table className="w-full">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">الاسم</th>
-                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">البريد الإلكتروني</th>
-                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">الهاتف</th>
-                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">الدور</th>
-                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">الحالة</th>
-                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">التاريخ</th>
-                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">الإجراءات</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">Name</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">Email</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">Phone</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">Role</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">Status</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">Date</th>
+                    <th className="px-4 py-3 text-right text-xs sm:text-sm font-semibold text-gray-600">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -229,9 +229,9 @@ export default function Users() {
                           onChange={(e) => handleRoleChange(user._id, e.target.value)}
                           className="p-1 sm:p-2 border rounded text-xs sm:text-sm bg-white w-full"
                         >
-                          <option value="user">مستخدم</option>
-                          <option value="admin">مدير</option>
-                          <option value="moderator">مشرف</option>
+                          <option value="user">User</option>
+                          <option value="admin">Admin</option>
+                          <option value="moderator">Moderator</option>
                         </select>
                       </td>
                       <td className="px-4 py-3">
@@ -242,12 +242,12 @@ export default function Users() {
                             ? 'bg-red-100 text-red-800'
                             : 'bg-yellow-100 text-yellow-800'
                         }`}>
-                          {user.status === 'active' ? 'نشط' :
-                          user.status === 'inactive' ? 'غير نشط' : 'في الانتظار'}
+                          {user.status === 'active' ? 'Active' :
+                          user.status === 'inactive' ? 'Inactive' : 'Pending'}
                         </span>
                       </td>
                       <td className="px-4 py-3 text-xs sm:text-sm whitespace-nowrap">
-                        {new Date(user.createdAt).toLocaleDateString('ar-EG')}
+                        {new Date(user.createdAt).toLocaleDateString('en-US')}
                       </td>
                       <td className="px-4 py-3 space-x-1 sm:space-x-2 whitespace-nowrap">
                         <button
@@ -258,13 +258,13 @@ export default function Users() {
                               : 'bg-green-500 text-white hover:bg-green-600'
                           }`}
                         >
-                          {user.status === 'active' ? 'إيقاف' : 'تفعيل'}
+                          {user.status === 'active' ? 'Disable' : 'Enable'}
                         </button>
                         <button
                           onClick={() => handleDelete(user._id)}
                           className="px-2 sm:px-3 py-1 sm:py-2 bg-red-600 text-white rounded text-xs sm:text-sm font-medium hover:bg-red-700"
                         >
-                          حذف
+                          Delete
                         </button>
                       </td>
                     </tr>
@@ -284,8 +284,8 @@ export default function Users() {
                       user.status === 'inactive' ? 'bg-red-100 text-red-800' :
                       'bg-yellow-100 text-yellow-800'
                     }`}>
-                      {user.status === 'active' ? 'نشط' :
-                       user.status === 'inactive' ? 'غير نشط' : 'في الانتظار'}
+                      {user.status === 'active' ? 'Active' :
+                       user.status === 'inactive' ? 'Inactive' : 'Pending'}
                     </span>
                   </div>
                   <p className="text-sm text-gray-600 mb-2">{user.email}</p>
@@ -296,9 +296,9 @@ export default function Users() {
                       onChange={(e) => handleRoleChange(user._id, e.target.value)}
                       className="p-1 border rounded text-xs w-full mb-2"
                     >
-                      <option value="user">مستخدم</option>
-                      <option value="admin">مدير</option>
-                      <option value="moderator">مشرف</option>
+                      <option value="user">User</option>
+                      <option value="admin">Admin</option>
+                      <option value="moderator">Moderator</option>
                     </select>
                     <button
                       onClick={() => handleStatusToggle(user._id, user.status)}
@@ -308,13 +308,13 @@ export default function Users() {
                           : 'bg-green-500 text-white hover:bg-green-600'
                       }`}
                     >
-                      {user.status === 'active' ? 'إيقاف' : 'تفعيل'}
+                      {user.status === 'active' ? 'Disable' : 'Enable'}
                     </button>
                     <button
                       onClick={() => handleDelete(user._id)}
                       className="flex-1 px-2 py-1.5 bg-red-600 text-white rounded text-xs font-medium hover:bg-red-700"
                     >
-                      حذف
+                      Delete
                     </button>
                   </div>
                 </div>
@@ -323,7 +323,7 @@ export default function Users() {
 
             {users.length === 0 && (
               <div className="text-center py-8 text-gray-500 text-sm sm:text-base">
-                لا يوجد مستخدمون حالياً
+                No users found
               </div>
             )}
           </div>

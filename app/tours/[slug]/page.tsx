@@ -105,7 +105,7 @@ export default function TourDetailsPage() {
 
       {/* Image Gallery */}
       <section className="max-w-5xl mx-auto px-4 py-8">
-        <h2 className="text-2xl font-bold mb-4">معرض الصور</h2>
+        <h2 className="text-2xl font-bold mb-4">Image Gallery</h2>
         <ImageGallery 
           images={tour.images} 
           title={tour.title}
@@ -147,13 +147,13 @@ export default function TourDetailsPage() {
                 }}
               >
                 <User className="ml-2 h-4 w-4" />
-                احجز الآن
+                Book Now
               </Button>
 
               <Dialog open={isBookingOpen} onOpenChange={setIsBookingOpen}>
                 <DialogContent className="sm:max-w-[425px] rtl">
                   <DialogHeader>
-                    <DialogTitle>حجز الرحلة</DialogTitle>
+                    <DialogTitle> Book the tour</DialogTitle>
                   </DialogHeader>
                   <BookingForm
                     tourId={tour.id}
@@ -177,8 +177,6 @@ export default function TourDetailsPage() {
           </div>
         </div>
       </div>
-
-
     </div>
   )
 }

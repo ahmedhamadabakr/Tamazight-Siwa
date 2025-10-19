@@ -47,7 +47,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching gallery images:', error);
     return NextResponse.json(
-      { success: false, message: 'فشل في جلب الصور' },
+      { success: false, message: 'Failed to fetch images' },
       { status: 500 }
     );
   }
@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
     
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح لك بهذا الإجراء' },
+        { success: false, message: 'You are not authorized to perform this action' },
         { status: 403 }
       );
     }
@@ -97,13 +97,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: insertedImage,
-      message: 'تم إضافة الصورة بنجاح'
+      message: 'Image added successfully'
     });
 
   } catch (error) {
     console.error('Error creating gallery image:', error);
     return NextResponse.json(
-      { success: false, message: 'فشل في إضافة الصورة' },
+      { success: false, message: 'Failed to add image' },
       { status: 500 }
     );
   }

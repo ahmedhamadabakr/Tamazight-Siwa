@@ -11,7 +11,7 @@ export default function VerifyEmail() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const [status, setStatus] = useState<VerificationStatus>('verifying');
-  const [message, setMessage] = useState('جاري التحقق من البريد الإلكتروني...');
+  const [message, setMessage] = useState('Verifying your email...');
 
   useEffect(() => {
     const verifyToken = async () => {
@@ -19,7 +19,7 @@ export default function VerifyEmail() {
       
       if (!token) {
         setStatus('invalid');
-        setMessage('رابط التحقق غير صالح');
+        setMessage('Invalid verification token');
         return;
       }
 
@@ -36,16 +36,16 @@ export default function VerifyEmail() {
 
         if (data.success) {
           setStatus('success');
-          setMessage('تم التحقق من بريدك الإلكتروني بنجاح! سيتم تحويلك إلى الصفحة الرئيسية...');
+          setMessage('Email verified successfully! Redirecting to home page...');
           setTimeout(() => router.push('/'), 3000);
         } else {
-          throw new Error(data.error || 'فشل التحقق من البريد الإلكتروني');
+          throw new Error(data.error || 'Failed to verify email');
         }
       } catch (error: unknown) {
         console.error('Verification error:', error);
         setStatus('error');
-        const errorMessage = error instanceof Error ? error.message : 'حدث خطأ غير متوقع';
-        setMessage(errorMessage || 'حدث خطأ أثناء التحقق من البريد الإلكتروني');
+        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
+        setMessage(errorMessage || 'An error occurred while verifying your email');
       }
     };
 
@@ -72,9 +72,9 @@ export default function VerifyEmail() {
         <div className="flex flex-col items-center">
           {getStatusIcon()}
           <h2 className="mt-6 text-2xl font-bold text-gray-900">
-            {status === 'verifying' && 'جاري التحقق...'}
-            {status === 'success' && 'تم التحقق بنجاح!'}
-            {(status === 'error' || status === 'invalid') && 'خطأ في التحقق'}
+            {status === 'verifying' && 'Verifying...'}
+            {status === 'success' && 'Success!'}
+            {(status === 'error' || status === 'invalid') && 'Error in verification'}
           </h2>
         </div>
         <p className="mt-2 text-gray-600 text-right">{message}</p>
@@ -84,7 +84,7 @@ export default function VerifyEmail() {
             onClick={() => window.location.href = '/'}
             className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            العودة إلى الصفحة الرئيسية
+            Return to home page
           </button>
         )}
       </div>

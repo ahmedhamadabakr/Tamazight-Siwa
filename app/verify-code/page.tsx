@@ -14,7 +14,7 @@ export default function VerifyEmail() {
   const [code, setCode] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('أدخل رمز التحقق المرسل إلى بريدك الإلكتروني');
+  const [message, setMessage] = useState('Enter the verification code sent to your email');
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
@@ -38,11 +38,11 @@ export default function VerifyEmail() {
     
     if (!finalEmail) {
       setStatus('error');
-      setMessage('لم يتم العثور على البريد الإلكتروني. يرجى إعادة التسجيل.');
+      setMessage('Email not found. Please register again.');
     } else if (!registrationData.name || !registrationData.password) {
       // This case handles if email is in URL but name/password are missing from localStorage
       setStatus('error');
-      setMessage('لم يتم العثور على بيانات التسجيل الكاملة. يرجى إعادة التسجيل.');
+      setMessage('Email not found. Please register again.');
     }
   }, [searchParams]);
 
@@ -50,20 +50,20 @@ export default function VerifyEmail() {
     e.preventDefault();
 
     if (!code) {
-      setMessage('الرجاء إدخال رمز التحقق');
+      setMessage('Enter the verification code sent to your email');
       setStatus('error');
       return;
     }
 
     if (!email) {
-      setMessage('لم يتم العثور على البريد الإلكتروني. يرجى إعادة التسجيل.');
+      setMessage('Email not found. Please register again.');
       setStatus('error');
       return;
     }
 
     setIsLoading(true);
     setStatus('verifying');
-    setMessage('جاري التحقق من الرمز...');
+    setMessage('Verifying the code...');
 
     try {
       const response = await fetch('/api/verify-code', {
@@ -83,7 +83,7 @@ export default function VerifyEmail() {
 
       if (data.success) {
         setStatus('success');
-        setMessage('تم إنشاء الحساب بنجاح! سيتم تحويلك إلى صفحة تسجيل الدخول...');
+        setMessage('Account created successfully! Redirecting to login page...');
 
         // Clear stored data
         localStorage.removeItem('registrationData');
@@ -94,12 +94,12 @@ export default function VerifyEmail() {
         }, 3000);
       } else {
         setStatus('error');
-        setMessage(data.error || 'رمز التحقق غير صحيح');
+        setMessage(data.error || '  Invalid verification code');
       }
     } catch (error) {
       console.error('Verification error:', error);
       setStatus('error');
-      setMessage('حدث خطأ أثناء التحقق من الرمز');
+      setMessage('An error occurred while verifying the code');
     } finally {
       setIsLoading(false);
     }
@@ -107,14 +107,14 @@ export default function VerifyEmail() {
 
   const handleResendCode = async () => {
     if (!email || !name || !password) {
-      setMessage('يرجى العودة لصفحة التسجيل وإدخال البيانات مرة أخرى');
+      setMessage('Please return to the registration page and enter the data again');
       setStatus('error');
       return;
     }
 
     setIsLoading(true);
     setStatus('verifying');
-    setMessage('جاري إرسال رمز التحقق الجديد...');
+    setMessage('Sending new verification code...');
 
     try {
       const response = await fetch('/api/register', {
@@ -133,16 +133,16 @@ export default function VerifyEmail() {
 
       if (data.success) {
         setStatus('entering');
-        setMessage('تم إرسال رمز التحقق الجديد إلى بريدك الإلكتروني');
+        setMessage('New verification code sent to your email');
         setCode(''); // Clear the code field
       } else {
         setStatus('error');
-        setMessage(data.error || 'فشل في إرسال رمز التحقق الجديد');
+        setMessage(data.error || 'Failed to send new verification code');
       }
     } catch (error) {
       console.error('Resend error:', error);
       setStatus('error');
-      setMessage('حدث خطأ أثناء إرسال رمز التحقق الجديد');
+      setMessage('An error occurred while sending the new verification code');
     } finally {
       setIsLoading(false);
     }
@@ -166,16 +166,16 @@ export default function VerifyEmail() {
       <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8 bg-white p-8 rounded-lg shadow-md">
           <div className="text-center">
-            <h2 className="mt-6 text-3xl font-bold text-gray-900">تأكيد البريد الإلكتروني</h2>
+            <h2 className="mt-6 text-3xl font-bold text-gray-900">Verify your email</h2>
             <p className="mt-2 text-sm text-gray-600">
-              أدخل رمز التحقق المرسل إلى: <strong>{email}</strong>
+              Enter the verification code sent to: <strong>{email}</strong>
             </p>
           </div>
 
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="code" className="block text-sm font-medium text-gray-700 text-right">
-                رمز التحقق (6 أرقام)
+                Verification code (6 digits)
               </label>
               <input
                 id="code"
@@ -196,7 +196,7 @@ export default function VerifyEmail() {
                 disabled={isLoading || code.length !== 6}
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {isLoading ? 'جاري التحقق...' : 'تأكيد الحساب'}
+                {isLoading ? 'Verifying...' : 'Verify account'}
               </button>
             </div>
 
@@ -207,7 +207,7 @@ export default function VerifyEmail() {
                 disabled={isLoading}
                 className="text-sm text-blue-600 hover:text-blue-500 disabled:opacity-50"
               >
-                إرسال رمز جديد
+                Resend code
               </button>
             </div>
 
@@ -218,7 +218,7 @@ export default function VerifyEmail() {
                 className="text-sm text-gray-600 hover:text-gray-500 flex items-center justify-center gap-2"
               >
                 <FaArrowLeft className="text-sm" />
-                العودة إلى صفحة التسجيل
+                Return to registration page
               </button>
             </div>
           </form>
@@ -239,9 +239,9 @@ export default function VerifyEmail() {
         <div className="flex flex-col items-center">
           {getStatusIcon()}
           <h2 className="mt-6 text-2xl font-bold text-gray-900">
-            {status === 'verifying' && 'جاري التحقق...'}
-            {status === 'success' && 'تم بنجاح!'}
-            {status === 'error' && 'خطأ في التحقق'}
+            {status === 'verifying' && 'Verifying...'}
+            {status === 'success' && 'Success!'}
+            {status === 'error' && 'Error in verification'}
           </h2>
         </div>
         <p className="mt-2 text-gray-600 text-right">{message}</p>
@@ -250,12 +250,12 @@ export default function VerifyEmail() {
           <button
             onClick={() => {
               setStatus('entering');
-              setMessage('أدخل رمز التحقق المرسل إلى بريدك الإلكتروني');
+              setMessage('Enter the verification code sent to your email');
               setCode('');
             }}
             className="mt-4 w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
-            المحاولة مرة أخرى
+            Try again
           </button>
         )}
       </div>

@@ -8,13 +8,21 @@ export async function GET(
     { params }: { params: { id: string } }
 ) {
     try {
+        // Skip database operations during build time
+        if (process.env.NEXT_PHASE === 'phase-production-build') {
+            return NextResponse.json({
+                success: false,
+                error: 'API routes are not available during build time'
+            }, { status: 503 });
+        }
+
         const db = await dbConnect();
         const { id } = params;
 
         if (!ObjectId.isValid(id)) {
             return NextResponse.json({
                 success: false,
-                error: 'معرف المدير غير صالح'
+                error: 'Invalid admin ID'
             }, { status: 400 });
         }
 
@@ -26,7 +34,7 @@ export async function GET(
         if (!admin) {
             return NextResponse.json({
                 success: false,
-                error: 'المدير غير موجود'
+                error: 'Admin not found'
             }, { status: 404 });
         }
 
@@ -38,7 +46,7 @@ export async function GET(
         console.error('Error fetching admin:', error);
         return NextResponse.json({
             success: false,
-            error: 'فشل في جلب بيانات المدير'
+            error: 'Failed to fetch admin data'
         }, { status: 500 });
     }
 }
@@ -49,6 +57,14 @@ export async function PUT(
     { params }: { params: { id: string } }
 ) {
     try {
+        // Skip database operations during build time
+        if (process.env.NEXT_PHASE === 'phase-production-build') {
+            return NextResponse.json({
+                success: false,
+                error: 'API routes are not available during build time'
+            }, { status: 503 });
+        }
+
         const db = await dbConnect();
 
         const { id } = params;
@@ -70,20 +86,20 @@ export async function PUT(
         if (!updatedAdmin || !updatedAdmin.value) {
             return NextResponse.json({
                 success: false,
-                error: 'المدير غير موجود'
+                error: 'Admin not found'
             }, { status: 404 });
         }
 
         return NextResponse.json({
             success: true,
             data: updatedAdmin.value,
-            message: 'تم تحديث المدير بنجاح'
+            message: 'Admin updated successfully'
         });
     } catch (error) {
         console.error('Error updating admin:', error);
         return NextResponse.json({
             success: false,
-            error: 'فشل في تحديث المدير'
+            error: 'Failed to update admin'
         }, { status: 500 });
     }
 }
@@ -94,6 +110,14 @@ export async function DELETE(
     { params }: { params: { id: string } }
 ) {
     try {
+        // Skip database operations during build time
+        if (process.env.NEXT_PHASE === 'phase-production-build') {
+            return NextResponse.json({
+                success: false,
+                error: 'API routes are not available during build time'
+            }, { status: 503 });
+        }
+
         const db = await dbConnect();
 
         const { id } = params;
@@ -103,18 +127,18 @@ export async function DELETE(
         if (!deletedAdmin || !deletedAdmin.value) {
             return NextResponse.json({
                 success: false,
-                error: 'المدير غير موجود'
+                error: 'Admin not found'
             }, { status: 404 });
         }
         return NextResponse.json({
             success: true,
-            message: 'تم حذف المدير بنجاح'
+            message: 'Admin deleted successfully'
         });
     } catch (error) {
         console.error('Error deleting admin:', error);
         return NextResponse.json({
             success: false,
-            error: 'فشل في حذف المدير'
+            error: 'Failed to delete admin'
         }, { status: 500 });
     }
 }

@@ -122,13 +122,12 @@ export default function UserDashboard({ params }: UserDashboardProps) {
 });
       setEditMode(false)
       router.refresh()
-      alert('تم تحديث الملف الشخصي بنجاح ✅')
+      alert('Profile updated successfully ')
     } else {
-      alert(`خطأ في تحديث الملف الشخصي ❌: ${data.message || 'حدث خطأ غير معروف'}`)
+      alert(`Error updating profile : ${data.message || 'Error updating profile'}`)
     }
   } catch (err) {
-    console.error('Error updating profile:', err)
-    alert('حدث خطأ في تحديث الملف الشخصي. الرجاء المحاولة مرة أخرى لاحقاً.')
+    alert('Error updating profile. Please try again later.')
   }
 }
 
@@ -148,7 +147,7 @@ export default function UserDashboard({ params }: UserDashboardProps) {
         alert('Error cancelling the trip ❌')
       }
     } catch (err) {
-      console.error(err)
+      alert('Error cancelling the trip. Please try again later.')
     }
   }
 

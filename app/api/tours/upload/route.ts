@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json(
-        { success: false, error: 'لا يوجد ملف مرفق' },
+        { success: false, error: 'No file attached' },
         { status: 400 }
       );
     }
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     // Validate file type
     if (!file.type.startsWith('image/')) {
       return NextResponse.json(
-        { success: false, error: 'يجب أن يكون الملف صورة' },
+        { success: false, error: 'File must be an image' },
         { status: 400 }
       );
     }
@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       return NextResponse.json(
-        { success: false, error: 'حجم الصورة يجب أن يكون أقل من 5 ميجابايت' },
+        { success: false, error: 'File size must be less than 5MB' },
         { status: 400 }
       );
     }
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error uploading image:', error);
     return NextResponse.json(
-      { success: false, error: 'فشل في رفع الصورة' },
+      { success: false, error: 'Failed to upload image' },
       { status: 500 }
     );
   }

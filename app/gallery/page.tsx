@@ -55,11 +55,11 @@ export default function GalleryPage() {
       if (data.success) {
         setImages(data.data || [])
       } else {
-        setError(data.message || 'فشل في تحميل الصور')
+        setError(data.message || 'Failed to load images')
       }
     } catch (error) {
-      console.error('Error fetching gallery images:', error)
-      setError('فشل في الاتصال بالخادم')
+    
+      setError('Failed to connect to the server')
     } finally {
       setLoading(false)
     }
@@ -77,7 +77,7 @@ export default function GalleryPage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary mb-2" />
-            <p className="text-muted-foreground">جاري تحميل معرض الصور...</p>
+            <p className="text-muted-foreground">Loading gallery...</p>
           </div>
         </div>
         <Footer />
@@ -93,7 +93,7 @@ export default function GalleryPage() {
           <div className="text-center">
             <p className="text-red-500 mb-2">{error}</p>
             <Button onClick={fetchImages} variant="outline">
-              إعادة المحاولة
+              Retry
             </Button>
           </div>
         </div>
@@ -122,9 +122,9 @@ export default function GalleryPage() {
           transition={{ duration: 0.8 }}
           className="relative z-10 text-center text-white max-w-3xl mx-auto px-4"
         >
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">معرض واحة سيوة</h1>
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">Siwa Gallery</h1>
           <p className="text-lg md:text-2xl opacity-90">
-            اكتشف جمال واحة سيوة من خلال عدستنا
+            Discover the beauty of Siwa Oasis through our collection
           </p>
         </motion.div>
       </section>
@@ -136,22 +136,22 @@ export default function GalleryPage() {
             <div>
               <Images className="mx-auto w-8 h-8 text-primary mb-2" />
               <div className="text-2xl font-bold text-primary">{images.length}+</div>
-              <div className="text-sm text-muted-foreground">صورة</div>
+              <div className="text-sm text-muted-foreground">Image</div>
             </div>
             <div>
               <MapPin className="mx-auto w-8 h-8 text-primary mb-2" />
               <div className="text-2xl font-bold text-primary">50+</div>
-              <div className="text-sm text-muted-foreground">موقع</div>
+              <div className="text-sm text-muted-foreground">Location</div>
             </div>
             <div>
               <Camera className="mx-auto w-8 h-8 text-primary mb-2" />
               <div className="text-2xl font-bold text-primary">{categories.length - 1}</div>
-              <div className="text-sm text-muted-foreground">فئات</div>
+              <div className="text-sm text-muted-foreground">Categories</div>
             </div>
             <div>
               <Users className="mx-auto w-8 h-8 text-primary mb-2" />
               <div className="text-2xl font-bold text-primary">3</div>
-              <div className="text-sm text-muted-foreground">مصورين</div>
+              <div className="text-sm text-muted-foreground">Photographers</div>
             </div>
           </div>
         </div>
@@ -183,10 +183,10 @@ export default function GalleryPage() {
             <div className="text-center py-12">
               <Images className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
               <h3 className="text-lg font-medium text-muted-foreground mb-2">
-                لا توجد صور في هذه الفئة
+                No images found in this category
               </h3>
               <p className="text-muted-foreground">
-                جرب فئة أخرى أو عد لاحقاً لرؤية المزيد من الصور
+                Try another category or come back later to see more images
               </p>
             </div>
           ) : (
@@ -242,20 +242,20 @@ export default function GalleryPage() {
         <div className="absolute inset-0 bg-black/70" />
         <div className="relative z-10 max-w-4xl mx-auto px-4">
           <Camera className="w-16 h-16 mx-auto mb-6 opacity-90" />
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">التقط ذكرياتك الخاصة</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Capture your memories</h2>
           <p className="text-lg md:text-xl mb-8 opacity-90">
-            انضم إلى جولات التصوير لدينا وتعلم كيفية التقاط جمال سيوة كالمحترفين
+            Join our photography tours and learn how to capture the beauty of Siwa like professionals
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button size="lg" variant="secondary" className="bg-white text-black hover:bg-white/90">
-              جولات التصوير
+              Photography Tours
             </Button>
             <Button
               size="lg"
               variant="outline"
               className="border-white text-black hover:bg-white hover:text-black-900"
             >
-              جلسات خاصة
+              Special Sessions
             </Button>
           </div>
         </div>
@@ -264,9 +264,9 @@ export default function GalleryPage() {
       {/* Instagram Feed */}
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto text-center">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">تابع رحلتنا</h2>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Follow our journey</h2>
           <p className="text-lg text-muted-foreground mb-8">
-            ابق على اطلاع بأحدث اللحظات من واحة سيوة
+            Stay updated with the latest moments from Siwa Oasis
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-8">
@@ -286,7 +286,7 @@ export default function GalleryPage() {
             size="lg"
             className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white border-0"
           >
-            متابعة على إنستغرام
+            Follow on Instagram
           </Button>
         </div>
       </section>
