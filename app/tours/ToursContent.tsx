@@ -5,14 +5,10 @@ import React from "react"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Clock, Users, Star } from "lucide-react"
-import Image from "next/image"
 import { motion } from "framer-motion"
-import Link from "next/link"
-import { tours } from "@/app/data/tours"   // ✅ استيراد الداتا من ملف واحد
 import { Tour } from "@/types/tour"
+import { TourCard } from "@/components/TourCard"
 const categories = ["All", "Cultural", "Adventure", "Wellness", "Photography", "Extreme"]
 
 export default function ToursContent() {
@@ -50,37 +46,50 @@ export default function ToursContent() {
     <div className="min-h-screen bg-background">
       <Navigation />
 
-      {/* باقي الكود بتاع عرض الكروت زي ما هو */}
+      {/* Tours Grid */}
       <section className="py-20 px-4">
         <div className="max-w-6xl mx-auto">
-          <motion.div layout className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {tour?.map((tour) => (
-              <motion.div key={tour._id} initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }}>
-                <Card className="overflow-hidden border-0 shadow-lg hover:shadow-2xl transition group">
-                  <div className="relative h-48">
-                    <Image src={tour.images[0]} alt={tour.title} fill className="object-cover" />
-                  </div>
-
-                  <CardHeader>
-                    <CardTitle className="text-xl">{tour.title}</CardTitle>
-                    <div className="text-2xl font-bold text-primary">{tour.price}</div>
-                  </CardHeader>
-
-                  <CardContent>
-                    <p className="text-muted-foreground mb-4">{tour.description}</p>
-                    <div className="flex gap-2">
-                      <Link href={`/tours/${tour.slug || tour._id}`} className="flex-1">
-                        <Button className="w-full bg-primary">Book Now</Button>
-                      </Link>
-                      <Link href={`/tours/${tour.slug || tour._id}`} className="flex-1">
-                        <Button variant="outline" className="w-full">Learn More</Button>
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
+          {/* Category Filter */}
+          <div className="flex flex-wrap justify-center gap-4 mb-12">
+            {categories.map((category) => (
+              <Button
+                key={category}
+                variant={activeCategory === category ? "default" : "outline"}
+                onClick={() => setActiveCategory(category)}
+                className="transition-all duration-300"
+              >
+                {category === "All" ? "الكل" : category}
+              </Button>
             ))}
-          </motion.div>
+          </div>
+
+          {/* Loading State */}
+          {loading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-200 h-48 rounded-lg mb-4"></div>
+                  <div className="bg-gray-200 h-6 rounded mb-2"></div>
+                  <div className="bg-gray-200 h-4 rounded mb-4"></div>
+                  <div className="bg-gray-200 h-10 rounded"></div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            /* Tours Grid */
+            <motion.div layout className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {tour?.map((tourItem, index) => (
+                <TourCard key={tourItem._id} tour={tourItem} index={index} />
+              ))}
+            </motion.div>
+          )}
+
+          {/* Empty State */}
+          {!loading && tour?.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500 text-lg">لا توجد رحلات متاحة في هذه الفئة</p>
+            </div>
+          )}
         </div>
       </section>
 

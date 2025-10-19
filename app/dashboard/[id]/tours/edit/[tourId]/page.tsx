@@ -15,63 +15,7 @@ import {
     FiUpload,
     FiTrash2
 } from 'react-icons/fi';
-
-// Component لعرض الصور مع معالجة الأخطاء
-const ImageDisplay = ({ src, alt, className }: {
-    src?: string;
-    alt: string;
-    className?: string;
-}) => {
-    const [imageError, setImageError] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        setImageError(false);
-        setIsLoading(true);
-    }, [src]);
-
-    if (!src || imageError) {
-        return (
-            <div className={`flex items-center justify-center bg-gray-100 ${className || ''}`}>
-                <div className="text-center p-4">
-                    <FiImage className="w-12 h-12 text-gray-400 mx-auto mb-2" />
-                    <p className="text-gray-500 text-sm">
-                        {!src ? 'لا توجد صورة' : 'فشل في تحميل الصورة'}
-                    </p>
-                    {src && (
-                        <p className="text-gray-400 text-xs mt-1 break-all">
-                            {src.length > 50 ? src.substring(0, 50) + '...' : src}
-                        </p>
-                    )}
-                </div>
-            </div>
-        );
-    }
-
-    return (
-        <div className="relative w-full h-full">
-            {isLoading && (
-                <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                </div>
-            )}
-            <img
-                src={src}
-                alt={alt}
-                className={`${className || ''} ${isLoading ? 'opacity-0' : 'opacity-100'} transition-opacity duration-300`}
-                onLoad={() => {
-                    setIsLoading(false);
-                    console.log('✅ تم تحميل الصورة بنجاح:', src);
-                }}
-                onError={() => {
-                    console.error('❌ فشل في تحميل الصورة:', src);
-                    setImageError(true);
-                    setIsLoading(false);
-                }}
-            />
-        </div>
-    );
-};
+import { DashboardLayout } from '@/components/dashboard/sidebar';
 
 type Tour = {
     _id: string;
@@ -119,6 +63,12 @@ export default function EditTourPage({ params }: EditTourPageProps) {
     const [imagePreviews, setImagePreviews] = useState<string[]>([]);
     const [mainImageIndex, setMainImageIndex] = useState(0);
 
+    useEffect(() => {
+        if (!session || session.user?.role !== 'manager') {
+            router.push('/');
+        }
+    }, [session, router]);
+    
     // Fetch tour data
     const fetchTour = useCallback(async () => {
         try {
@@ -247,14 +197,9 @@ export default function EditTourPage({ params }: EditTourPageProps) {
 
         try {
             const newImages: string[] = [];
-            const newPreviews: string[] = [];
 
-            for (let i = 0; i < files.length; i++) {
+            for (let i = 0; i <files.length; i++) {
                 const file = files[i];
-
-                // إنشاء معاينة فورية للصورة
-                const previewUrl = URL.createObjectURL(file);
-                newPreviews.push(previewUrl);
 
                 // رفع الصورة للخادم
                 const formData = new FormData();
@@ -273,31 +218,32 @@ export default function EditTourPage({ params }: EditTourPageProps) {
 
                     if (res.ok) {
                         const data = await res.json();
-                        console.log('استجابة رفع الصورة:', data);
-                        if (data.url) {
-                            newImages.push(data.url);
-                            console.log('تم رفع الصورة بنجاح:', data.url);
+                        if (data.success && data.data.url) {
+                            newImages.push(data.data.url);
+                            console.log('تم رفع الصورة بنجاح:', data.data.url);
                         } else {
-                            console.warn('لم يتم إرجاع URL للصورة، استخدام preview');
-                            newImages.push(previewUrl);
+                            console.error('لم يتم إرجاع URL صالح للصورة');
+                            alert(`فشل في رفع الصورة: ${data.error || 'خطأ غير معروف'}`);
                         }
                     } else {
-                        console.error('فشل رفع الصورة، الحالة:', res.status);
-                        newImages.push(previewUrl);
+                        const errorData = await res.json();
+                        console.error('فشل رفع الصورة، الحالة:', res.status, errorData);
+                        alert(`فشل في رفع الصورة: ${errorData.error || 'خطأ في الخادم'}`);
                     }
                 } catch (uploadError) {
                     console.error('خطأ في رفع الصورة:', uploadError);
-                    console.log('استخدام preview URL بدلاً من الرفع');
-                    newImages.push(previewUrl);
+                    alert('حدث خطأ أثناء رفع الصورة. تأكد من اتصال الإنترنت وحاول مرة أخرى.');
                 }
             }
 
-            // تحديث البيانات
-            setTour(prev => ({
-                ...prev,
-                images: [...prev.images, ...newImages]
-            }));
-            setImagePreviews(prev => [...prev, ...newImages]);
+            // تحديث البيانات فقط بالصور الناجحة
+            if (newImages.length > 0) {
+                setTour(prev => ({
+                    ...prev,
+                    images: [...prev.images, ...newImages]
+                }));
+                setImagePreviews(prev => [...prev, ...newImages]);
+            }
 
         } catch (error) {
             console.error('Error handling images:', error);
@@ -372,73 +318,11 @@ export default function EditTourPage({ params }: EditTourPageProps) {
     }
 
     return (
+        <DashboardLayout>
+
         <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
             <div className="max-w-4xl mx-auto">
-                {/* Header */}
-                <div className="mb-8">
-                    <button
-                        onClick={() => router.back()}
-                        className="flex items-center text-gray-600 hover:text-blue-600 transition-colors mb-4 group"
-                    >
-                        <FiArrowLeft className="mr-2 transition-transform group-hover:-translate-x-1" />
-                        <span className="font-medium">العودة للرحلات</span>
-                    </button>
-
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                        <div className="flex items-center justify-between">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <FiImage className="w-5 h-5 text-blue-600" />
-                                </div>
-                                <div>
-                                    <h1 className="text-2xl font-bold text-gray-900">تعديل الرحلة</h1>
-                                    <p className="text-gray-600">قم بتحديث تفاصيل الرحلة والصور والأسعار</p>
-                                </div>
-                            </div>
-
-                            {/* Debug Button - احذفه لاحقاً */}
-                            <div className="flex gap-2">
-                                <button
-                                    onClick={() => {
-                                        console.log('=== فحص بيانات الرحلة ===');
-                                        console.log('بيانات الرحلة:', tour);
-                                        console.log('معاينات الصور:', imagePreviews);
-                                        console.log('الصورة الحالية:', imagePreviews[mainImageIndex]);
-
-                                        const imageInfo = imagePreviews.map((img, idx) => {
-                                            const isBlob = img.startsWith('blob:');
-                                            const isHttp = img.startsWith('http');
-                                            const isData = img.startsWith('data:');
-                                            return `${idx + 1}: ${isBlob ? 'Blob URL' : isHttp ? 'HTTP URL' : isData ? 'Data URL' : 'Unknown'} - ${img.substring(0, 50)}...`;
-                                        }).join('\n');
-
-                                        alert(`عدد الصور: ${imagePreviews.length}\n\nتفاصيل الصور:\n${imageInfo}`);
-                                    }}
-                                    className="px-3 py-1 bg-yellow-500 text-white rounded text-xs hover:bg-yellow-600"
-                                >
-                                    فحص البيانات
-                                </button>
-
-                                <button
-                                    onClick={() => {
-                                        // إضافة صورة تجريبية للاختبار
-                                        const testImage = 'https://via.placeholder.com/400x300/4F46E5/FFFFFF?text=Test+Image';
-                                        setImagePreviews(prev => [...prev, testImage]);
-                                        setTour(prev => ({
-                                            ...prev,
-                                            images: [...prev.images, testImage]
-                                        }));
-                                        alert('تم إضافة صورة تجريبية');
-                                    }}
-                                    className="px-3 py-1 bg-green-500 text-white rounded text-xs hover:bg-green-600"
-                                >
-                                    إضافة صورة تجريبية
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
+               
                 <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Basic Information */}
                     <div className="bg-white shadow rounded-lg">
@@ -651,9 +535,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                                 src={imagePreviews[mainImageIndex]}
                                                 alt="صورة الرحلة"
                                                 className="w-full h-full object-cover"
-                                                onLoad={() => console.log('تم تحميل الصورة بنجاح')}
                                                 onError={(e) => {
-                                                    console.error('فشل في تحميل الصورة:', imagePreviews[mainImageIndex]);
                                                     const target = e.target as HTMLImageElement;
                                                     target.style.display = 'none';
                                                     const parent = target.parentElement;
@@ -699,7 +581,6 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                                         alt={`صورة ${idx + 1}`}
                                                         className="w-full h-full object-cover"
                                                         onError={(e) => {
-                                                            console.error(`فشل في تحميل الصورة المصغرة ${idx + 1}:`, img);
                                                             const target = e.target as HTMLImageElement;
                                                             target.style.display = 'none';
                                                             const parent = target.parentElement;
@@ -806,5 +687,6 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                 </form>
             </div>
         </div>
+        </DashboardLayout>
     );
 }

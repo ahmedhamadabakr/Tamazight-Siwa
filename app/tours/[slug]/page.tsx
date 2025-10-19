@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Session } from "next-auth";
 import { BookingForm } from '@/components/BookingForm'
+import { ImageGallery } from '@/components/ImageGallery'
 import {
   Dialog,
   DialogContent,
@@ -62,7 +63,6 @@ export default function TourDetailsPage() {
       const data = await response.json();
       if (data.success) {
         if (data.data) {
-
           setTour(data.data);
         } else {
           setTour(null);
@@ -77,6 +77,8 @@ export default function TourDetailsPage() {
     }
   };
 
+
+
   if (isLoading) {
     return <div>Loading...</div>; // Add a proper loading state
   }
@@ -87,12 +89,28 @@ export default function TourDetailsPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Image */}
-      <section className="relative h-[50vh]">
-        <Image src={tour.images[0]} alt={tour.title} fill className="object-cover" />
-        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-          <h1 className="text-4xl md:text-6xl font-bold text-white">{tour.title}</h1>
+      {/* Hero Section with Title */}
+      <section className="relative h-[60vh]">
+        <Image 
+          src={tour.images[0]} 
+          alt={tour.title} 
+          fill 
+          className="object-cover" 
+          priority
+        />
+        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+          <h1 className="text-4xl md:text-6xl font-bold text-white text-center px-4">{tour.title}</h1>
         </div>
+      </section>
+
+      {/* Image Gallery */}
+      <section className="max-w-5xl mx-auto px-4 py-8">
+        <h2 className="text-2xl font-bold mb-4">معرض الصور</h2>
+        <ImageGallery 
+          images={tour.images} 
+          title={tour.title}
+          className="h-96"
+        />
       </section>
 
       {/* Content */}
@@ -159,6 +177,8 @@ export default function TourDetailsPage() {
           </div>
         </div>
       </div>
+
+
     </div>
   )
 }

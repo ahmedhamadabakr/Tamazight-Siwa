@@ -11,6 +11,8 @@ export const uploadImage = async (file: string) => {
     const result = await cloudinary.uploader.upload(file, {
       folder: 'aitu-dev-website',
       resource_type: 'auto',
+      quality: 'auto',
+      format: 'auto',
     });
     return result;
   } catch (error) {

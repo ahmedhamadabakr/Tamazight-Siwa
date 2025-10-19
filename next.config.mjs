@@ -7,7 +7,18 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    unoptimized: true,
+    loader: 'cloudinary',
+    path: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/fetch/`,
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+    ],
   },
 }
 

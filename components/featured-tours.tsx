@@ -49,35 +49,56 @@ const fetchTours = async () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {firstFourItems.map((tour) => (
-            <Card key={tour.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300">
-              <div className="relative overflow-hidden">
+          {firstFourItems.map((tour, index) => (
+            <Card key={tour.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 h-full">
+              <div className="relative overflow-hidden h-48">
                 <img
                   src={tour.images[0] || "/placeholder.svg"}
                   alt={tour.title}
-                  className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  loading="lazy"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                
+                {/* Image Count Badge */}
+                {tour.images.length > 1 && (
+                  <div className="absolute top-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                    {tour.images.length} صور
+                  </div>
+                )}
+
+                {/* Hover Overlay with Title */}
+                <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="text-white text-center p-4">
+                    <h4 className="font-bold text-lg mb-2">{tour.title}</h4>
+                    <p className="text-sm opacity-90">اضغط لمشاهدة التفاصيل</p>
+                  </div>
+                </div>
               </div>
-              <CardContent className="p-6">
-                <h3 className="text-xl font-bold text-foreground mb-3 text-balance">{tour.title}</h3>
-                <p className="text-muted-foreground mb-4 text-pretty">{tour.description}</p>
+              
+              <CardContent className="p-6 flex flex-col h-full">
+                <h3 className="text-xl font-bold text-foreground mb-3 text-balance line-clamp-2">{tour.title}</h3>
+                <p className="text-muted-foreground mb-4 text-pretty line-clamp-3 flex-grow">{tour.description}</p>
+                
                 <div className="space-y-2 mb-6">
                   <div className="flex items-center text-sm text-muted-foreground">
-                    <Clock className="w-4 h-4 mr-2" />
+                    <Clock className="w-4 h-4 mr-2 text-primary" />
                     <span>{tour.duration}</span>
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground">
-                    <Users className="w-4 h-4 mr-2" />
+                    <Users className="w-4 h-4 mr-2 text-primary" />
                     <span>{tour.groupSize}</span>
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground">
-                    <MapPin className="w-4 h-4 mr-2" />
+                    <MapPin className="w-4 h-4 mr-2 text-primary" />
                     <span>{tour.location}</span>
                   </div>
                 </div>
-                <Link href={`/tours/${tour.slug || tour.id}`} className="w-full">
-                  <Button variant="outline" className="w-full">Learn More</Button>
+                
+                <Link href={`/tours/${tour.slug || tour.id}`} className="w-full mt-auto">
+                  <Button variant="outline" className="w-full hover:bg-primary hover:text-white transition-colors">
+                    اكتشف المزيد
+                  </Button>
                 </Link>
               </CardContent>
             </Card>

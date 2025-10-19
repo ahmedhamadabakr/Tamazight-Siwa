@@ -1,8 +1,9 @@
 'use client'
 
 import { DashboardLayout } from '@/components/dashboard/sidebar'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
 export default function NewTrip() {
   const router = useRouter()
@@ -19,6 +20,15 @@ export default function NewTrip() {
 
   const [images, setImages] = useState<string[]>([])
   const [uploading, setUploading] = useState(false)
+
+
+  const { data: session } = useSession();
+
+  useEffect(() => {
+    if (!session || session.user?.role !== 'manager') {
+      router.push('/');
+    }
+  }, [session, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
