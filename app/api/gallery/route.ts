@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
         { success: false, message: 'You are not authorized to perform this action' },
+
         { status: 403 }
       );
     }
@@ -99,7 +100,7 @@ export async function POST(request: NextRequest) {
       data: insertedImage,
       message: 'Image added successfully'
     });
-
+    
   } catch (error) {
     console.error('Error creating gallery image:', error);
     return NextResponse.json(

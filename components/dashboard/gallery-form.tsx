@@ -1,16 +1,21 @@
 'use client';
 
-import { useState, useRef } from 'react';
-import { X, Upload, Image as ImageIcon } from 'lucide-react';
-import Image from 'next/image';
+import { useState } from 'react';
+import { X } from 'lucide-react';
+import { CloudinaryUpload } from '@/components/CloudinaryUpload';
 
 interface GalleryImage {
   _id?: string;
   title: string;
   description: string;
   imageUrl: string;
+  publicId?: string;
   category: string;
   isActive: boolean;
+  width?: number;
+  height?: number;
+  format?: string;
+  bytes?: number;
 }
 
 interface GalleryFormProps {
@@ -26,74 +31,70 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
     category: image?.category || 'طبيعة',
     isActive: image?.isActive ?? true,
   });
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>(image?.imageUrl || '');
+  const [cloudinaryData, setCloudinaryData] = useState<{
+    imageUrl: string;
+    publicId: string;
+    width: number;
+    height: number;
+    format: string;
+    bytes: number;
+  } | null>(
+    image?.imageUrl ? {
+      imageUrl: image.imageUrl,
+      publicId: image.publicId || '',
+      width: image.width || 0,
+      height: image.height || 0,
+      format: image.format || '',
+      bytes: image.bytes || 0
+    } : null
+  );
   const [loading, setLoading] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadError, setUploadError] = useState<string>('');
 
   const categories = ['طبيعة', 'تراث', 'مناظر', 'أنشطة', 'طعام', 'أخرى'];
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setImageFile(file);
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleUploadSuccess = (result: {
+    imageUrl: string;
+    publicId: string;
+    width: number;
+    height: number;
+    format: string;
+    bytes: number;
+  }) => {
+    setCloudinaryData(result);
+    setUploadError('');
   };
 
-  const uploadImage = async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append('image', file);
-
-    const response = await fetch('/api/upload', {
-      method: 'POST',
-      body: formData,
-    });
-
-    const data = await response.json();
-    if (!data.success) {
-      throw new Error(data.message || 'فشل في رفع الصورة');
-    }
-
-    return data.imageUrl;
+  const handleUploadError = (error: string) => {
+    setUploadError(error);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+    setUploadError('');
 
     try {
-      let imageUrl = image?.imageUrl || '';
-
-      // Upload new image if selected
-      if (imageFile) {
-        imageUrl = await uploadImage(imageFile);
-      }
-
       // Validate required fields
       if (!formData.title.trim()) {
-        alert('يرجى إدخال عنوان الصورة');
+        setUploadError('يرجى إدخال عنوان الصورة');
         return;
       }
 
-      if (!imageUrl) {
-        alert('يرجى اختيار صورة');
+      if (!cloudinaryData?.imageUrl) {
+        setUploadError('يرجى اختيار صورة');
         return;
       }
 
       await onSave({
         ...formData,
-        imageUrl,
+        ...cloudinaryData,
       });
 
       onClose();
     } catch (error) {
       console.error('Error saving image:', error);
-      alert('فشل في حفظ الصورة');
+      setUploadError('فشل في حفظ الصورة');
     } finally {
       setLoading(false);
     }
@@ -120,56 +121,16 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
             <label className="block text-sm font-medium text-gray-700 mb-2">
               الصورة *
             </label>
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
-              {imagePreview ? (
-                <div className="relative">
-                  <div className="relative h-48 w-full mb-4">
-                    <Image
-                      src={imagePreview}
-                      alt="معاينة الصورة"
-                      fill
-                      className="object-cover rounded-lg"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setImagePreview('');
-                      setImageFile(null);
-                      if (fileInputRef.current) {
-                        fileInputRef.current.value = '';
-                      }
-                    }}
-                    className="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600"
-                  >
-                    إزالة الصورة
-                  </button>
-                </div>
-              ) : (
-                <div className="text-center">
-                  <ImageIcon className="mx-auto h-12 w-12 text-gray-400" />
-                  <div className="mt-4">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                    >
-                      اختيار صورة
-                    </button>
-                  </div>
-                  <p className="mt-2 text-sm text-gray-500">
-                    PNG, JPG, GIF حتى 10MB
-                  </p>
-                </div>
-              )}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageChange}
-                className="hidden"
-              />
-            </div>
+            <CloudinaryUpload
+              onUploadSuccess={handleUploadSuccess}
+              onUploadError={handleUploadError}
+              folder="gallery"
+              currentImage={image?.imageUrl}
+              disabled={loading}
+            />
+            {uploadError && (
+              <p className="mt-2 text-sm text-red-600">{uploadError}</p>
+            )}
           </div>
 
           {/* Title */}

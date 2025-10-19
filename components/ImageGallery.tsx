@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import Image from "next/image"
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react"
+import { CloudinaryImage } from "./CloudinaryImage"
 
 interface ImageGalleryProps {
     images: string[]
@@ -68,12 +68,14 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                     className="relative cursor-pointer group overflow-hidden rounded-lg"
                     onClick={() => openGallery(0)}
                 >
-                    <Image
+                    <CloudinaryImage
                         src={images[0]}
                         alt={`${title} - الصورة الرئيسية`}
                         fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        className="group-hover:scale-105 transition-transform duration-300"
                         priority
+                        quality={85}
+                        transformation="w_800,h_600,c_fill,q_85,f_auto"
                     />
                     <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
                         <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
@@ -94,11 +96,13 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                                 className="relative aspect-square cursor-pointer group overflow-hidden rounded-lg"
                                 onClick={() => openGallery(index + 1)}
                             >
-                                <Image
+                                <CloudinaryImage
                                     src={image}
                                     alt={`${title} - صورة ${index + 2}`}
                                     fill
-                                    className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                    className="group-hover:scale-105 transition-transform duration-300"
+                                    quality={75}
+                                    transformation="w_200,h_200,c_fill,q_75,f_auto"
                                 />
                                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
                             </div>
@@ -153,12 +157,14 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
 
                         {/* Current Image */}
                         <div className="relative max-w-6xl max-h-[85vh] w-full h-full flex items-center justify-center">
-                            <Image
+                            <CloudinaryImage
                                 src={images[currentIndex]}
                                 alt={`${title} - صورة ${currentIndex + 1}`}
                                 fill
                                 className="object-contain drop-shadow-2xl"
                                 priority
+                                quality={90}
+                                transformation="w_1920,h_1080,c_limit,q_90,f_auto"
                             />
                         </div>
 
@@ -184,11 +190,12 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                                             }`}
                                         onClick={() => setCurrentIndex(index)}
                                     >
-                                        <Image
+                                        <CloudinaryImage
                                             src={image}
                                             alt={`صورة مصغرة ${index + 1}`}
                                             fill
-                                            className="object-cover"
+                                            quality={70}
+                                            transformation="w_56,h_56,c_fill,q_70,f_auto"
                                         />
                                         {index === currentIndex && (
                                             <div className="absolute inset-0 bg-white/20"></div>

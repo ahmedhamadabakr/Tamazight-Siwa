@@ -3,8 +3,13 @@ export interface GalleryImage {
   title: string;
   description: string;
   imageUrl: string;
+  publicId?: string; // Cloudinary public ID for deletion
   category: string;
   isActive: boolean;
+  width?: number;
+  height?: number;
+  format?: string;
+  bytes?: number;
   createdAt: Date;
   updatedAt: Date;
 }

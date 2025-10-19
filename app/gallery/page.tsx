@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Camera, Heart, Share2, Download, MapPin, Images, Users, Loader2 } from "lucide-react"
 import Image from "next/image"
+import { CloudinaryImage } from "@/components/CloudinaryImage"
 import { motion } from "framer-motion"
 
 interface GalleryImage {
@@ -21,13 +22,13 @@ interface GalleryImage {
 }
 
 const categories = [
-  "all",
-  "nature",
-  "heritage",
-  "scenery",
-  "activities",
-  "food",
-  "other"
+  { key: "all", label: "الكل" },
+  { key: "طبيعة", label: "طبيعة" },
+  { key: "تراث", label: "تراث" },
+  { key: "مناظر", label: "مناظر" },
+  { key: "أنشطة", label: "أنشطة" },
+  { key: "طعام", label: "طعام" },
+  { key: "أخرى", label: "أخرى" }
 ]
 
 export default function GalleryPage() {
@@ -146,7 +147,7 @@ export default function GalleryPage() {
             <div>
               <Camera className="mx-auto w-8 h-8 text-primary mb-2" />
               <div className="text-2xl font-bold text-primary">{categories.length - 1}</div>
-              <div className="text-sm text-muted-foreground">Categories</div>
+              <div className="text-sm text-muted-foreground">فئات</div>
             </div>
             <div>
               <Users className="mx-auto w-8 h-8 text-primary mb-2" />
@@ -163,13 +164,13 @@ export default function GalleryPage() {
           <div className="flex gap-3 justify-center min-w-max">
             {categories.map((category) => (
               <Button
-                key={category}
-                variant={activeCategory === category ? "default" : "outline"}
+                key={category.key}
+                variant={activeCategory === category.key ? "default" : "outline"}
                 size="sm"
-                onClick={() => setActiveCategory(category)}
+                onClick={() => setActiveCategory(category.key)}
                 className="rounded-full"
               >
-                {category}
+                {category.label}
               </Button>
             ))}
           </div>
@@ -201,11 +202,13 @@ export default function GalleryPage() {
                   onClick={() => setLightbox({ src: image.imageUrl, title: image.title })}
                 >
                   <div className="relative aspect-[4/3]">
-                    <Image
+                    <CloudinaryImage
                       src={image.imageUrl}
                       alt={image.title}
                       fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      className="group-hover:scale-110 transition-transform duration-500"
+                      quality={80}
+                      transformation="w_400,h_300,c_fill,q_80,f_auto"
                     />
 
                     {/* Overlay */}
@@ -298,12 +301,14 @@ export default function GalleryPage() {
           onClick={() => setLightbox(null)}
         >
           <div className="relative max-w-4xl w-full px-4">
-            <Image
+            <CloudinaryImage
               src={lightbox.src}
               alt={lightbox.title}
               width={1200}
               height={800}
               className="rounded-lg mx-auto"
+              quality={95}
+              transformation="w_1200,h_800,c_limit,q_95,f_auto"
             />
             <p className="text-center text-white mt-4 text-lg">{lightbox.title}</p>
           </div>

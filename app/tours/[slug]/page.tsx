@@ -91,13 +91,22 @@ export default function TourDetailsPage() {
     <div className="min-h-screen bg-background">
       {/* Hero Section with Title */}
       <section className="relative h-[60vh]">
-        <Image 
-          src={tour.images[0]} 
-          alt={tour.title} 
-          fill 
-          className="object-cover" 
-          priority
-        />
+        {tour.images && tour.images.length > 0 ? (
+          <Image
+            src={tour.images[0]}
+            alt={tour.title}
+            fill
+            className="object-cover"
+            priority
+          />
+        ) : (
+          <div className="w-full h-full bg-gradient-to-br from-blue-400 to-blue-600 flex items-center justify-center">
+            <div className="text-white text-center">
+              <h1 className="text-4xl md:text-6xl font-bold mb-4">{tour.title}</h1>
+              <p className="text-lg opacity-90">No images available</p>
+            </div>
+          </div>
+        )}
         <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
           <h1 className="text-4xl md:text-6xl font-bold text-white text-center px-4">{tour.title}</h1>
         </div>

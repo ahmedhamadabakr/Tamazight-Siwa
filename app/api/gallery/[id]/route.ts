@@ -147,13 +147,40 @@ export async function DELETE(
       );
     }
 
-    const result = await collection.deleteOne({ _id: new ObjectId(params.id) });
-
-    if (result.deletedCount === 0) {
+    // First, get the image to retrieve publicId for Cloudinary deletion
+    const image = await collection.findOne({ _id: new ObjectId(params.id) });
+    
+    if (!image) {
       return NextResponse.json(
         { success: false, message: 'الصورة غير موجودة' },
         { status: 404 }
       );
+    }
+
+    // Delete from database first
+    const result = await collection.deleteOne({ _id: new ObjectId(params.id) });
+
+    if (result.deletedCount === 0) {
+      return NextResponse.json(
+        { success: false, message: 'فشل في حذف الصورة من قاعدة البيانات' },
+        { status: 500 }
+      );
+    }
+
+    // If image has publicId, try to delete from Cloudinary
+    if (image.publicId) {
+      try {
+        const deleteResponse = await fetch(`${process.env.NEXTAUTH_URL}/api/upload?publicId=${image.publicId}`, {
+          method: 'DELETE',
+        });
+        
+        if (!deleteResponse.ok) {
+          console.warn('Failed to delete image from Cloudinary, but database deletion succeeded');
+        }
+      } catch (cloudinaryError) {
+        console.warn('Error deleting from Cloudinary:', cloudinaryError);
+        // Continue anyway since database deletion succeeded
+      }
     }
 
     return NextResponse.json({

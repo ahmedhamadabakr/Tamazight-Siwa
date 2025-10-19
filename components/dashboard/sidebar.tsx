@@ -50,14 +50,6 @@ export function DashboardLayout({ children }: SidebarProps) {
     { href: `/dashboard/${session?.user?.id}/gallery`, label: 'Gallery Management', icon: Image },
   ];
 
-  if (userRole === 'General Manager') {
-    menuItems.push({
-      href: `/dashboard/${session?.user?.id}/admins`,
-      label: 'Admin Management',
-      icon: Settings,
-    });
-  }
-
   return (
     <div className="flex h-screen bg-gray-50 text-gray-800 overflow-hidden">
       {/* Mobile Header */}
