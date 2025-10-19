@@ -2,30 +2,27 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
-// GET a single tour by ID
+// GET a single tour by ID or slug
 export async function GET(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const db = await dbConnect();
 
-    const { slug } = params;
+    const { id } = params;
 
     let query: any = {};
 
-    // Check if the slug is a valid MongoDB ObjectId
-    if (ObjectId.isValid(slug) && String(new ObjectId(slug)) === slug) {
-      query._id = new ObjectId(slug);
+    // Check if the id is a valid MongoDB ObjectId
+    if (ObjectId.isValid(id) && String(new ObjectId(id)) === id) {
+      query._id = new ObjectId(id);
     } else {
       // If not a valid ObjectId, search by slug
-      query.slug = slug;
+      query.slug = id;
     }
 
-
-
     const tour = await db.collection('tours').findOne(query);
-
 
     if (tour) {
       console.log('Tour details:', {
@@ -44,7 +41,6 @@ export async function GET(
         status: tour.status,
         createdAt: tour.createdAt,
         updatedAt: tour.updatedAt
-
       });
     }
 
@@ -78,14 +74,14 @@ export async function GET(
 // PUT (update) a tour by ID
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const db = await dbConnect();
-    const { slug } = params;
+    const { id } = params;
     const body = await request.json();
 
-    if (!ObjectId.isValid(slug)) {
+    if (!ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Tour ID is invalid' },
         { status: 400 }
@@ -134,7 +130,7 @@ export async function PUT(
     };
 
     const result = await db.collection('tours').updateOne(
-      { _id: new ObjectId(slug) },
+      { _id: new ObjectId(id) },
       { $set: updateData }
     );
 
@@ -145,7 +141,7 @@ export async function PUT(
       );
     }
 
-    const updatedTour = await db.collection('tours').findOne({ _id: new ObjectId(slug) });
+    const updatedTour = await db.collection('tours').findOne({ _id: new ObjectId(id) });
 
     return NextResponse.json({ success: true, data: updatedTour });
   } catch (error) {
@@ -160,20 +156,20 @@ export async function PUT(
 // DELETE a tour by ID
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { slug: string } }
+  { params }: { params: { id: string } }
 ) {
   try {
     const db = await dbConnect();
-    const { slug } = params;
+    const { id } = params;
 
-    if (!ObjectId.isValid(slug)) {
+    if (!ObjectId.isValid(id)) {
       return NextResponse.json(
         { success: false, error: 'Tour ID is invalid' },
         { status: 400 }
       );
     }
 
-    const result = await db.collection('tours').deleteOne({ _id: new ObjectId(slug) });
+    const result = await db.collection('tours').deleteOne({ _id: new ObjectId(id) });
 
     if (result.deletedCount === 0) {
       return NextResponse.json(
