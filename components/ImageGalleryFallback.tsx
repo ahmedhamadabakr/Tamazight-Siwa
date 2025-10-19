@@ -2,17 +2,18 @@
 
 import { useState, useEffect } from "react"
 import { ChevronLeft, ChevronRight, X, ZoomIn } from "lucide-react"
-import { CloudinaryImage } from "./CloudinaryImage"
+import Image from "next/image"
 
-interface ImageGalleryProps {
+interface ImageGalleryFallbackProps {
     images: string[]
     title: string
     className?: string
 }
 
-export function ImageGallery({ images, title, className = "" }: ImageGalleryProps) {
+export function ImageGalleryFallback({ images, title, className = "" }: ImageGalleryFallbackProps) {
     const [isOpen, setIsOpen] = useState(false)
     const [currentIndex, setCurrentIndex] = useState(0)
+    const [imageErrors, setImageErrors] = useState<{ [key: number]: boolean }>({})
 
     const openGallery = (index: number) => {
         setCurrentIndex(index)
@@ -31,6 +32,10 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
         if (e.key === 'ArrowRight') nextImage()
         if (e.key === 'ArrowLeft') prevImage()
         if (e.key === 'Escape') setIsOpen(false)
+    }
+
+    const handleImageError = (index: number) => {
+        setImageErrors(prev => ({ ...prev, [index]: true }))
     }
 
     // Add keyboard event listeners
@@ -52,12 +57,13 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
     }, [isOpen])
 
     // Debug logging
-    console.log('ImageGallery received:', {
+    console.log('ImageGalleryFallback received:', {
         images,
         imagesLength: images?.length,
         imagesType: typeof images,
         isArray: Array.isArray(images),
-        title
+        title,
+        imageErrors
     })
 
     if (!images || images.length === 0) {
@@ -72,6 +78,21 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
         )
     }
 
+    // Filter out broken images
+    const validImages = images.filter((_, index) => !imageErrors[index])
+
+    if (validImages.length === 0) {
+        return (
+            <div className={`bg-red-50 border border-red-200 flex items-center justify-center min-h-[200px] rounded-lg ${className}`}>
+                <div className="text-center text-red-600">
+                    <div className="text-4xl mb-2">⚠️</div>
+                    <div className="text-lg font-medium">فشل في تحميل الصور</div>
+                    <div className="text-sm">جميع الصور المرفقة تالفة أو غير متاحة</div>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <>
             {/* Main Gallery Grid */}
@@ -81,22 +102,29 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                     className="relative cursor-pointer group overflow-hidden rounded-lg"
                     onClick={() => openGallery(0)}
                 >
-                    <CloudinaryImage
-                        src={images[0]}
-                        alt={`${title} - الصورة الرئيسية`}
-                        fill
-                        className="group-hover:scale-105 transition-transform duration-300"
-                        priority
-                        quality={85}
-                        transformation="w_800,h_600,c_fill,q_85,f_auto"
-                    />
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
-                        <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
-                    </div>
-                    {images.length > 1 && (
-                        <div className="absolute bottom-2 right-2 bg-black/70 text-white text-sm px-3 py-1 rounded-full">
-                            {images.length} صور
+                    {imageErrors[0] ? (
+                        <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                            <span className="text-gray-500">فشل في تحميل الصورة</span>
                         </div>
+                    ) : (
+                        <>
+                            <Image
+                                src={images[0]}
+                                alt={`${title} - الصورة الرئيسية`}
+                                fill
+                                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                priority
+                                onError={() => handleImageError(0)}
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300 flex items-center justify-center">
+                                <ZoomIn className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300" size={32} />
+                            </div>
+                            {images.length > 1 && (
+                                <div className="absolute bottom-2 right-2 bg-black/70 text-white text-sm px-3 py-1 rounded-full">
+                                    {validImages.length} صور
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
 
@@ -109,15 +137,22 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                                 className="relative aspect-square cursor-pointer group overflow-hidden rounded-lg"
                                 onClick={() => openGallery(index + 1)}
                             >
-                                <CloudinaryImage
-                                    src={image}
-                                    alt={`${title} - صورة ${index + 2}`}
-                                    fill
-                                    className="group-hover:scale-105 transition-transform duration-300"
-                                    quality={75}
-                                    transformation="w_200,h_200,c_fill,q_75,f_auto"
-                                />
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
+                                {imageErrors[index + 1] ? (
+                                    <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                                        <span className="text-gray-400 text-xs">خطأ</span>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <Image
+                                            src={image}
+                                            alt={`${title} - صورة ${index + 2}`}
+                                            fill
+                                            className="object-cover group-hover:scale-105 transition-transform duration-300"
+                                            onError={() => handleImageError(index + 1)}
+                                        />
+                                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300"></div>
+                                    </>
+                                )}
                             </div>
                         ))}
                         {images.length > 5 && (
@@ -170,15 +205,21 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
 
                         {/* Current Image */}
                         <div className="relative max-w-6xl max-h-[85vh] w-full h-full flex items-center justify-center">
-                            <CloudinaryImage
-                                src={images[currentIndex]}
-                                alt={`${title} - صورة ${currentIndex + 1}`}
-                                fill
-                                className="object-contain drop-shadow-2xl"
-                                priority
-                                quality={90}
-                                transformation="w_1920,h_1080,c_limit,q_90,f_auto"
-                            />
+                            {imageErrors[currentIndex] ? (
+                                <div className="text-white text-center">
+                                    <div className="text-4xl mb-4">⚠️</div>
+                                    <div className="text-xl">فشل في تحميل الصورة</div>
+                                </div>
+                            ) : (
+                                <Image
+                                    src={images[currentIndex]}
+                                    alt={`${title} - صورة ${currentIndex + 1}`}
+                                    fill
+                                    className="object-contain drop-shadow-2xl"
+                                    priority
+                                    onError={() => handleImageError(currentIndex)}
+                                />
+                            )}
                         </div>
 
                         {/* Image Info */}
@@ -203,13 +244,19 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                                             }`}
                                         onClick={() => setCurrentIndex(index)}
                                     >
-                                        <CloudinaryImage
-                                            src={image}
-                                            alt={`صورة مصغرة ${index + 1}`}
-                                            fill
-                                            quality={70}
-                                            transformation="w_56,h_56,c_fill,q_70,f_auto"
-                                        />
+                                        {imageErrors[index] ? (
+                                            <div className="w-full h-full bg-gray-600 flex items-center justify-center">
+                                                <span className="text-white text-xs">×</span>
+                                            </div>
+                                        ) : (
+                                            <Image
+                                                src={image}
+                                                alt={`صورة مصغرة ${index + 1}`}
+                                                fill
+                                                className="object-cover"
+                                                onError={() => handleImageError(index)}
+                                            />
+                                        )}
                                         {index === currentIndex && (
                                             <div className="absolute inset-0 bg-white/20"></div>
                                         )}

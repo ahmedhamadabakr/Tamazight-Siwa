@@ -1,0 +1,184 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth/next'
+import { getAuthOptions } from '@/lib/auth'
+import dbConnect from '@/lib/mongodb'
+import { ObjectId } from 'mongodb'
+import { Review, validateReview, reviewCollectionName } from '@/models/Review'
+
+interface CustomSession {
+  user?: {
+    id: string
+    name?: string | null
+    email?: string | null
+    image?: string | null
+    role?: string
+  }
+}
+
+// GET - Fetch reviews
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const tourId = searchParams.get('tourId')
+    const userId = searchParams.get('userId')
+    const status = searchParams.get('status')
+    const page = parseInt(searchParams.get('page') || '1')
+    const limit = parseInt(searchParams.get('limit') || '10')
+    const sortBy = searchParams.get('sortBy') || 'createdAt'
+    const sortOrder = searchParams.get('sortOrder') || 'desc'
+
+    const db = await dbConnect()
+    const collection = db.collection(reviewCollectionName)
+
+    let query: any = {}
+
+    if (tourId) {
+      query.tourId = tourId
+    }
+
+    if (userId) {
+      query.userId = userId
+    }
+
+    if (status) {
+      query.status = status
+    } else {
+      // Default to approved reviews for public viewing
+      query.status = 'approved'
+    }
+
+    const skip = (page - 1) * limit
+    const sortOptions: any = {}
+    sortOptions[sortBy] = sortOrder === 'desc' ? -1 : 1
+
+    const [reviews, totalCount] = await Promise.all([
+      collection
+        .find(query)
+        .sort(sortOptions)
+        .skip(skip)
+        .limit(limit)
+        .toArray(),
+      collection.countDocuments(query)
+    ])
+
+    const totalPages = Math.ceil(totalCount / limit)
+
+    return NextResponse.json({
+      success: true,
+      data: {
+        reviews,
+        pagination: {
+          currentPage: page,
+          totalPages,
+          totalCount,
+          hasNext: page < totalPages,
+          hasPrev: page > 1
+        }
+      }
+    })
+
+  } catch (error) {
+    console.error('Error fetching reviews:', error)
+    return NextResponse.json(
+      { success: false, message: 'فشل في جلب التقييمات' },
+      { status: 500 }
+    )
+  }
+}
+
+// POST - Create new review
+export async function POST(request: NextRequest) {
+  try {
+    const authOptions = await getAuthOptions()
+    const session = await getServerSession(authOptions) as CustomSession
+
+    if (!session?.user) {
+      return NextResponse.json(
+        { success: false, message: 'يجب تسجيل الدخول لإضافة تقييم' },
+        { status: 401 }
+      )
+    }
+
+    const db = await dbConnect()
+    const body = await request.json()
+    const { tourId, rating, title, comment, images } = body
+
+    // Validation
+    const validation = validateReview({
+      tourId,
+      userId: session.user.id,
+      rating,
+      title,
+      comment,
+      images
+    })
+
+    if (!validation.isValid) {
+      return NextResponse.json(
+        { success: false, message: validation.errors.join(', ') },
+        { status: 400 }
+      )
+    }
+
+    // Check if user has booked this tour (REQUIRED for adding review)
+    const booking = await db.collection('bookings').findOne({
+      tour: ObjectId.createFromHexString(tourId),
+      user: ObjectId.createFromHexString(session.user.id),
+      status: { $in: ['confirmed', 'completed'] }
+    })
+
+    if (!booking) {
+      return NextResponse.json(
+        { success: false, message: 'يجب أن تكون قد حجزت هذه الرحلة لتتمكن من تقييمها' },
+        { status: 403 }
+      )
+    }
+
+    // Check if user already reviewed this tour
+    const existingReview = await db.collection(reviewCollectionName).findOne({
+      tourId,
+      userId: session.user.id
+    })
+
+    if (existingReview) {
+      return NextResponse.json(
+        { success: false, message: 'لقد قمت بتقييم هذه الرحلة من قبل' },
+        { status: 400 }
+      )
+    }
+
+    const newReview = {
+      tourId,
+      userId: session.user.id,
+      userName: session.user.name || 'مستخدم',
+      userEmail: session.user.email || '',
+      userImage: session.user.image || undefined,
+      rating: parseInt(rating),
+      title: title.trim(),
+      comment: comment.trim(),
+      images: images || [],
+      helpful: 0,
+      helpfulVotes: [],
+      verified: true, // Always true since booking is required
+      status: 'pending', // Reviews need approval
+      createdAt: new Date(),
+      updatedAt: new Date()
+    }
+
+    const result = await db.collection(reviewCollectionName).insertOne(newReview)
+    const insertedReview = await db.collection(reviewCollectionName).findOne({ _id: result.insertedId })
+
+    return NextResponse.json({
+      success: true,
+      data: insertedReview,
+      message: 'تم إرسال التقييم وسيتم مراجعته قريباً'
+    })
+
+  } catch (error) {
+    console.error('Error creating review:', error)
+    return NextResponse.json(
+      { success: false, message: 'فشل في إضافة التقييم' },
+      { status: 500 }
+    )
+  }
+}

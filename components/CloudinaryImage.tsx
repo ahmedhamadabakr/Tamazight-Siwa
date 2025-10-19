@@ -41,7 +41,17 @@ export function CloudinaryImage({
 
   // Generate optimized Cloudinary URL
   const getOptimizedUrl = (originalUrl: string, customTransformation?: string) => {
-    if (!isCloudinaryUrl) return originalUrl
+    // Debug logging
+    console.log('CloudinaryImage Debug:', {
+      originalUrl,
+      isCloudinaryUrl,
+      customTransformation
+    })
+
+    if (!isCloudinaryUrl) {
+      console.log('Not a Cloudinary URL, returning original:', originalUrl)
+      return originalUrl
+    }
 
     try {
       const url = new URL(originalUrl)
@@ -49,7 +59,10 @@ export function CloudinaryImage({
       
       // Find the upload index
       const uploadIndex = pathParts.findIndex(part => part === 'upload')
-      if (uploadIndex === -1) return originalUrl
+      if (uploadIndex === -1) {
+        console.warn('No "upload" found in Cloudinary URL:', originalUrl)
+        return originalUrl
+      }
 
       // Build transformation string
       let transformations = []
@@ -76,7 +89,15 @@ export function CloudinaryImage({
       }
 
       url.pathname = pathParts.join('/')
-      return url.toString()
+      const optimizedUrl = url.toString()
+      
+      console.log('Cloudinary URL optimized:', {
+        original: originalUrl,
+        optimized: optimizedUrl,
+        transformations
+      })
+      
+      return optimizedUrl
     } catch (error) {
       console.warn('Error optimizing Cloudinary URL:', error)
       return originalUrl

@@ -11,7 +11,7 @@ import { useRouter } from "next/navigation"
 import { useSession } from "next-auth/react"
 import { Session } from "next-auth";
 import { BookingForm } from '@/components/BookingForm'
-import { ImageGallery } from '@/components/ImageGallery'
+import { ImageGalleryFallback } from '@/components/ImageGalleryFallback'
 import {
   Dialog,
   DialogContent,
@@ -115,8 +115,8 @@ export default function TourDetailsPage() {
       {/* Image Gallery */}
       <section className="max-w-5xl mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold mb-4">Image Gallery</h2>
-        <ImageGallery 
-          images={tour.images} 
+        <ImageGalleryFallback 
+          images={tour.images || []} 
           title={tour.title}
           className="h-96"
         />
