@@ -2,6 +2,47 @@ import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { ObjectId } from 'mongodb';
 
+// GET /api/admin/[id] - Get single admin by ID
+export async function GET(
+    request: NextRequest,
+    { params }: { params: { id: string } }
+) {
+    try {
+        const db = await dbConnect();
+        const { id } = params;
+
+        if (!ObjectId.isValid(id)) {
+            return NextResponse.json({
+                success: false,
+                error: 'معرف المدير غير صالح'
+            }, { status: 400 });
+        }
+
+        const admin = await db.collection('users').findOne({
+            _id: new ObjectId(id),
+            role: { $in: ['manager', 'admin'] }
+        });
+
+        if (!admin) {
+            return NextResponse.json({
+                success: false,
+                error: 'المدير غير موجود'
+            }, { status: 404 });
+        }
+
+        return NextResponse.json({
+            success: true,
+            data: admin
+        });
+    } catch (error) {
+        console.error('Error fetching admin:', error);
+        return NextResponse.json({
+            success: false,
+            error: 'فشل في جلب بيانات المدير'
+        }, { status: 500 });
+    }
+}
+
 // PUT /api/admins/[id] - Update admin status
 export async function PUT(
     request: NextRequest,

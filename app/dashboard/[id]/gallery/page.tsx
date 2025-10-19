@@ -1,0 +1,340 @@
+'use client';
+
+import { useEffect, useState } from 'react';
+import { DashboardLayout } from '@/components/dashboard/sidebar';
+import { useSession } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { Plus, Edit, Trash2, Eye, Upload } from 'lucide-react';
+import GalleryForm from '@/components/dashboard/gallery-form';
+
+interface GalleryImage {
+    _id: string;
+    title: string;
+    description: string;
+    imageUrl: string;
+    category: string;
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+}
+
+export default function GalleryDashboard() {
+    const [images, setImages] = useState<GalleryImage[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [categoryFilter, setCategoryFilter] = useState('');
+    const [showAddModal, setShowAddModal] = useState(false);
+    const [editingImage, setEditingImage] = useState<GalleryImage | null>(null);
+    const router = useRouter();
+    const { data: session, status: sessionStatus } = useSession();
+
+    useEffect(() => {
+        if (sessionStatus === 'loading') return;
+
+        if (!session?.user || session.user.role !== 'manager') {
+            router.push('/');
+            return;
+        }
+
+        fetchImages();
+    }, [session, sessionStatus, router]);
+
+    const fetchImages = async () => {
+        try {
+            const params = new URLSearchParams();
+            if (searchTerm) params.append('search', searchTerm);
+            if (categoryFilter) params.append('category', categoryFilter);
+
+            const response = await fetch(`/api/gallery?${params.toString()}`);
+            const data = await response.json();
+            if (data.success) {
+                setImages(data.data || []);
+            }
+        } catch (error) {
+            console.error('Error fetching images:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleDelete = async (id: string) => {
+        if (!confirm('هل أنت متأكد من حذف هذه الصورة؟')) return;
+
+        try {
+            const response = await fetch(`/api/gallery/${id}`, {
+                method: 'DELETE',
+            });
+            const data = await response.json();
+            if (data.success) {
+                setImages(images.filter(img => img._id !== id));
+            } else {
+                alert('فشل في حذف الصورة');
+            }
+        } catch (error) {
+            console.error('Error deleting image:', error);
+            alert('فشل في حذف الصورة');
+        }
+    };
+
+    const handleStatusToggle = async (id: string, currentStatus: boolean) => {
+        try {
+            const response = await fetch(`/api/gallery/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ isActive: !currentStatus }),
+            });
+            const data = await response.json();
+            if (data.success) {
+                setImages(images.map(img =>
+                    img._id === id ? { ...img, isActive: !currentStatus } : img
+                ));
+            }
+        } catch (error) {
+            console.error('Error updating image status:', error);
+        }
+    };
+
+    const handleSaveImage = async (imageData: Partial<GalleryImage>) => {
+        try {
+            const url = editingImage ? `/api/gallery/${editingImage._id}` : '/api/gallery';
+            const method = editingImage ? 'PUT' : 'POST';
+
+            const response = await fetch(url, {
+                method,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(imageData),
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                if (editingImage) {
+                    // Update existing image
+                    setImages(images.map(img =>
+                        img._id === editingImage._id ? { ...img, ...imageData } : img
+                    ));
+                } else {
+                    // Add new image
+                    setImages([data.data, ...images]);
+                }
+                setEditingImage(null);
+                setShowAddModal(false);
+            } else {
+                alert(data.message || 'فشل في حفظ الصورة');
+            }
+        } catch (error) {
+            console.error('Error saving image:', error);
+            alert('فشل في حفظ الصورة');
+        }
+    };
+
+    const categories = ['طبيعة', 'تراث', 'مناظر', 'أنشطة', 'طعام', 'أخرى'];
+
+    const stats = {
+        total: images.length,
+        active: images.filter(img => img.isActive).length,
+        inactive: images.filter(img => !img.isActive).length,
+        byCategory: categories.reduce((acc, cat) => {
+            acc[cat] = images.filter(img => img.category === cat).length;
+            return acc;
+        }, {} as Record<string, number>)
+    };
+
+    if (loading || sessionStatus === 'loading') {
+        return (
+            <div className="flex items-center justify-center h-64">
+                <div className="text-center">جاري التحميل...</div>
+            </div>
+        );
+    }
+
+    return (
+        <DashboardLayout>
+            <div className="space-y-6">
+                <div className="flex justify-between items-center">
+                    <h1 className="text-3xl font-bold">إدارة معرض الصور</h1>
+                    <button
+                        onClick={() => setShowAddModal(true)}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                    >
+                        <Plus size={20} />
+                        إضافة صورة جديدة
+                    </button>
+                </div>
+
+                {/* Statistics Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-white p-6 rounded-lg shadow">
+                        <div className="flex items-center">
+                            <div className="p-2 bg-blue-100 rounded-lg">
+                                <Eye className="h-6 w-6 text-blue-600" />
+                            </div>
+                            <div className="mr-4">
+                                <p className="text-sm font-medium text-gray-600">إجمالي الصور</p>
+                                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-lg shadow">
+                        <div className="flex items-center">
+                            <div className="p-2 bg-green-100 rounded-lg">
+                                <Eye className="h-6 w-6 text-green-600" />
+                            </div>
+                            <div className="mr-4">
+                                <p className="text-sm font-medium text-gray-600">الصور النشطة</p>
+                                <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-lg shadow">
+                        <div className="flex items-center">
+                            <div className="p-2 bg-red-100 rounded-lg">
+                                <Eye className="h-6 w-6 text-red-600" />
+                            </div>
+                            <div className="mr-4">
+                                <p className="text-sm font-medium text-gray-600">الصور غير النشطة</p>
+                                <p className="text-2xl font-bold text-gray-900">{stats.inactive}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-lg shadow">
+                        <div className="flex items-center">
+                            <div className="p-2 bg-purple-100 rounded-lg">
+                                <Upload className="h-6 w-6 text-purple-600" />
+                            </div>
+                            <div className="mr-4">
+                                <p className="text-sm font-medium text-gray-600">الفئات</p>
+                                <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Filters */}
+                <div className="bg-white p-6 rounded-lg shadow">
+                    <div className="flex flex-col sm:flex-row gap-4">
+                        <input
+                            type="text"
+                            placeholder="البحث في الصور..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            className="flex-1 p-3 border rounded-lg"
+                        />
+                        <select
+                            value={categoryFilter}
+                            onChange={(e) => setCategoryFilter(e.target.value)}
+                            className="p-3 border rounded-lg"
+                        >
+                            <option value="">جميع الفئات</option>
+                            {categories.map(cat => (
+                                <option key={cat} value={cat}>{cat}</option>
+                            ))}
+                        </select>
+                        <button
+                            onClick={fetchImages}
+                            className="bg-gray-500 text-white px-6 py-3 rounded-lg hover:bg-gray-600"
+                        >
+                            بحث
+                        </button>
+                    </div>
+                </div>
+
+                {/* Images Grid */}
+                <div className="bg-white rounded-lg shadow overflow-hidden">
+                    <div className="p-6 border-b">
+                        <h2 className="text-xl font-semibold">معرض الصور</h2>
+                    </div>
+
+                    {images.length === 0 ? (
+                        <div className="text-center py-12">
+                            <Upload className="mx-auto h-12 w-12 text-gray-400" />
+                            <h3 className="mt-2 text-sm font-medium text-gray-900">لا توجد صور</h3>
+                            <p className="mt-1 text-sm text-gray-500">ابدأ بإضافة صور جديدة للمعرض</p>
+                            <div className="mt-6">
+                                <button
+                                    onClick={() => setShowAddModal(true)}
+                                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                                >
+                                    إضافة صورة جديدة
+                                </button>
+                            </div>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+                            {images.map((image) => (
+                                <div key={image._id} className="bg-gray-50 rounded-lg overflow-hidden">
+                                    <div className="relative h-48">
+                                        <Image
+                                            src={image.imageUrl}
+                                            alt={image.title}
+                                            fill
+                                            className="object-cover"
+                                        />
+                                        <div className="absolute top-2 right-2">
+                                            <span className={`px-2 py-1 text-xs rounded-full ${image.isActive
+                                                    ? 'bg-green-100 text-green-800'
+                                                    : 'bg-red-100 text-red-800'
+                                                }`}>
+                                                {image.isActive ? 'نشط' : 'غير نشط'}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-4">
+                                        <h3 className="font-medium text-gray-900 mb-1">{image.title}</h3>
+                                        <p className="text-sm text-gray-600 mb-2">{image.description}</p>
+                                        <p className="text-xs text-gray-500 mb-3">الفئة: {image.category}</p>
+
+                                        <div className="flex gap-2">
+                                            <button
+                                                onClick={() => setEditingImage(image)}
+                                                className="flex-1 bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600 flex items-center justify-center gap-1"
+                                            >
+                                                <Edit size={14} />
+                                                تعديل
+                                            </button>
+                                            <button
+                                                onClick={() => handleStatusToggle(image._id, image.isActive)}
+                                                className={`flex-1 px-3 py-2 rounded text-sm ${image.isActive
+                                                        ? 'bg-yellow-500 text-white hover:bg-yellow-600'
+                                                        : 'bg-green-500 text-white hover:bg-green-600'
+                                                    }`}
+                                            >
+                                                {image.isActive ? 'إخفاء' : 'إظهار'}
+                                            </button>
+                                            <button
+                                                onClick={() => handleDelete(image._id)}
+                                                className="bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
+
+            {/* Add/Edit Modal */}
+            {(showAddModal || editingImage) && (
+                <GalleryForm
+                    image={editingImage}
+                    onClose={() => {
+                        setShowAddModal(false);
+                        setEditingImage(null);
+                    }}
+                    onSave={handleSaveImage}
+                />
+            )}
+        </DashboardLayout>
+    );
+}

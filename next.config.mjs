@@ -7,8 +7,6 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   images: {
-    loader: 'cloudinary',
-    path: `https://res.cloudinary.com/${process.env.CLOUDINARY_CLOUD_NAME}/image/fetch/`,
     remotePatterns: [
       {
         protocol: 'https',

@@ -12,6 +12,7 @@ import {
   LogOut,
   Menu,
   X,
+  Image,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
@@ -46,6 +47,7 @@ export function DashboardLayout({ children }: SidebarProps) {
     { href: `/dashboard/${session?.user?.id}`, label: 'Overview', icon: BarChart3 },
     { href: `/dashboard/${session?.user?.id}/users`, label: 'Users Management', icon: Users },
     { href: `/dashboard/${session?.user?.id}/tours`, label: 'Tours Management', icon: MapPin },
+    { href: `/dashboard/${session?.user?.id}/gallery`, label: 'Gallery Management', icon: Image },
   ];
 
   if (userRole === 'General Manager') {
