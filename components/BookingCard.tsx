@@ -71,13 +71,13 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'مؤكد'
+        return 'Confirmed'
       case 'pending':
-        return 'في الانتظار'
+        return 'Pending'
       case 'cancelled':
-        return 'ملغي'
+        return 'Cancelled'
       case 'completed':
-        return 'مكتمل'
+        return 'Completed'
       default:
         return status
     }
@@ -86,20 +86,20 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
   const getPaymentStatusText = (status: string) => {
     switch (status) {
       case 'paid':
-        return 'مدفوع'
+        return 'Paid'
       case 'pending':
-        return 'في الانتظار'
+        return 'Pending'
       case 'refunded':
-        return 'مسترد'
+        return 'Refunded'
       case 'failed':
-        return 'فشل'
+        return 'Failed'
       default:
         return status
     }
   }
 
   const handleCancel = async () => {
-    if (!confirm('هل أنت متأكد من إلغاء هذا الحجز؟')) return
+    if (!confirm('Are you sure you want to cancel this booking?')) return
 
     setIsLoading(true)
     try {
@@ -112,16 +112,16 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
       const data = await response.json()
       
       if (data.success) {
-        toast.success('تم إلغاء الحجز بنجاح')
+        toast.success('Booking cancelled successfully')
         if (onCancel) {
           onCancel(booking._id)
         }
       } else {
-        toast.error('فشل في إلغاء الحجز')
+        toast.error('Failed to cancel booking')
       }
     } catch (error) {
       console.error('Cancel booking error:', error)
-      toast.error('حدث خطأ أثناء إلغاء الحجز')
+      toast.error('Failed to cancel booking')
     } finally {
       setIsLoading(false)
     }
@@ -146,7 +146,7 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">{booking.destination}</h3>
-              <p className="text-sm text-gray-500">رقم الحجز: {booking.bookingReference}</p>
+              <p className="text-sm text-gray-500">Booking Reference: {booking.bookingReference}</p>
             </div>
           </div>
           
@@ -162,12 +162,12 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="flex items-center space-x-2 space-x-reverse text-sm text-gray-600">
             <Calendar className="w-4 h-4" />
-            <span>تاريخ الحجز: {new Date(booking.bookingDate).toLocaleDateString('ar-EG')}</span>
+            <span>Booking Date: {new Date(booking.bookingDate).toLocaleDateString('ar-EG')}</span>
           </div>
           
           <div className="flex items-center space-x-2 space-x-reverse text-sm text-gray-600">
             <Users className="w-4 h-4" />
-            <span>{booking.travelers} أشخاص</span>
+            <span>{booking.travelers} People</span>
           </div>
           
           <div className="flex items-center space-x-2 space-x-reverse text-sm text-gray-600">
@@ -185,7 +185,7 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
 
         {/* Price */}
         <div className="flex items-center justify-between mb-4 pt-4 border-t">
-          <span className="text-sm text-gray-600">المبلغ الإجمالي</span>
+          <span className="text-sm text-gray-600">Total Amount</span>
           <span className="text-lg font-bold text-blue-600">{booking.price.toLocaleString()} Dollar</span>
         </div>
 
@@ -198,7 +198,7 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
             className="flex items-center"
           >
             <Eye className="w-4 h-4 ml-1" />
-            عرض التفاصيل
+            View Details
           </Button>
           
           {canCancel && (
@@ -210,7 +210,7 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
               className="flex items-center text-red-600 hover:text-red-700 hover:bg-red-50"
             >
               <X className="w-4 h-4 ml-1" />
-              {isLoading ? 'جارِ الإلغاء...' : 'إلغاء الحجز'}
+              {isLoading ? 'Canceling...' : 'Cancel Booking'}
             </Button>
           )}
         </div>

@@ -54,14 +54,15 @@ export function TourCard({ tour, index = 0 }: TourCardProps) {
           {/* Image Count Badge */}
           {tour.images && tour.images.length > 1 && (
             <div className="absolute top-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-              {tour.images.length} صور
-            </div>
+              {tour.images.length}   
+              Images
+                       </div>
           )}
 
           {/* Featured Badge */}
           {tour.featured && (
             <div className="absolute top-3 left-3 bg-primary text-white text-xs px-2 py-1 rounded-full">
-              مميز
+              Featured
             </div>
           )}
 
@@ -94,13 +95,13 @@ export function TourCard({ tour, index = 0 }: TourCardProps) {
             {tour.groupSize && (
               <div className="flex items-center text-sm text-muted-foreground">
                 <Users className="w-4 h-4 mr-2 text-primary" />
-                <span>{tour.groupSize} أشخاص</span>
+                <span>{tour.groupSize} People</span>
               </div>
             )}
             
             <div className="flex items-center text-sm text-muted-foreground">
               <MapPin className="w-4 h-4 mr-2 text-primary" />
-              <span>{tour.location}</span>
+              <span>{tour.location} Location</span>
             </div>
           </div>
 
@@ -108,12 +109,12 @@ export function TourCard({ tour, index = 0 }: TourCardProps) {
           <div className="flex gap-2 mt-auto">
             <Link href={tourLink} className="flex-1">
               <Button className="w-full bg-primary hover:bg-primary/90 transition-colors">
-                احجز الآن
+                Book Now
               </Button>
             </Link>
             <Link href={tourLink} className="flex-1">
               <Button variant="outline" className="w-full hover:bg-primary/10 transition-colors">
-                التفاصيل
+                Details
               </Button>
             </Link>
           </div>

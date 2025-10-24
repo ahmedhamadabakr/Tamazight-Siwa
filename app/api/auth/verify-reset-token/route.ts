@@ -7,7 +7,7 @@ export async function POST(req: Request) {
 
     if (!token) {
       return NextResponse.json(
-        { success: false, message: 'الرمز المميز مطلوب' },
+        { success: false, message: 'Token is required' },
         { status: 400 }
       )
     }
@@ -23,20 +23,20 @@ export async function POST(req: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { success: false, message: 'الرابط غير صالح أو منتهي الصلاحية' },
+        { success: false, message: 'Invalid or expired token' },
         { status: 400 }
       )
     }
 
     return NextResponse.json({
       success: true,
-      message: 'الرمز المميز صالح'
+      message: 'Token is valid'
     })
 
   } catch (error) {
     console.error('Verify reset token error:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في التحقق من الرمز المميز' },
+      { success: false, message: 'An error occurred while verifying reset token' },
       { status: 500 }
     )
   }

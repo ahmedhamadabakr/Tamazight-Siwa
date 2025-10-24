@@ -70,7 +70,7 @@ export function BookingConfirmationModal({
                 transition={{ delay: 0.3 }}
                 className="text-2xl font-bold text-gray-900 mb-2"
               >
-                تم تأكيد حجزك!
+                Booking confirmed!
               </motion.h2>
               
               <motion.p
@@ -79,7 +79,7 @@ export function BookingConfirmationModal({
                 transition={{ delay: 0.4 }}
                 className="text-gray-600"
               >
-                رقم الحجز: {bookingData.bookingReference}
+                Booking Reference: {bookingData.bookingReference}
               </motion.p>
             </div>
 
@@ -121,9 +121,9 @@ export function BookingConfirmationModal({
               >
                 <div className="flex items-center space-x-2 space-x-reverse">
                   <CreditCard className="w-5 h-5 text-gray-400" />
-                  <span className="text-gray-600">المبلغ الإجمالي</span>
+                  <span className="text-gray-600">Total Amount</span>
                 </div>
-                <span className="font-bold text-blue-600">{bookingData.totalAmount.toLocaleString()} ريال</span>
+                <span className="font-bold text-blue-600">{bookingData.totalAmount.toLocaleString()} Dollar</span>
               </motion.div>
             </div>
 
@@ -138,7 +138,7 @@ export function BookingConfirmationModal({
                   onClick={onViewDetails}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white"
                 >
-                  عرض تفاصيل الحجز
+                  View Booking Details
                 </Button>
               </motion.div>
 
@@ -152,7 +152,7 @@ export function BookingConfirmationModal({
                   variant="outline"
                   className="w-full"
                 >
-                  إغلاق
+                  Close
                 </Button>
               </motion.div>
             </div>
@@ -165,7 +165,7 @@ export function BookingConfirmationModal({
               className="bg-blue-50 px-6 py-3 text-center"
             >
               <p className="text-sm text-blue-700">
-                سيتم إرسال تأكيد الحجز إلى بريدك الإلكتروني
+                A confirmation email will be sent to your email address.
               </p>
             </motion.div>
           </motion.div>

@@ -165,7 +165,7 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
           {/* Category */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              الفئة *
+              Category *
             </label>
             <select
               value={formData.category}
@@ -189,7 +189,7 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
                 className="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50"
               />
               <span className="mr-2 text-sm font-medium text-gray-700">
-                نشط (سيظهر في المعرض)
+              Active (Will be displayed in the gallery)
               </span>
             </label>
           </div>
@@ -202,14 +202,14 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
               className="flex-1 bg-gray-500 text-white px-4 py-3 rounded-lg hover:bg-gray-600 font-medium"
               disabled={loading}
             >
-              إلغاء
+              Cancel
             </button>
             <button
               type="submit"
               className="flex-1 bg-blue-600 text-white px-4 py-3 rounded-lg hover:bg-blue-700 font-medium disabled:opacity-50"
               disabled={loading}
             >
-              {loading ? 'جاري الحفظ...' : (image ? 'تحديث' : 'إضافة')}
+              {loading ? 'Saving...' : (image ? 'Update' : 'Add')}
             </button>
           </div>
         </form>

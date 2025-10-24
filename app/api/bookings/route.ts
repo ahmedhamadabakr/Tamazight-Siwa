@@ -32,7 +32,7 @@ export async function POST(req: Request) {
     if (!session?.user?.id) {
       console.error('No valid session or user ID')
       return NextResponse.json(
-        { success: false, message: 'يجب تسجيل الدخول لإتمام الحجز' },
+        { success: false, message: 'Unauthorized' },
         { status: 401 }
       )
     }
@@ -45,14 +45,14 @@ export async function POST(req: Request) {
 
     if (!tourId) {
       return NextResponse.json(
-        { success: false, message: 'معرف الرحلة مطلوب' },
+        { success: false, message: 'Tour ID is required' },
         { status: 400 }
       )
     }
 
     if (!numberOfTravelers) {
       return NextResponse.json(
-        { success: false, message: 'عدد المسافرين مطلوب' },
+        { success: false, message: 'Number of travelers is required' },
         { status: 400 }
       )
     }
@@ -60,14 +60,14 @@ export async function POST(req: Request) {
     const travelersNum = parseInt(numberOfTravelers)
     if (isNaN(travelersNum) || travelersNum < 1 || travelersNum > 5) {
       return NextResponse.json(
-        { success: false, message: 'عدد المسافرين يجب أن يكون بين 1 و 5' },
+        { success: false, message: 'Number of travelers must be between 1 and 5' },
         { status: 400 }
       )
     }
 
     if (!totalAmount || isNaN(parseFloat(totalAmount)) || parseFloat(totalAmount) <= 0) {
       return NextResponse.json(
-        { success: false, message: 'المبلغ الإجمالي غير صحيح' },
+        { success: false, message: 'Total amount is invalid' },
         { status: 400 }
       )
     }
@@ -86,7 +86,7 @@ export async function POST(req: Request) {
     } catch (pingError) {
       console.error('Database ping failed:', pingError)
       return NextResponse.json(
-        { success: false, message: 'فشل في الاتصال بقاعدة البيانات' },
+        { success: false, message: 'Database connection failed' },
         { status: 503 }
       )
     }
@@ -97,7 +97,7 @@ export async function POST(req: Request) {
     // Validate tourId format
     if (!ObjectId.isValid(tourId)) {
       return NextResponse.json(
-        { success: false, message: 'معرف الرحلة غير صحيح' },
+        { success: false, message: 'Tour ID is invalid' },
         { status: 400 }
       )
     }
@@ -111,7 +111,7 @@ export async function POST(req: Request) {
     } catch (tourError) {
       console.error('Error looking up tour:', tourError)
       return NextResponse.json(
-        { success: false, message: 'خطأ في البحث عن الرحلة' },
+        { success: false, message: 'Error looking up tour' },
         { status: 500 }
       )
     }
@@ -119,7 +119,7 @@ export async function POST(req: Request) {
     if (!tour) {
       console.error(`Tour not found with ID: ${tourId}`)
       return NextResponse.json(
-        { success: false, message: 'الرحلة غير موجودة' },
+        { success: false, message: 'Tour not found' },
         { status: 404 }
       )
     }
@@ -131,7 +131,7 @@ export async function POST(req: Request) {
     if (!ObjectId.isValid(session.user.id)) {
       console.error('Invalid user ID format:', session.user.id)
       return NextResponse.json(
-        { success: false, message: 'معرف المستخدم غير صحيح' },
+        { success: false, message: 'User ID is invalid' },
         { status: 400 }
       )
     }
@@ -188,20 +188,20 @@ export async function POST(req: Request) {
       if (insertError instanceof Error) {
         if (insertError.message.includes('validation')) {
           return NextResponse.json(
-            { success: false, message: 'بيانات الحجز لا تتوافق مع متطلبات قاعدة البيانات' },
+            { success: false, message: 'Booking data does not meet database requirements' },
             { status: 400 }
           )
         }
         if (insertError.message.includes('duplicate')) {
           return NextResponse.json(
-            { success: false, message: 'رقم الحجز موجود مسبقاً' },
+            { success: false, message: 'Booking reference already exists' },
             { status: 400 }
           )
         }
       }
 
       return NextResponse.json(
-        { success: false, message: `خطأ في حفظ الحجز: ${insertError instanceof Error ? insertError.message : 'خطأ غير معروف'}` },
+        { success: false, message: `Error saving booking: ${insertError instanceof Error ? insertError.message : 'Unknown error'}` },
         { status: 500 }
       )
     }

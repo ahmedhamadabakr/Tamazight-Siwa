@@ -33,7 +33,7 @@ export async function PUT(
 
     if (!ObjectId.isValid(bookingId)) {
       return NextResponse.json(
-        { success: false, message: 'معرف الحجز غير صحيح' },
+        { success: false, message: 'Invalid booking ID' },
         { status: 400 }
       )
     }
@@ -72,7 +72,7 @@ export async function PUT(
 
     if (!booking || booking.length === 0) {
       return NextResponse.json(
-        { success: false, message: 'الحجز غير موجود' },
+        { success: false, message: 'Booking not found' },
         { status: 404 }
       )
     }
@@ -92,7 +92,7 @@ export async function PUT(
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
-        { success: false, message: 'الحجز غير موجود' },
+        { success: false, message: 'Booking not found' },
         { status: 404 }
       )
     }
@@ -114,13 +114,13 @@ export async function PUT(
 
     return NextResponse.json({
       success: true,
-      message: 'تم تحديث الحجز بنجاح'
+      message: 'Booking updated successfully'
     })
 
   } catch (error) {
     console.error('Admin update booking error:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ أثناء تحديث الحجز' },
+      { success: false, message: 'Failed to update booking' },
       { status: 500 }
     )
   }

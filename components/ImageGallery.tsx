@@ -143,7 +143,7 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                         <button
                             onClick={() => setIsOpen(false)}
                             className="absolute top-4 right-4 text-white hover:text-gray-300 z-10 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 hover:scale-110"
-                            title="إغلاق (Esc)"
+                            title="Close (Esc)"
                         >
                             <X size={24} />
                         </button>
@@ -154,14 +154,14 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                                 <button
                                     onClick={prevImage}
                                     className="absolute left-4 text-white hover:text-gray-300 z-10 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 hover:scale-110"
-                                    title="الصورة السابقة (←)"
+                                    title="Previous Image (←)"
                                 >
                                     <ChevronLeft size={32} />
                                 </button>
                                 <button
                                     onClick={nextImage}
                                     className="absolute right-4 text-white hover:text-gray-300 z-10 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 hover:scale-110"
-                                    title="الصورة التالية (→)"
+                                    title="Next Image (→)"
                                 >
                                     <ChevronRight size={32} />
                                 </button>
@@ -172,7 +172,7 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                         <div className="relative max-w-6xl max-h-[85vh] w-full h-full flex items-center justify-center">
                             <CloudinaryImage
                                 src={images[currentIndex]}
-                                alt={`${title} - صورة ${currentIndex + 1}`}
+                                alt={`${title} - Image ${currentIndex + 1}`}
                                 fill
                                 className="object-contain drop-shadow-2xl"
                                 priority
@@ -189,7 +189,7 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                         {/* Image Counter */}
                         {images.length > 1 && (
                             <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-white bg-black/60 px-4 py-2 rounded-full text-sm backdrop-blur-sm">
-                                {currentIndex + 1} من {images.length}
+                                {currentIndex + 1} from {images.length}
                             </div>
                         )}
 
@@ -205,7 +205,7 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                                     >
                                         <CloudinaryImage
                                             src={image}
-                                            alt={`صورة مصغرة ${index + 1}`}
+                                            alt={`Thumbnail ${index + 1}`}
                                             fill
                                             quality={70}
                                             transformation="w_56,h_56,c_fill,q_70,f_auto"

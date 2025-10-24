@@ -76,11 +76,11 @@ export function BookingsList({ limit, showFilters = true, title = "الحجوز�
         }
         setBookings(bookingsData)
       } else {
-        toast.error('فشل في تحميل الحجوزات')
+        toast.error('Failed to load bookings')
       }
     } catch (error) {
       console.error('Error fetching bookings:', error)
-      toast.error('حدث خطأ في تحميل الحجوزات')
+      toast.error('Error loading bookings')
     } finally {
       setLoading(false)
     }
@@ -124,14 +124,14 @@ export function BookingsList({ limit, showFilters = true, title = "الحجوز�
       const data = await response.json()
 
       if (data.success) {
-        toast.success('تم تحديث حالة الحجز بنجاح')
+        toast.success('Booking status updated successfully')
         fetchBookings()
       } else {
-        toast.error('فشل في تحديث حالة الحجز')
+        toast.error('Failed to update booking status')
       }
     } catch (error) {
       console.error('Error updating booking status:', error)
-      toast.error('حدث خطأ في تحديث حالة الحجز')
+      toast.error('Error updating booking status')
     }
   }
 
@@ -168,13 +168,13 @@ export function BookingsList({ limit, showFilters = true, title = "الحجوز�
   const getStatusText = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'مؤكد'
+        return 'Confirmed'
       case 'pending':
-        return 'في الانتظار'
+        return 'Pending'
       case 'cancelled':
-        return 'ملغي'
+        return 'Cancelled'
       case 'completed':
-        return 'مكتمل'
+        return 'Completed'
       default:
         return status
     }
@@ -203,7 +203,7 @@ export function BookingsList({ limit, showFilters = true, title = "الحجوز�
           {!limit && (
             <Button variant="outline" size="sm">
               <Download className="w-4 h-4 ml-2" />
-              تصدير
+              Export
             </Button>
           )}
         </div>
@@ -216,7 +216,7 @@ export function BookingsList({ limit, showFilters = true, title = "الحجوز�
               <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
               <Input
                 type="text"
-                placeholder="البحث..."
+                placeholder="Search..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pr-10"
@@ -228,11 +228,11 @@ export function BookingsList({ limit, showFilters = true, title = "الحجوز�
               onChange={(e) => setStatusFilter(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
             >
-              <option value="all">جميع الحالات</option>
-              <option value="pending">في الانتظار</option>
-              <option value="confirmed">مؤكد</option>
-              <option value="completed">مكتمل</option>
-              <option value="cancelled">ملغي</option>
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
             </select>
 
             <select
@@ -240,12 +240,12 @@ export function BookingsList({ limit, showFilters = true, title = "الحجوز�
               onChange={(e) => setPaymentFilter(e.target.value)}
               className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
             >
-              <option value="all">جميع حالات الدفع</option>
-              <option value="pending">في الانتظار</option>
-              <option value="paid">مدفوع</option>
-              <option value="on-demand">تحت الطلب</option>
-              <option value="refunded">مسترد</option>
-              <option value="failed">فشل</option>
+              <option value="all">All Payment Status</option>
+              <option value="pending">Pending</option>
+              <option value="paid">Paid</option>
+              <option value="on-demand">On-Demand</option>
+              <option value="refunded">Refunded</option>
+              <option value="failed">Failed</option>
             </select>
           </div>
         </div>
@@ -256,25 +256,25 @@ export function BookingsList({ limit, showFilters = true, title = "الحجوز�
           <thead className="bg-gray-50">
             <tr>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                رقم الحجز
+                Booking Reference
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                العميل
+                Customer
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                الرحلة
+                Tour
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                الأفراد
+                travelers
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                المبلغ
+                Amount
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                الحالة
+                Status
               </th>
               <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                الإجراءات
+                Actions
               </th>
             </tr>
           </thead>
@@ -345,7 +345,7 @@ export function BookingsList({ limit, showFilters = true, title = "الحجوز�
                         onClick={() => updateBookingStatus(booking._id, 'confirmed')}
                         className="text-green-600 hover:text-green-700"
                       >
-                        تأكيد
+                        Confirm
                       </Button>
                     )}
                     
@@ -356,7 +356,7 @@ export function BookingsList({ limit, showFilters = true, title = "الحجوز�
                         onClick={() => updateBookingStatus(booking._id, 'cancelled')}
                         className="text-red-600 hover:text-red-700"
                       >
-                        إلغاء
+                        Cancel
                       </Button>
                     )}
                   </div>
@@ -369,7 +369,7 @@ export function BookingsList({ limit, showFilters = true, title = "الحجوز�
 
       {filteredBookings.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-gray-500">لا توجد حجوزات تطابق المعايير المحددة</p>
+          <p className="text-gray-500">No bookings found matching the specified criteria</p>
         </div>
       )}
     </div>

@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
     
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح لك بتنفيذ هذا الإجراء' },
+        { success: false, message: 'You do not have permission to access this data' },
         { status: 403 }
       )
     }
@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching Cloudinary stats:', error)
     return NextResponse.json(
-      { success: false, message: 'فشل في جلب إحصائيات Cloudinary' },
+      { success: false, message: 'Error fetching Cloudinary stats' },
       { status: 500 }
     )
   }

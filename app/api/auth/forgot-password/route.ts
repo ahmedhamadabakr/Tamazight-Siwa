@@ -9,7 +9,7 @@ export async function POST(req: Request) {
 
     if (!email) {
       return NextResponse.json(
-        { success: false, message: 'البريد الإلكتروني مطلوب' },
+        { success: false, message: 'Email is required' },
         { status: 400 }
       )
     }
@@ -23,7 +23,7 @@ export async function POST(req: Request) {
       // Don't reveal if user exists or not for security
       return NextResponse.json({
         success: true,
-        message: 'إذا كان البريد الإلكتروني موجود، ستتلقى رابط إعادة تعيين كلمة المرور'
+        message: 'If the email exists, you will receive a reset password link'
       })
     }
 
@@ -47,17 +47,17 @@ export async function POST(req: Request) {
     const resetUrl = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/reset-password?token=${resetToken}`
 
     // Send email
-    await sendResetPasswordEmail(email, user.name || 'المستخدم', resetUrl)
+    await sendResetPasswordEmail(email, user.name || 'User', resetUrl)
 
     return NextResponse.json({
       success: true,
-      message: 'تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني'
+      message: 'A reset password link has been sent to your email'
     })
 
   } catch (error) {
     console.error('Forgot password error:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في إرسال البريد الإلكتروني' },
+      { success: false, message: 'Failed to send email' },
       { status: 500 }
     )
   }
@@ -78,7 +78,7 @@ async function sendResetPasswordEmail(email: string, name: string, resetUrl: str
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>إعادة تعيين كلمة المرور</title>
+      <title>Reset Password</title>
       <style>
         body {
           font-family: 'Arial', 'Tahoma', sans-serif;
@@ -143,38 +143,38 @@ async function sendResetPasswordEmail(email: string, name: string, resetUrl: str
     <body>
       <div class="container">
         <div class="header">
-          <h1>إعادة تعيين كلمة المرور</h1>
+          <h1>Reset Password</h1>
         </div>
         
         <div class="content">
-          <h2>مرحباً ${name}</h2>
+          <h2>Hello ${name}</h2>
           
-          <p>تلقينا طلباً لإعادة تعيين كلمة المرور الخاصة بحسابك في موقع تمازيغت سيوة.</p>
+          <p>We received a request to reset your password for your account on Tamazight Siwa.</p>
           
-          <p>للمتابعة، يرجى النقر على الزر أدناه:</p>
+          <p>To proceed, please click the button below:</p>
           
           <div style="text-align: center;">
-            <a href="${resetUrl}" class="reset-button">إعادة تعيين كلمة المرور</a>
+            <a href="${resetUrl}" class="reset-button">Reset Password</a>
           </div>
           
-          <p>أو يمكنك نسخ الرابط التالي ولصقه في متصفحك:</p>
+          <p>Or you can copy the link below and paste it in your browser:</p>
           <p style="word-break: break-all; background: #f8f9fa; padding: 10px; border-radius: 5px;">
             ${resetUrl}
           </p>
           
           <div class="warning">
-            <strong>تنبيه:</strong>
+            <strong>Warning:</strong>
             <ul>
-              <li>هذا الرابط صالح لمدة ساعة واحدة فقط</li>
-              <li>إذا لم تطلب إعادة تعيين كلمة المرور، يرجى تجاهل هذا البريد</li>
-              <li>لا تشارك هذا الرابط مع أي شخص آخر</li>
+              <li>This link is valid for one hour only</li>
+              <li>If you did not request a password reset, please ignore this email</li>
+              <li>Do not share this link with anyone else</li>
             </ul>
           </div>
         </div>
         
         <div class="footer">
-          <p>هذا البريد الإلكتروني تم إرساله تلقائياً، يرجى عدم الرد عليه.</p>
-          <p>للدعم الفني: info@tamazight-siwa.com</p>
+          <p>This email was sent automatically, please do not reply to it.</p>
+          <p>For support: info@tamazight-siwa.com</p>
         </div>
       </div>
     </body>
@@ -182,27 +182,27 @@ async function sendResetPasswordEmail(email: string, name: string, resetUrl: str
   `
 
   const textContent = `
-إعادة تعيين كلمة المرور
+Reset Password
 
-مرحباً ${name}
+Hello ${name}
 
-تلقينا طلباً لإعادة تعيين كلمة المرور الخاصة بحسابك في موقع تمازيغت سيوة.
+We received a request to reset your password for your account on Tamazight Siwa.
 
-للمتابعة، يرجى زيارة الرابط التالي:
+To proceed, please visit the following link:
 ${resetUrl}
 
-تنبيه:
-- هذا الرابط صالح لمدة ساعة واحدة فقط
-- إذا لم تطلب إعادة تعيين كلمة المرور، يرجى تجاهل هذا البريد
-- لا تشارك هذا الرابط مع أي شخص آخر
+Warning:
+- This link is valid for one hour only
+- If you did not request a password reset, please ignore this email
+- Do not share this link with anyone else
 
-للدعم الفني: info@tamazight-siwa.com
+For support: info@tamazight-siwa.com
   `
 
   const mailOptions = {
-    from: `"تمازيغت سيوة" <${process.env.GMAIL_USER}>`,
+    from: `"Tamazight Siwa" <${process.env.GMAIL_USER}>`,
     to: email,
-    subject: 'إعادة تعيين كلمة المرور - تمازيغت سيوة',
+    subject: 'Reset Password - Tamazight Siwa',
     text: textContent,
     html: htmlContent,
   }

@@ -145,7 +145,7 @@ export async function POST(request: NextRequest) {
     const newReview = {
       tourId,
       userId: session.user.id,
-      userName: session.user.name || 'مستخدم',
+      userName: session.user.name || 'user',
       userEmail: session.user.email || '',
       userImage: session.user.image || undefined,
       rating: parseInt(rating),

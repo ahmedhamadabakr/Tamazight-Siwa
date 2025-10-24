@@ -121,7 +121,7 @@ export async function GET(req: Request) {
   } catch (error) {
     console.error('Admin get bookings error:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ أثناء جلب الحجوزات' },
+      { success: false, message: 'Failed to get bookings' },
       { status: 500 }
     )
   }

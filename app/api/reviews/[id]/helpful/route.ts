@@ -26,7 +26,7 @@ export async function POST(
 
     if (!session?.user) {
       return NextResponse.json(
-        { success: false, message: 'يجب تسجيل الدخول للتصويت' },
+        { success: false, message: 'You must be logged in to vote' },
         { status: 401 }
       )
     }
@@ -36,7 +36,7 @@ export async function POST(
 
     if (!ObjectId.isValid(params.id)) {
       return NextResponse.json(
-        { success: false, message: 'معرف التقييم غير صحيح' },
+        { success: false, message: 'Invalid review ID' },
         { status: 400 }
       )
     }
@@ -45,7 +45,7 @@ export async function POST(
 
     if (!review) {
       return NextResponse.json(
-        { success: false, message: 'التقييم غير موجود' },
+        { success: false, message: 'Review not found' },
         { status: 404 }
       )
     }
@@ -80,7 +80,7 @@ export async function POST(
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
-        { success: false, message: 'فشل في تحديث التصويت' },
+        { success: false, message: 'Failed to update vote' },
         { status: 500 }
       )
     }
@@ -91,13 +91,13 @@ export async function POST(
         helpful: newHelpfulCount,
         hasVoted: !hasVoted
       },
-      message: hasVoted ? 'تم إلغاء التصويت' : 'تم التصويت بنجاح'
+      message: hasVoted ? 'Vote removed' : 'Vote added'
     })
 
   } catch (error) {
     console.error('Error toggling helpful vote:', error)
     return NextResponse.json(
-      { success: false, message: 'فشل في التصويت' },
+      { success: false, message: 'Error toggling helpful vote' },
       { status: 500 }
     )
   }

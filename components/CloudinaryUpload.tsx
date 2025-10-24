@@ -40,14 +40,14 @@ export function CloudinaryUpload({
     // Validate file type
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp']
     if (!allowedTypes.includes(file.type)) {
-      onUploadError?.('نوع الملف غير مدعوم. يرجى اختيار صورة (JPG, PNG, GIF, WebP)')
+      onUploadError?.('File type not supported. Please select an image (JPG, PNG, GIF, WebP)')
       return
     }
 
     // Validate file size (10MB max)
     const maxSize = 10 * 1024 * 1024 // 10MB
     if (file.size > maxSize) {
-      onUploadError?.('حجم الملف يجب أن يكون أقل من 10 ميجابايت')
+      onUploadError?.('File size must be less than 10MB')
       return
     }
 
@@ -82,12 +82,12 @@ export function CloudinaryUpload({
           bytes: result.bytes
         })
       } else {
-        onUploadError?.(result.message || 'فشل في رفع الصورة')
+        onUploadError?.(result.message || 'Failed to upload image')
         setPreviewUrl(currentImage || null)
       }
     } catch (error) {
       console.error('Upload error:', error)
-      onUploadError?.('حدث خطأ أثناء رفع الصورة')
+      onUploadError?.('Failed to upload image')
       setPreviewUrl(currentImage || null)
     } finally {
       setIsUploading(false)
@@ -154,17 +154,17 @@ export function CloudinaryUpload({
         {isUploading ? (
           <div className="flex flex-col items-center space-y-2">
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
-            <p className="text-sm text-gray-600">جاري رفع الصورة...</p>
+            <p className="text-sm text-gray-600">Uploading...</p>
           </div>
         ) : (
           <div className="flex flex-col items-center space-y-2">
             <Upload className="h-8 w-8 text-gray-400" />
             <div>
               <p className="text-sm font-medium text-gray-900">
-                انقر لاختيار صورة أو اسحب وأفلت
+                Click to select an image or drag and drop
               </p>
               <p className="text-xs text-gray-500">
-                PNG, JPG, GIF, WebP حتى 10MB
+                PNG, JPG, GIF, WebP until 10MB
               </p>
             </div>
           </div>
@@ -177,7 +177,7 @@ export function CloudinaryUpload({
           <div className="relative w-full h-48 bg-gray-100 rounded-lg overflow-hidden">
             <Image
               src={previewUrl}
-              alt="معاينة الصورة"
+              alt="Image Preview"
               fill
               className="object-cover"
             />
@@ -188,7 +188,7 @@ export function CloudinaryUpload({
                   clearPreview()
                 }}
                 className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600 transition-colors"
-                title="إزالة الصورة"
+                title="Remove Image"
               >
                 <X className="h-4 w-4" />
               </button>
@@ -207,7 +207,7 @@ export function CloudinaryUpload({
           className="w-full"
         >
           <ImageIcon className="h-4 w-4 mr-2" />
-          {isUploading ? 'جاري الرفع...' : 'اختيار صورة'}
+          {isUploading ? 'Uploading...' : 'Select Image'}
         </Button>
       )}
     </div>

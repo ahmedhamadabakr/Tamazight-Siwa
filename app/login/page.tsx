@@ -144,7 +144,7 @@ export default function LoginPage() {
 
             <div className="mt-5 text-center">
               <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                نسيت كلمة المرور؟
+                Forget password ?
               </Link>
             </div>
           </CardContent>

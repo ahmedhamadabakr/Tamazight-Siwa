@@ -8,14 +8,14 @@ export async function POST(req: Request) {
 
     if (!token || !password) {
       return NextResponse.json(
-        { success: false, message: 'الرمز المميز وكلمة المرور مطلوبان' },
+        { success: false, message: 'Token and password are required' },
         { status: 400 }
       )
     }
 
     if (password.length < 6) {
       return NextResponse.json(
-        { success: false, message: 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' },
+        { success: false, message: 'Password must be at least 6 characters long' },
         { status: 400 }
       )
     }
@@ -31,7 +31,7 @@ export async function POST(req: Request) {
 
     if (!user) {
       return NextResponse.json(
-        { success: false, message: 'الرابط غير صالح أو منتهي الصلاحية' },
+        { success: false, message: 'Invalid or expired token' },
         { status: 400 }
       )
     }
@@ -56,13 +56,13 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'تم تغيير كلمة المرور بنجاح'
+      message: 'Password reset successfully'
     })
 
   } catch (error) {
     console.error('Reset password error:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في تغيير كلمة المرور' },
+      { success: false, message: 'An error occurred while resetting password' },
       { status: 500 }
     )
   }

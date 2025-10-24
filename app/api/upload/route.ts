@@ -104,13 +104,13 @@ export async function POST(request: NextRequest) {
       height: result.height,
       format: result.format,
       bytes: result.bytes,
-      message: 'تم رفع الصورة بنجاح'
+      message: 'Image uploaded successfully'
     });
 
   } catch (error) {
     console.error('Error uploading to Cloudinary:', error);
     return NextResponse.json(
-      { success: false, message: 'فشل في رفع الصورة' },
+      { success: false, message: 'Failed to upload image' },
       { status: 500 }
     );
   }
@@ -124,7 +124,7 @@ export async function DELETE(request: NextRequest) {
     
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح لك بتنفيذ هذا الإجراء' },
+        { success: false, message: 'You are not authorized to perform this action' },
         { status: 403 }
       );
     }
@@ -134,7 +134,7 @@ export async function DELETE(request: NextRequest) {
 
     if (!publicId) {
       return NextResponse.json(
-        { success: false, message: 'معرف الصورة مطلوب' },
+        { success: false, message: 'Image ID is required' },
         { status: 400 }
       );
     }
@@ -145,11 +145,11 @@ export async function DELETE(request: NextRequest) {
     if (result.result === 'ok') {
       return NextResponse.json({
         success: true,
-        message: 'تم حذف الصورة بنجاح'
+        message: 'Image deleted successfully'
       });
     } else {
       return NextResponse.json(
-        { success: false, message: 'فشل في حذف الصورة من Cloudinary' },
+        { success: false, message: 'Failed to delete image from Cloudinary' },
         { status: 400 }
       );
     }
@@ -157,7 +157,7 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     console.error('Error deleting from Cloudinary:', error);
     return NextResponse.json(
-      { success: false, message: 'فشل في حذف الصورة' },
+      { success: false, message: 'Failed to delete image from Cloudinary' },
       { status: 500 }
     );
   }

@@ -362,9 +362,9 @@ export default function UserDashboard({ params }: UserDashboardProps) {
           {activeTab === 'trips' && (
             <>
               <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-800">حجوزاتي</h2>
+                <h2 className="text-xl font-semibold text-gray-800">My Trips</h2>
                 <div className="text-sm text-gray-500">
-                  إجمالي الحجوزات: {trips.length}
+                  Total Trips: {trips.length}
                 </div>
               </div>
               
@@ -373,13 +373,13 @@ export default function UserDashboard({ params }: UserDashboardProps) {
                   <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
                     <Plane className="w-8 h-8 text-gray-400" />
                   </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد حجوزات بعد</h3>
-                  <p className="text-gray-500 mb-6">ابدأ رحلتك القادمة معنا واستكشف وجهات رائعة</p>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No trips found</h3>
+                  <p className="text-gray-500 mb-6">Start your next trip with us and explore amazing destinations</p>
                   <button
                     onClick={() => router.push('/tours')}
                     className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
                   >
-                    تصفح الرحلات المتاحة
+                    Browse available tours
                   </button>
                 </div>
               ) : (
@@ -390,25 +390,25 @@ export default function UserDashboard({ params }: UserDashboardProps) {
                       <div className="text-2xl font-bold text-green-600">
                         {trips.filter(t => t.status === 'confirmed').length}
                       </div>
-                      <div className="text-sm text-green-700">مؤكدة</div>
+                      <div className="text-sm text-green-700">Confirmed</div>
                     </div>
                     <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
                       <div className="text-2xl font-bold text-yellow-600">
                         {trips.filter(t => t.status === 'pending').length}
                       </div>
-                      <div className="text-sm text-yellow-700">في الانتظار</div>
+                      <div className="text-sm text-yellow-700">Pending</div>
                     </div>
                     <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
                       <div className="text-2xl font-bold text-blue-600">
                         {trips.filter(t => t.status === 'completed').length}
                       </div>
-                      <div className="text-sm text-blue-700">مكتملة</div>
+                      <div className="text-sm text-blue-700">Completed</div>
                     </div>
                     <div className="bg-red-50 border border-red-200 rounded-lg p-4">
                       <div className="text-2xl font-bold text-red-600">
                         {trips.filter(t => t.status === 'cancelled').length}
                       </div>
-                      <div className="text-sm text-red-700">ملغية</div>
+                      <div className="text-sm text-red-700">Cancelled</div>
                     </div>
                   </div>
 

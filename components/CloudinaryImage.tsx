@@ -122,7 +122,7 @@ export function CloudinaryImage({
       <div className={`flex items-center justify-center bg-gray-200 ${className}`}>
         <div className="text-center text-gray-500">
           <ImageIcon className="h-8 w-8 mx-auto mb-2" />
-          <p className="text-sm">فشل في تحميل الصورة</p>
+          <p className="text-sm">Failed to load image</p>
         </div>
       </div>
     )

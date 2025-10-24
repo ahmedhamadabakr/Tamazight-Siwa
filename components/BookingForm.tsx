@@ -33,34 +33,34 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
     console.log('Session status:', status, 'Session data:', session)
 
     if (status === 'loading') {
-      toast.error('جاري التحقق من تسجيل الدخول...')
+      toast.error('Checking authentication...')
       return
     }
 
     if (status === 'unauthenticated' || !session?.user) {
-      toast.error('يجب تسجيل الدخول أولاً')
+      toast.error('You must be logged in first')
       router.push(`/login?callbackUrl=/tours/${tourId}`)
       return
     }
 
     // Client-side validation
     if (!tourId) {
-      toast.error('خطأ', {
-        description: 'معرف الرحلة غير موجود'
+      toast.error('Error', {
+        description: 'Tour ID not found'
       });
       return;
     }
 
     if (travelers < 1 || travelers > 5) {
-      toast.error('خطأ', {
-        description: 'عدد المسافرين يجب أن يكون بين 1 و 5'
+      toast.error('Error', {
+        description: 'Number of travelers must be between 1 and 5'
       });
       return;
     }
 
     if (!price || price <= 0) {
-      toast.error('خطأ', {
-        description: 'سعر الرحلة غير صحيح'
+      toast.error('Error', {
+        description: 'Tour price is invalid'
       });
       return;
     }
@@ -90,7 +90,7 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
 
       if (!response.ok) {
         console.error('Booking failed:', data)
-        throw new Error(data.message || 'فشل في إتمام الحجز')
+        throw new Error(data.message || 'Booking failed')
       }
 
       // Set booking data and show confirmation modal
@@ -111,8 +111,8 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
 
     } catch (error) {
       console.error('Booking error:', error)
-      toast.error('حدث خطأ', {
-        description: error instanceof Error ? error.message : 'حدث خطأ أثناء معالجة طلبك. يرجى المحاولة مرة أخرى.'
+      toast.error('Error', {
+        description: error instanceof Error ? error.message : 'An error occurred while processing your request. Please try again.'
       })
     } finally {
       setIsLoading(false)
@@ -168,7 +168,7 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
               }
             }}
           >
-            اختبار الاتصال
+            Test Connection
           </Button>
           
           <Button
@@ -179,12 +179,12 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
             {isLoading ? (
               <>
                 <Loader2 className="ml-2 h-4 w-4 animate-spin" />
-                جارِ المعالجة...
+                Processing...
               </>
             ) : (
               <>
                 <CreditCard className="ml-2 h-4 w-4" />
-                تأكيد الحجز
+                Confirm Booking
               </>
             )}
           </Button>

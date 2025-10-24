@@ -133,14 +133,14 @@ export async function POST(request: NextRequest) {
     
     if (start >= end) {
       return NextResponse.json(
-        { success: false, error: 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية' },
+        { success: false, error: 'End date must be after start date' },
         { status: 400 }
       );
     }
 
     if (start < new Date()) {
       return NextResponse.json(
-        { success: false, error: 'تاريخ البداية يجب أن يكون في المستقبل' },
+        { success: false, error: 'Start date must be in the future' },
         { status: 400 }
       );
     }

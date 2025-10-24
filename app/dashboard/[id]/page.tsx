@@ -142,20 +142,20 @@ export default function ManagerDashboard() {
     <DashboardLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-gray-900">لوحة تحكم المدير</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Manager Dashboard</h1>
           <div className="flex space-x-3 space-x-reverse">
             <Link
               href="/admin/bookings"
               className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              إدارة الحجوزات
+              Bookings Management
             </Link>
           </div>
         </div>
 
         {/* User Statistics */}
         <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">إحصائيات المستخدمين</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">User Statistics</h2>
           <Analytics
             active={userStats.active}
             total={userStats.total}
@@ -166,7 +166,7 @@ export default function ManagerDashboard() {
 
         {/* Booking Statistics */}
         <div>
-          <h2 className="text-xl font-semibold text-gray-800 mb-4">إحصائيات الحجوزات</h2>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">Booking Statistics</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white rounded-lg shadow-sm border p-6">
               <div className="flex items-center">
@@ -174,7 +174,7 @@ export default function ManagerDashboard() {
                   <Calendar className="w-6 h-6 text-blue-600" />
                 </div>
                 <div className="mr-4">
-                  <p className="text-sm text-gray-600">إجمالي الحجوزات</p>
+                  <p className="text-sm text-gray-600">Total Bookings</p>
                   <p className="text-2xl font-bold text-gray-900">{bookingStats.total}</p>
                 </div>
               </div>
@@ -186,7 +186,7 @@ export default function ManagerDashboard() {
                   <CheckCircle className="w-6 h-6 text-green-600" />
                 </div>
                 <div className="mr-4">
-                  <p className="text-sm text-gray-600">الحجوزات المؤكدة</p>
+                  <p className="text-sm text-gray-600">Confirmed Bookings</p>
                   <p className="text-2xl font-bold text-gray-900">{bookingStats.confirmed}</p>
                 </div>
               </div>
@@ -198,7 +198,7 @@ export default function ManagerDashboard() {
                   <Clock className="w-6 h-6 text-yellow-600" />
                 </div>
                 <div className="mr-4">
-                  <p className="text-sm text-gray-600">في الانتظار</p>
+                  <p className="text-sm text-gray-600">Pending Bookings</p>
                   <p className="text-2xl font-bold text-gray-900">{bookingStats.pending}</p>
                 </div>
               </div>
@@ -210,8 +210,8 @@ export default function ManagerDashboard() {
                   <CreditCard className="w-6 h-6 text-green-600" />
                 </div>
                 <div className="mr-4">
-                  <p className="text-sm text-gray-600">إجمالي الإيرادات</p>
-                  <p className="text-2xl font-bold text-gray-900">{bookingStats.totalRevenue.toLocaleString()} ريال</p>
+                  <p className="text-sm text-gray-600">Total Revenue</p>
+                  <p className="text-2xl font-bold text-gray-900">{bookingStats.totalRevenue.toLocaleString()} Dollars</p>
                 </div>
               </div>
             </div>
@@ -226,7 +226,7 @@ export default function ManagerDashboard() {
                 <UsersIcon className="w-6 h-6 text-purple-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm text-gray-600">إجمالي المسافرين</p>
+                <p className="text-sm text-gray-600">Total Travelers</p>
                 <p className="text-2xl font-bold text-gray-900">{bookingStats.totalTravelers}</p>
               </div>
             </div>
@@ -238,7 +238,7 @@ export default function ManagerDashboard() {
                 <XCircle className="w-6 h-6 text-red-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm text-gray-600">الحجوزات الملغية</p>
+                <p className="text-sm text-gray-600">Cancelled Bookings</p>
                 <p className="text-2xl font-bold text-gray-900">{bookingStats.cancelled}</p>
               </div>
             </div>
@@ -249,18 +249,18 @@ export default function ManagerDashboard() {
         <div className="bg-white rounded-lg shadow-sm border">
           <div className="px-6 py-4 border-b">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">أحدث الحجوزات</h3>
+              <h3 className="text-lg font-semibold text-gray-900">Recent Bookings</h3>
               <button
                 onClick={() => router.push('/admin/bookings')}
                 className="text-blue-600 hover:text-blue-700 text-sm font-medium"
               >
-                عرض الكل
+                Show All
               </button>
             </div>
           </div>
           <div className="p-6">
             {recentBookings.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">لا توجد حجوزات حديثة</p>
+              <p className="text-gray-500 text-center py-4">No recent bookings found</p>
             ) : (
               <div className="space-y-4">
                 {recentBookings.map((booking) => (
@@ -272,11 +272,11 @@ export default function ManagerDashboard() {
                       </div>
                       <div>
                         <p className="font-medium text-gray-900">{booking.tour.title}</p>
-                        <p className="text-sm text-gray-500">{booking.user.name} • {booking.travelers} أشخاص</p>
+                        <p className="text-sm text-gray-500">{booking.user.name} • {booking.travelers} People</p>
                       </div>
                     </div>
                     <div className="text-left">
-                      <p className="font-medium text-gray-900">{booking.totalAmount.toLocaleString()} ريال</p>
+                      <p className="font-medium text-gray-900">{booking.totalAmount.toLocaleString()}Dollars</p>
                       <p className="text-sm text-gray-500">{new Date(booking.createdAt).toLocaleDateString('ar-EG')}</p>
                     </div>
                   </div>

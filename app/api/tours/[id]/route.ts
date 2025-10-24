@@ -121,7 +121,7 @@ export async function PUT(
       
       if (start >= end) {
         return NextResponse.json(
-          { success: false, error: 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية' },
+          { success: false, error: 'End date must be after start date' },
           { status: 400 }
         );
       }

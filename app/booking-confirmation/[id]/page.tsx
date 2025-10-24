@@ -64,17 +64,17 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
       const data = await response.json()
 
       if (!response.ok) {
-        throw new Error(data.message || 'فشل في تحميل تفاصيل الحجز')
+        throw new Error(data.message || 'Failed to fetch booking details')
       }
 
       if (data.success) {
         setBooking(data.data)
       } else {
-        setError(data.message || 'لم يتم العثور على الحجز')
+        setError(data.message || 'Booking not found')
       }
     } catch (error) {
       console.error('Error fetching booking:', error)
-      setError('حدث خطأ في تحميل تفاصيل الحجز')
+      setError('Failed to fetch booking details')
     } finally {
       setLoading(false)
     }
@@ -93,13 +93,13 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
         a.click()
         window.URL.revokeObjectURL(url)
         document.body.removeChild(a)
-        toast.success('تم تحميل تأكيد الحجز بنجاح')
+        toast.success('Booking confirmation downloaded successfully')
       } else {
-        toast.error('فشل في تحميل تأكيد الحجز')
+        toast.error('Failed to download booking confirmation')
       }
     } catch (error) {
       console.error('Error downloading confirmation:', error)
-      toast.error('حدث خطأ في تحميل تأكيد الحجز')
+      toast.error('Failed to download booking confirmation')
     }
   }
 
@@ -121,13 +121,13 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
   const getStatusText = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'مؤكد'
+        return 'Confirmed'
       case 'pending':
-        return 'في الانتظار'
+        return 'Pending'
       case 'cancelled':
-        return 'ملغي'
+        return 'Cancelled'
       case 'completed':
-        return 'مكتمل'
+        return 'Completed'
       default:
         return status
     }
@@ -145,11 +145,11 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">خطأ في تحميل الحجز</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">Booking not found</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <Button onClick={() => router.push('/tours')} variant="outline">
             <ArrowLeft className="ml-2 h-4 w-4" />
-            العودة للرحلات
+            Back to tours
           </Button>
         </div>
       </div>
@@ -168,8 +168,8 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
           <div className="inline-flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mb-4">
             <CheckCircle className="w-8 h-8 text-green-600" />
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">تم تأكيد حجزك بنجاح!</h1>
-          <p className="text-gray-600">رقم الحجز: {booking.bookingReference}</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Booking confirmed successfully!</h1>
+          <p className="text-gray-600">Booking reference: {booking.bookingReference}</p>
         </motion.div>
 
         {/* Booking Details Card */}
@@ -180,14 +180,14 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
           className="bg-white rounded-lg shadow-lg overflow-hidden mb-6"
         >
           <div className="bg-gradient-to-r from-blue-600 to-blue-700 px-6 py-4">
-            <h2 className="text-xl font-semibold text-white">تفاصيل الحجز</h2>
+            <h2 className="text-xl font-semibold text-white">Booking details</h2>
           </div>
 
           <div className="p-6">
             <div className="grid md:grid-cols-2 gap-6">
               {/* Tour Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">معلومات الرحلة</h3>
+                <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Tour Information</h3>
 
                 <div className="flex items-start space-x-3 space-x-reverse">
                   <MapPin className="w-5 h-5 text-blue-600 mt-1" />
@@ -200,9 +200,9 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
                 <div className="flex items-center space-x-3 space-x-reverse">
                   <Calendar className="w-5 h-5 text-blue-600" />
                   <div>
-                    <p className="font-medium text-gray-900">تاريخ الرحلة</p>
+                    <p className="font-medium text-gray-900">Tour Date</p>
                     <p className="text-gray-600">
-                      {new Date(booking.tour.startDate).toLocaleDateString('us-US')} - {new Date(booking.tour.endDate).toLocaleDateString('us-US')}
+                      {new Date(booking.tour.startDate).toLocaleDateString('ar-EG')} - {new Date(booking.tour.endDate).toLocaleDateString('ar-EG')}
                     </p>
                   </div>
                 </div>
@@ -210,14 +210,14 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
                 <div className="flex items-center space-x-3 space-x-reverse">
                   <Users className="w-5 h-5 text-blue-600" />
                   <div>
-                    <p className="font-medium text-gray-900">عدد الأفراد</p>
-                    <p className="text-gray-600">{booking.travelers} أشخاص</p>
+                    <p className="font-medium text-gray-900">Number of travelers</p>
+                    <p className="text-gray-600">{booking.travelers} people</p>
                   </div>
                 </div>
 
                 {booking.specialRequests && (
                   <div>
-                    <p className="font-medium text-gray-900 mb-1">الطلبات الخاصة</p>
+                    <p className="font-medium text-gray-900 mb-1">Special Requests</p>
                     <p className="text-gray-600 bg-gray-50 p-3 rounded-md">{booking.specialRequests}</p>
                   </div>
                 )}
@@ -225,14 +225,14 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
 
               {/* Customer Information */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">معلومات العميل</h3>
+                <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">Customer Information</h3>
 
                 <div className="flex items-center space-x-3 space-x-reverse">
                   <div className="w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center">
                     <span className="text-white text-xs font-bold">{booking.user.name.charAt(0)}</span>
                   </div>
                   <div>
-                    <p className="font-medium text-gray-900">الاسم</p>
+                    <p className="font-medium text-gray-900">Name</p>
                     <p className="text-gray-600">{booking.user.name}</p>
                   </div>
                 </div>
@@ -240,7 +240,7 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
                 <div className="flex items-center space-x-3 space-x-reverse">
                   <Mail className="w-5 h-5 text-blue-600" />
                   <div>
-                    <p className="font-medium text-gray-900">البريد الإلكتروني</p>
+                    <p className="font-medium text-gray-900">Email</p>
                     <p className="text-gray-600">{booking.user.email}</p>
                   </div>
                 </div>
@@ -249,7 +249,7 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
                   <div className="flex items-center space-x-3 space-x-reverse">
                     <Phone className="w-5 h-5 text-blue-600" />
                     <div>
-                      <p className="font-medium text-gray-900">رقم الهاتف</p>
+                      <p className="font-medium text-gray-900">Phone Number</p>
                       <p className="text-gray-600">{booking.user.phone}</p>
                     </div>
                   </div>
@@ -257,13 +257,13 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
 
                 <div className="pt-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-gray-900">حالة الحجز</span>
+                    <span className="font-medium text-gray-900"> Booking Status</span>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(booking.status)}`}>
                       {getStatusText(booking.status)}
                     </span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="font-medium text-gray-900">حالة الدفع</span>
+                    <span className="font-medium text-gray-900">Payment Status</span>
                     <span className={`px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(booking.paymentStatus)}`}>
                       {getStatusText(booking.paymentStatus)}
                     </span>
@@ -276,15 +276,15 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
             <div className="mt-6 pt-6 border-t">
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600">سعر الفرد الواحد</span>
+                  <span className="text-gray-600">Price per person</span>
                   <span className="text-gray-900">{booking.tour.price.toLocaleString()}Dollar</span>
                 </div>
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-gray-600">عدد الأفراد</span>
+                  <span className="text-gray-600">Number of travelers</span>
                   <span className="text-gray-900">{booking.travelers}</span>
                 </div>
                 <div className="flex items-center justify-between text-lg font-semibold border-t pt-2">
-                  <span className="text-gray-900">المجموع الكلي</span>
+                  <span className="text-gray-900">Total amount</span>
                   <span className="text-blue-600">{booking.totalAmount.toLocaleString()} Dollar</span>
                 </div>
               </div>
@@ -301,16 +301,16 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
         >
           <Button onClick={downloadConfirmation} className="flex items-center">
             <Download className="ml-2 h-4 w-4" />
-            تحميل تأكيد الحجز
+            Download Booking Confirmation
           </Button>
 
           <Button variant="outline" onClick={() => router.push('/tours')}>
             <ArrowLeft className="ml-2 h-4 w-4" />
-            تصفح المزيد من الرحلات
+            Browse More Tours
           </Button>
 
           <Button variant="outline" onClick={() => router.push(`/user/${(session?.user as any)?.id}`)}>
-            عرض حجوزاتي
+            View My Bookings
           </Button>
         </motion.div>
 
@@ -321,23 +321,23 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
           transition={{ delay: 0.3 }}
           className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6"
         >
-          <h3 className="text-lg font-semibold text-blue-900 mb-3">ملاحظات مهمة</h3>
+          <h3 className="text-lg font-semibold text-blue-900 mb-3">Important Notes</h3>
           <ul className="space-y-2 text-blue-800">
             <li className="flex items-start">
               <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 ml-3 flex-shrink-0"></span>
-              سيتم إرسال تأكيد الحجز إلى بريدك الإلكتروني خلال 24 ساعة
+              Booking confirmation will be sent to your email within 24 hours
             </li>
             <li className="flex items-start">
               <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 ml-3 flex-shrink-0"></span>
-              يرجى الاحتفاظ برقم الحجز للمراجعة
+              Please keep your booking number for reference
             </li>
             <li className="flex items-start">
               <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 ml-3 flex-shrink-0"></span>
-              في حالة وجود أي استفسارات، يرجى التواصل معنا على الرقم: 966501234567+
+              In case of any questions, please contact us at the number: 966501234567+
             </li>
             <li className="flex items-start">
               <span className="w-2 h-2 bg-blue-600 rounded-full mt-2 ml-3 flex-shrink-0"></span>
-              يمكن إلغاء الحجز قبل 48 ساعة من موعد الرحلة
+              You can cancel the booking before 48 hours from the tour date
             </li>
           </ul>
         </motion.div>

@@ -24,7 +24,7 @@ export async function GET(
 
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
-        { success: false, message: 'معرف الحجز غير صحيح' },
+        { success: false, message: 'Invalid booking ID' },
         { status: 400 }
       )
     }
@@ -95,7 +95,7 @@ export async function GET(
 
     if (!booking || booking.length === 0) {
       return NextResponse.json(
-        { success: false, message: 'الحجز غير موجود' },
+        { success: false, message: 'Booking not found' },
         { status: 404 }
       )
     }
@@ -116,7 +116,7 @@ export async function GET(
   } catch (error) {
     console.error('Error generating PDF:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في إنشاء ملف PDF' },
+      { success: false, message: 'Error generating PDF' },  
       { status: 500 }
     )
   }

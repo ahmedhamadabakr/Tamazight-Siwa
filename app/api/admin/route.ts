@@ -53,7 +53,7 @@ export async function GET(request: NextRequest) {
     console.error('Error fetching admins:', error);
     return NextResponse.json({
       success: false,
-      error: 'فشل في جلب بيانات المدراء'
+      error: 'Failed to fetch admins'
     }, { status: 500 });
   }
 }
@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     if (!fullName || !email || !password || !role) {
       return NextResponse.json({
         success: false,
-        error: 'جميع الحقول مطلوبة'
+        error: 'All fields are required'
       }, { status: 400 });
     }
 
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     if (existingUser) {
       return NextResponse.json({
         success: false,
-        error: 'هذا البريد الإلكتروني مسجل بالفعل'
+        error: 'Email already exists'
       }, { status: 400 });
     }
 
@@ -119,13 +119,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: { _id: result.insertedId, ...newAdmin },
-      message: 'تم إضافة المدير بنجاح'
+      message: 'Admin created successfully'
     });
   } catch (error) {
     console.error('Error creating admin:', error);
     return NextResponse.json({
       success: false,
-      error: 'فشل في إضافة المدير'
+      error: 'Failed to create admin'
     }, { status: 500 });
   }
 }

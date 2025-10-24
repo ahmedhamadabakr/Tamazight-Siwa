@@ -100,11 +100,11 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
       if (data.success) {
         await fetchReviews() // Refresh list
       } else {
-        alert(data.message || 'فشل في تحديث حالة التقييم')
+        alert(data.message || 'failed to update review status')
       }
     } catch (error) {
       console.error('Error updating review status:', error)
-      alert('حدث خطأ أثناء تحديث الحالة')
+      alert('failed to update review status')
     }
   }
 
@@ -128,17 +128,17 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
         setSelectedReview(null)
         await fetchReviews() // Refresh list
       } else {
-        alert(data.message || 'فشل في إرسال الرد')
+        alert(data.message || 'failed to send admin response')
       }
     } catch (error) {
       console.error('Error sending admin response:', error)
-      alert('حدث خطأ أثناء إرسال الرد')
+      alert('failed to send admin response')
     }
   }
 
   // Delete review
   const deleteReview = async (reviewId: string) => {
-    if (!confirm('هل أنت متأكد من حذف هذا التقييم؟')) return
+    if (!confirm('Are you sure you want to delete this review?')) return
 
     try {
       const response = await fetch(`/api/reviews/${reviewId}`, {
@@ -149,11 +149,11 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
       if (data.success) {
         await fetchReviews() // Refresh list
       } else {
-        alert(data.message || 'فشل في حذف التقييم')
+        alert(data.message || 'failed to delete review')
       }
     } catch (error) {
       console.error('Error deleting review:', error)
-      alert('حدث خطأ أثناء حذف التقييم')
+      alert('failed to delete review')
     }
   }
 
@@ -182,11 +182,11 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
   const getStatusText = (status: string) => {
     switch (status) {
       case 'approved':
-        return 'مقبول'
+        return 'Approved'
       case 'rejected':
-        return 'مرفوض'
+        return 'Rejected'
       default:
-        return 'في الانتظار'
+        return 'Pending'
     }
   }
 
@@ -205,7 +205,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
     <div className={`space-y-6 ${className}`}>
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">إدارة التقييمات</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Reviews Manager</h1>
       </div>
 
       {/* Statistics */}
@@ -215,7 +215,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
             <MessageSquare className="h-8 w-8 text-blue-600" />
             <div className="mr-4">
               <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
-              <p className="text-gray-600">إجمالي التقييمات</p>
+              <p className="text-gray-600">Total Reviews</p>
             </div>
           </div>
         </div>
@@ -225,7 +225,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
             <Clock className="h-8 w-8 text-yellow-600" />
             <div className="mr-4">
               <p className="text-2xl font-semibold text-gray-900">{stats.pending}</p>
-              <p className="text-gray-600">في الانتظار</p>
+              <p className="text-gray-600">Pending</p>
             </div>
           </div>
         </div>
@@ -235,7 +235,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
             <CheckCircle className="h-8 w-8 text-green-600" />
             <div className="mr-4">
               <p className="text-2xl font-semibold text-gray-900">{stats.approved}</p>
-              <p className="text-gray-600">مقبولة</p>
+              <p className="text-gray-600">Approved</p>
             </div>
           </div>
         </div>
@@ -245,7 +245,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
             <XCircle className="h-8 w-8 text-red-600" />
             <div className="mr-4">
               <p className="text-2xl font-semibold text-gray-900">{stats.rejected}</p>
-              <p className="text-gray-600">مرفوضة</p>
+              <p className="text-gray-600">Rejected</p>
             </div>
           </div>
         </div>
@@ -255,7 +255,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
             <Star className="h-8 w-8 text-yellow-400" />
             <div className="mr-4">
               <p className="text-2xl font-semibold text-gray-900">{stats.averageRating.toFixed(1)}</p>
-              <p className="text-gray-600">متوسط التقييم</p>
+              <p className="text-gray-600">Average Rating</p>
             </div>
           </div>
         </div>
@@ -268,7 +268,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
-              placeholder="البحث في التقييمات..."
+              placeholder="Search reviews..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pr-10 pl-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -280,10 +280,10 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
             onChange={(e) => setStatusFilter(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">جميع الحالات</option>
-            <option value="pending">في الانتظار</option>
-            <option value="approved">مقبول</option>
-            <option value="rejected">مرفوض</option>
+            <option value="">All Statuses</option>
+            <option value="pending">Pending</option>
+            <option value="approved">Approved</option>
+            <option value="rejected">Rejected</option>
           </select>
         </div>
       </div>
@@ -310,11 +310,11 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
       ) : reviews.length === 0 ? (
         <div className="text-center py-12">
           <MessageSquare className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد تقييمات</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No reviews found</h3>
           <p className="text-gray-600">
             {searchTerm || statusFilter
-              ? 'لم يتم العثور على تقييمات تطابق المرشحات المحددة'
-              : 'لم يتم إضافة أي تقييمات بعد'
+              ? 'No reviews found matching the selected filters'
+              : 'No reviews added yet'
             }
           </p>
         </div>
@@ -348,12 +348,12 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
                       {review.verified && (
                         <div className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
                           <Shield className="h-3 w-3" />
-                          <span>مؤكد</span>
+                          <span>Verified</span>
                         </div>
                       )}
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <span>{new Date(review.createdAt).toLocaleDateString('ar-EG')}</span>
+                      <span>{new Date(review.createdAt).toLocaleDateString('en-US')}</span>
                     </div>
                   </div>
                 </div>
@@ -387,7 +387,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
                     <CloudinaryImage
                       key={index}
                       src={image}
-                      alt={`صورة التقييم ${index + 1}`}
+                      alt={`Review image ${index + 1}`}
                       width={100}
                       height={80}
                       className="rounded"
@@ -402,9 +402,9 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
                 <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
                   <div className="flex items-center gap-2 mb-2">
                     <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">إ</span>
+                      <span className="text-white text-xs font-bold">A</span>
                     </div>
-                    <span className="font-medium text-blue-900">رد الإدارة</span>
+                    <span className="font-medium text-blue-900">Admin Response</span>
                   </div>
                   <p className="text-blue-800">{review.adminResponse.message}</p>
                 </div>
@@ -419,14 +419,14 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
                       className="bg-green-600 text-white px-3 py-1 text-sm rounded hover:bg-green-700 flex items-center gap-1"
                     >
                       <CheckCircle className="h-3 w-3" />
-                      قبول
+                      Approve
                     </button>
                     <button
                       onClick={() => updateReviewStatus(review._id!, 'rejected')}
                       className="bg-red-600 text-white px-3 py-1 text-sm rounded hover:bg-red-700 flex items-center gap-1"
                     >
                       <XCircle className="h-3 w-3" />
-                      رفض
+                      Reject
                     </button>
                   </>
                 )}
@@ -439,7 +439,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
                   className="bg-blue-600 text-white px-3 py-1 text-sm rounded hover:bg-blue-700 flex items-center gap-1"
                 >
                   <Reply className="h-3 w-3" />
-                  رد الإدارة
+                  Reply
                 </button>
                 
                 <button
@@ -447,7 +447,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
                   className="bg-red-600 text-white px-3 py-1 text-sm rounded hover:bg-red-700 flex items-center gap-1"
                 >
                   <Trash2 className="h-3 w-3" />
-                  حذف
+                  Delete
                 </button>
               </div>
             </div>
@@ -459,14 +459,14 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
       {showResponseModal && selectedReview && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold mb-4">رد الإدارة</h3>
+            <h3 className="text-lg font-semibold mb-4">Admin Response</h3>
             <p className="text-sm text-gray-600 mb-4">
-              الرد على تقييم: {selectedReview.title}
+              Reply to review: {selectedReview.title}
             </p>
             <textarea
               value={adminResponse}
               onChange={(e) => setAdminResponse(e.target.value)}
-              placeholder="اكتب رد الإدارة هنا..."
+              placeholder="Write admin response here..."
               rows={4}
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             />
@@ -479,13 +479,13 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
                 }}
                 className="flex-1 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
               >
-                إلغاء
+                Cancel
               </button>
               <button
                 onClick={sendAdminResponse}
                 className="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
               >
-                إرسال الرد
+                Send Response
               </button>
             </div>
           </div>

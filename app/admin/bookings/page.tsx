@@ -81,11 +81,11 @@ export default function AdminBookings() {
       if (data.success) {
         setBookings(data.data)
       } else {
-        toast.error('فشل في تحميل الحجوزات')
+        toast.error('Failed to load bookings')
       }
     } catch (error) {
       console.error('Error fetching bookings:', error)
-      toast.error('حدث خطأ في تحميل الحجوزات')
+      toast.error('Error fetching bookings')
     } finally {
       setLoading(false)
     }
@@ -129,14 +129,14 @@ export default function AdminBookings() {
       const data = await response.json()
 
       if (data.success) {
-        toast.success('تم تحديث حالة الحجز بنجاح')
+        toast.success('Booking status updated successfully')
         fetchBookings()
       } else {
-        toast.error('فشل في تحديث حالة الحجز')
+        toast.error('Failed to update booking status')
       }
     } catch (error) {
-      console.error('Error updating booking status:', error)
-      toast.error('حدث خطأ في تحديث حالة الحجز')
+
+      toast.error('Error updating booking status')
     }
   }
 
@@ -173,13 +173,13 @@ export default function AdminBookings() {
   const getStatusText = (status: string) => {
     switch (status) {
       case 'confirmed':
-        return 'مؤكد'
+        return 'Confirmed'
       case 'pending':
-        return 'في الانتظار'
+        return 'Pending'
       case 'cancelled':
-        return 'ملغي'
+        return 'Cancelled'
       case 'completed':
-        return 'مكتمل'
+        return 'Completed'
       default:
         return status
     }
@@ -198,20 +198,20 @@ export default function AdminBookings() {
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">إدارة الحجوزات</h1>
-          <p className="text-gray-600">إدارة ومتابعة جميع حجوزات العملاء</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Bookings Management</h1>
+          <p className="text-gray-600">Manage and track all customer bookings</p>
         </div>
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">البحث</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
               <div className="relative">
                 <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
                 <Input
                   type="text"
-                  placeholder="رقم الحجز، اسم العميل، الوجهة..."
+                  placeholder="Booking Reference, Customer Name, Destination..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pr-10"
@@ -220,40 +220,40 @@ export default function AdminBookings() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">حالة الحجز</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Booking Status</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
               >
-                <option value="all">جميع الحالات</option>
-                <option value="pending">في الانتظار</option>
-                <option value="confirmed">مؤكد</option>
-                <option value="completed">مكتمل</option>
-                <option value="cancelled">ملغي</option>
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="confirmed">Confirmed</option>
+                <option value="completed">Completed</option>
+                <option value="cancelled">Cancelled</option>
               </select>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">حالة الدفع</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Payment Status</label>
               <select
                 value={paymentFilter}
                 onChange={(e) => setPaymentFilter(e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
               >
-                <option value="all">جميع الحالات</option>
-                <option value="pending">في الانتظار</option>
-                <option value="paid">مدفوع</option>
-                <option value="on-demand">تحت الطلب</option>
-                <option value="refunded">مسترد</option>
-                <option value="failed">فشل</option>
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="paid">Paid</option>
+                <option value="on-demand">On Demand</option>
+                <option value="refunded">Refunded</option>
+                <option value="failed">Failed</option>
               </select>
             </div>
 
             <div className="flex items-end">
               <Button variant="outline" className="w-full">
                 <Download className="w-4 h-4 ml-2" />
-                تصدير Excel
+                Export to Excel
               </Button>
             </div>
           </div>
@@ -267,7 +267,7 @@ export default function AdminBookings() {
                 <Calendar className="w-6 h-6 text-blue-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm text-gray-600">إجمالي الحجوزات</p>
+                <p className="text-sm text-gray-600">Total Bookings</p>
                 <p className="text-2xl font-bold text-gray-900">{bookings.length}</p>
               </div>
             </div>
@@ -279,7 +279,7 @@ export default function AdminBookings() {
                 <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm text-gray-600">الحجوزات المؤكدة</p>
+                <p className="text-sm text-gray-600">Confirmed Bookings</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {bookings.filter(b => b.status === 'confirmed').length}
                 </p>
@@ -293,7 +293,7 @@ export default function AdminBookings() {
                 <Clock className="w-6 h-6 text-yellow-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm text-gray-600">في الانتظار</p>
+                <p className="text-sm text-gray-600">Pending Bookings</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {bookings.filter(b => b.status === 'pending').length}
                 </p>
@@ -307,7 +307,7 @@ export default function AdminBookings() {
                 <CreditCard className="w-6 h-6 text-green-600" />
               </div>
               <div className="mr-4">
-                <p className="text-sm text-gray-600">إجمالي الإيرادات</p>
+                <p className="text-sm text-gray-600">Total Earnings</p>
                 <p className="text-2xl font-bold text-gray-900">
                   {bookings.reduce((sum, b) => sum + b.totalAmount, 0).toLocaleString()} ريال
                 </p>
@@ -323,28 +323,28 @@ export default function AdminBookings() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    رقم الحجز
+                    Booking Reference
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    العميل
+                    Customer Name
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    الرحلة
+                    Trip
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    الأفراد
+                    People
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    المبلغ
+                    Amount
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    الحالة
+                    Status
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    الدفع
+                    Payment Status
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    الإجراءات
+                    Actions
                   </th>
                 </tr>
               </thead>
@@ -420,7 +420,7 @@ export default function AdminBookings() {
                             onClick={() => updateBookingStatus(booking._id, 'confirmed')}
                             className="text-green-600 hover:text-green-700"
                           >
-                            تأكيد
+                            Confirm
                           </Button>
                         )}
                         
@@ -431,7 +431,7 @@ export default function AdminBookings() {
                             onClick={() => updateBookingStatus(booking._id, 'cancelled')}
                             className="text-red-600 hover:text-red-700"
                           >
-                            إلغاء
+                            Cancel
                           </Button>
                         )}
                       </div>
@@ -444,7 +444,7 @@ export default function AdminBookings() {
 
           {filteredBookings.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-gray-500">لا توجد حجوزات تطابق المعايير المحددة</p>
+              <p className="text-gray-500">No bookings found</p>
             </div>
           )}
         </div>

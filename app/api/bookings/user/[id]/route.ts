@@ -35,27 +35,17 @@ export async function GET(
     // Check if user is authenticated
     if (!session?.user?.id) {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح' },
+        { success: false, message: 'Unauthorized' },
         { status: 401 }
       );
     }
 
     const userId = params.id;
 
-    console.log('User bookings request:', {
-      requestedUserId: userId,
-      sessionUserId: session.user.id,
-      userRole: session.user.role,
-      isAdmin: session.user.role === 'admin',
-      isManager: session.user.role === 'manager',
-      isSameUser: session.user.id === userId
-    });
-
     // Verify the requesting user is the same as the requested user or an admin/manager
-    if (session.user.role !== 'admin' && session.user.role !== 'manager' && session.user.id !== userId) {
-      console.log('Access denied for user bookings');
+    if (session.user.role !== 'manager' && session.user.id !== userId) {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح لك بالوصول إلى هذه البيانات' },
+        { success: false, message: 'You do not have permission to access this data' },
         { status: 403 }
       );
     }
@@ -63,8 +53,6 @@ export async function GET(
     // Get MongoDB client
     const client = await getMongoClient();
     const db = client.db();
-
-    console.log('Fetching bookings for user:', userId);
 
     // Find all bookings for the user with tour details
     const bookings = await db
@@ -107,15 +95,6 @@ export async function GET(
       ])
       .toArray();
 
-    console.log('Found bookings for user:', bookings.length);
-    if (bookings.length > 0) {
-      console.log('Sample booking:', {
-        _id: bookings[0]._id,
-        hasTour: !!bookings[0].tour,
-        status: bookings[0].status
-      });
-    }
-
     // Format the response
     const formattedBookings = bookings.map(booking => ({
       _id: booking._id.toString(),
@@ -137,11 +116,10 @@ export async function GET(
     });
 
   } catch (error) {
-    console.error('Error fetching user bookings:', error);
     return NextResponse.json(
       {
         success: false,
-        message: 'حدث خطأ أثناء جلب حجوزات المستخدم',
+        message: 'Error fetching user bookings',
         error: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 500 }
@@ -162,14 +140,15 @@ async function createBookingsCollection(db: any) {
     await db.collection(bookingCollectionName).createIndex({ user: 1 });
     await db.collection(bookingCollectionName).createIndex({ trip: 1 });
     await db.collection(bookingCollectionName).createIndex({ status: 1 });
-
-    console.log(`Created collection ${bookingCollectionName} with schema validation`);
+;
   } catch (error) {
     // Collection might already exist, which is fine
     if (error instanceof Error && error.message.includes('already exists')) {
-      console.log(`Collection ${bookingCollectionName} already exists`);
+      return NextResponse.json(
+        { success: false, message: 'Bookings collection already exists' },
+        { status: 400 }
+      )
     } else {
-      console.error('Error creating bookings collection:', error);
       throw error;
     }
   }
@@ -181,6 +160,13 @@ async function createBookingsCollection(db: any) {
     const client = await getMongoClient();
     await createBookingsCollection(client.db());
   } catch (error) {
-    console.error('Failed to initialize bookings collection:', error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: 'Error initializing bookings collection',
+        error: error instanceof Error ? error.message : 'Unknown error'
+      },
+      { status: 500 }
+    );
   }
 })();

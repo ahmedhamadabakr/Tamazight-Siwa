@@ -77,7 +77,7 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching tour reviews:', error)
     return NextResponse.json(
-      { success: false, message: 'فشل في جلب تقييمات الرحلة' },
+      { success: false, message: 'Failed to fetch tour reviews'  },
       { status: 500 }
     )
   }

@@ -91,7 +91,7 @@ export default function ImageOptimizer() {
   }
 
   const formatFileSize = (bytes: number) => {
-    const sizes = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت']
+    const sizes = ['bytes', 'KB', 'MB', 'GB']
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
     return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i]
   }
@@ -121,7 +121,7 @@ export default function ImageOptimizer() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Zap className="h-6 w-6 text-yellow-600" />
-          <h2 className="text-xl font-semibold text-gray-900">محسن الصور</h2>
+          <h2 className="text-xl font-semibold text-gray-900">Image Optimizer</h2>
         </div>
         <button
           onClick={startOptimization}
@@ -131,12 +131,12 @@ export default function ImageOptimizer() {
           {isRunning ? (
             <>
               <Pause className="h-4 w-4" />
-              جاري التحسين...
+              Optimizing...
             </>
           ) : (
             <>
               <Play className="h-4 w-4" />
-              بدء التحسين
+              Start Optimizing
             </>
           )}
         </button>
@@ -146,13 +146,13 @@ export default function ImageOptimizer() {
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex items-center gap-2 mb-4">
           <Settings className="h-5 w-5 text-gray-600" />
-          <h3 className="text-lg font-semibold text-gray-900">إعدادات التحسين</h3>
+          <h3 className="text-lg font-semibold text-gray-900">Optimization Settings</h3>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              جودة الصورة
+              Image Quality
             </label>
             <input
               type="range"
@@ -167,7 +167,7 @@ export default function ImageOptimizer() {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              أقصى عرض
+              Maximum Width
             </label>
             <input
               type="number"
@@ -179,7 +179,7 @@ export default function ImageOptimizer() {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              أقصى ارتفاع
+              Maximum Height
             </label>
             <input
               type="number"
@@ -191,14 +191,14 @@ export default function ImageOptimizer() {
           
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">
-              تنسيق الصورة
+              Image Format
             </label>
             <select
               value={settings.format}
               onChange={(e) => setSettings(prev => ({ ...prev, format: e.target.value }))}
               className="w-full px-3 py-2 border rounded-lg"
             >
-              <option value="auto">تلقائي</option>
+              <option value="auto">Auto</option>
               <option value="webp">WebP</option>
               <option value="avif">AVIF</option>
               <option value="jpg">JPEG</option>
@@ -215,7 +215,7 @@ export default function ImageOptimizer() {
               className="rounded border-gray-300 text-blue-600"
             />
             <label htmlFor="enableWebP" className="mr-2 text-sm text-gray-700">
-              تفعيل WebP
+              Enable WebP
             </label>
           </div>
           
@@ -228,7 +228,7 @@ export default function ImageOptimizer() {
               className="rounded border-gray-300 text-blue-600"
             />
             <label htmlFor="enableAVIF" className="mr-2 text-sm text-gray-700">
-              تفعيل AVIF
+              Enable AVIF
             </label>
           </div>
         </div>
@@ -239,21 +239,21 @@ export default function ImageOptimizer() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="bg-white p-4 rounded-lg shadow">
             <p className="text-2xl font-semibold text-gray-900">{jobs.length}</p>
-            <p className="text-gray-600">إجمالي الصور</p>
+            <p className="text-gray-600">Total Images</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
             <p className="text-2xl font-semibold text-green-600">{completedJobs}</p>
-            <p className="text-gray-600">تم تحسينها</p>
+            <p className="text-gray-600">Optimized</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
             <p className="text-2xl font-semibold text-red-600">{failedJobs}</p>
-            <p className="text-gray-600">فشلت</p>
+            <p className="text-gray-600">Failed</p>
           </div>
           <div className="bg-white p-4 rounded-lg shadow">
             <p className="text-2xl font-semibold text-blue-600">
-              {totalSavings > 0 ? formatFileSize(totalSavings) : '0 بايت'}
+              {totalSavings > 0 ? formatFileSize(totalSavings) : '0 bytes'}
             </p>
-            <p className="text-gray-600">توفير المساحة</p>
+            <p className="text-gray-600">Space saved</p>
           </div>
         </div>
       )}
@@ -262,7 +262,7 @@ export default function ImageOptimizer() {
       {jobs.length > 0 && (
         <div className="bg-white rounded-lg shadow">
           <div className="p-4 border-b">
-            <h3 className="text-lg font-semibold text-gray-900">سجل التحسين</h3>
+            <h3 className="text-lg font-semibold text-gray-900">Optimization Log</h3>
           </div>
           <div className="max-h-96 overflow-y-auto">
             {jobs.map((job) => (
@@ -272,10 +272,10 @@ export default function ImageOptimizer() {
                   <div>
                     <p className="font-medium text-gray-900">{job.title}</p>
                     <p className="text-sm text-gray-500">
-                      {job.status === 'pending' && 'في الانتظار'}
-                      {job.status === 'processing' && 'جاري المعالجة...'}
-                      {job.status === 'completed' && `تم التحسين - توفير ${job.savings}%`}
-                      {job.status === 'failed' && 'فشل في التحسين'}
+                      {job.status === 'pending' && 'Pending'}
+                      {job.status === 'processing' && 'Processing'}
+                      {job.status === 'completed' && `Optimized - saved ${job.savings}%`}
+                      {job.status === 'failed' && 'Failed'}
                     </p>
                   </div>
                 </div>

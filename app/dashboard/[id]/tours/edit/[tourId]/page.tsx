@@ -338,7 +338,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                     value={tour.title}
                                     onChange={handleChange}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    placeholder="مثال: رحلة سفاري الصحراء المذهلة"
+                                    placeholder="Tour Title"
                                     required
                                 />
                             </div>
@@ -354,7 +354,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                     onChange={handleChange}
                                     rows={4}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                    placeholder="اكتب وصفاً مفصلاً عن الرحلة..."
+                                    placeholder="Tour Description"
                                     required
                                 />
                             </div>
@@ -372,7 +372,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                         value={tour.duration}
                                         onChange={handleChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="مثال: 3 أيام، 5 ساعات"
+                                        placeholder="Tour Duration"
                                         required
                                     />
                                 </div>
@@ -389,7 +389,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                         value={tour.groupSize}
                                         onChange={handleChange}
                                         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                        placeholder="مثال: 2-8 أشخاص"
+                                        placeholder="Group Size"
                                         required
                                     />
                                 </div>
@@ -409,7 +409,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                             value={tour.price}
                                             onChange={handleChange}
                                             className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                                            placeholder="299"
+                                            placeholder="Tour Price"
                                             required
                                         />
                                         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -480,7 +480,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                 <div>
                                     <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">
                                         <FiClock className="inline w-4 h-4 mr-1" />
-                                        تاريخ بداية الرحلة *
+                                        Tour Start Date *
                                     </label>
                                     <input
                                         type="date"
@@ -496,7 +496,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                 <div>
                                     <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">
                                         <FiClock className="inline w-4 h-4 mr-1" />
-                                        تاريخ نهاية الرحلة *
+                                        Tour End Date *
                                     </label>
                                     <input
                                         type="date"

@@ -99,13 +99,13 @@ export function TourReviews({ tourId, currentUserId, className = '' }: TourRevie
         setShowReviewForm(false)
         await fetchReviews() // Refresh reviews
         await checkReviewEligibility() // Refresh eligibility
-        alert('تم إرسال التقييم بنجاح وسيتم مراجعته قريباً')
+        alert('Review submitted successfully! It will be reviewed soon.')
       } else {
-        alert(data.message || 'فشل في إرسال التقييم')
+        alert(data.message || 'Failed to submit review')
       }
     } catch (error) {
       console.error('Error submitting review:', error)
-      alert('حدث خطأ أثناء إرسال التقييم')
+      alert('Failed to submit review')
     } finally {
       setSubmitting(false)
     }
@@ -199,10 +199,10 @@ export function TourReviews({ tourId, currentUserId, className = '' }: TourRevie
                 <MessageSquare className="h-5 w-5 text-blue-600" />
                 <div>
                   <p className="text-blue-800 font-medium">
-                    يمكنك تقييم هذه الرحلة
+                    You can review this tour
                   </p>
                   <p className="text-blue-700 text-sm mt-1">
-                    شاركنا رأيك وتجربتك مع هذه الرحلة
+                    Share your experience with this tour
                   </p>
                 </div>
               </>

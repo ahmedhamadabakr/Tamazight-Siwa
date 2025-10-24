@@ -24,7 +24,7 @@ export async function PUT(
 
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
-        { success: false, message: 'معرف الحجز غير صحيح' },
+        { success: false, message: 'Invalid booking ID' },
         { status: 400 }
       )
     }
@@ -40,7 +40,7 @@ export async function PUT(
 
     if (!existingBooking) {
       return NextResponse.json(
-        { success: false, message: 'الحجز غير موجود أو غير مصرح لك بتعديله' },
+        { success: false, message: 'Booking not found or you do not have permission to update it' },
         { status: 404 }
       )
     }
@@ -58,20 +58,20 @@ export async function PUT(
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
-        { success: false, message: 'فشل في تحديث الحجز' },
+        { success: false, message: 'Updating booking failed' },
         { status: 400 }
       )
     }
 
     return NextResponse.json({
       success: true,
-      message: 'تم تحديث الحجز بنجاح'
+      message: 'Booking updated successfully'
     })
 
   } catch (error) {
     console.error('Error updating booking:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في تحديث الحجز' },
+      { success: false, message: 'Error updating booking' },
       { status: 500 }
     )
   }
@@ -113,7 +113,7 @@ export async function GET(
 
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
-        { success: false, message: 'معرف الحجز غير صحيح' },
+        { success: false, message: 'Invalid booking ID' },
         { status: 400 }
       )
     }
@@ -121,15 +121,11 @@ export async function GET(
     const client = await getMongoClient()
     const db = client.db()
 
-    console.log('Fetching booking with ID:', id)
-    console.log('User role:', session.user.role)
-    console.log('User ID:', session.user.id)
-
     // Find the booking with user and tour details
     // Allow admin/manager to see all bookings, regular users only their own
     const matchCondition: any = { _id: new ObjectId(id) }
     
-    if (session.user.role !== 'admin' && session.user.role !== 'manager') {
+    if (session.user.role !== 'manager') {
       matchCondition.user = new ObjectId(session.user.id)
     }
 
@@ -201,7 +197,7 @@ export async function GET(
 
     if (!booking || booking.length === 0) {
       return NextResponse.json(
-        { success: false, message: 'الحجز غير موجود' },
+        { success: false, message: 'Booking not found' },
         { status: 404 }
       )
     }
@@ -212,9 +208,8 @@ export async function GET(
     })
 
   } catch (error) {
-    console.error('Error fetching booking:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في تحميل تفاصيل الحجز' },
+      { success: false, message: 'Error fetching booking' },
       { status: 500 }
     )
   }

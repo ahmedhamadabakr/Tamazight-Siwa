@@ -71,8 +71,8 @@ export function ImageGalleryFallback({ images, title, className = "" }: ImageGal
             <div className={`bg-gray-200 flex items-center justify-center min-h-[200px] rounded-lg ${className}`}>
                 <div className="text-center text-gray-500">
                     <div className="text-4xl mb-2">📷</div>
-                    <div className="text-lg font-medium">لا توجد صور</div>
-                    <div className="text-sm">لم يتم رفع صور لهذه الرحلة بعد</div>
+                    <div className="text-lg font-medium">No images found</div>
+                    <div className="text-sm">No images uploaded for this trip yet</div>
                 </div>
             </div>
         )
@@ -86,8 +86,8 @@ export function ImageGalleryFallback({ images, title, className = "" }: ImageGal
             <div className={`bg-red-50 border border-red-200 flex items-center justify-center min-h-[200px] rounded-lg ${className}`}>
                 <div className="text-center text-red-600">
                     <div className="text-4xl mb-2">⚠️</div>
-                    <div className="text-lg font-medium">فشل في تحميل الصور</div>
-                    <div className="text-sm">جميع الصور المرفقة تالفة أو غير متاحة</div>
+                    <div className="text-lg font-medium">All images are broken or unavailable</div>
+                    <div className="text-sm">All uploaded images are broken or unavailable</div>
                 </div>
             </div>
         )
@@ -104,13 +104,13 @@ export function ImageGalleryFallback({ images, title, className = "" }: ImageGal
                 >
                     {imageErrors[0] ? (
                         <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                            <span className="text-gray-500">فشل في تحميل الصورة</span>
+                            <span className="text-gray-500">Image loading failed</span>
                         </div>
                     ) : (
                         <>
                             <Image
                                 src={images[0]}
-                                alt={`${title} - الصورة الرئيسية`}
+                                alt={`${title} - Image`}
                                 fill
                                 className="object-cover group-hover:scale-105 transition-transform duration-300"
                                 priority
@@ -121,7 +121,7 @@ export function ImageGalleryFallback({ images, title, className = "" }: ImageGal
                             </div>
                             {images.length > 1 && (
                                 <div className="absolute bottom-2 right-2 bg-black/70 text-white text-sm px-3 py-1 rounded-full">
-                                    {validImages.length} صور
+                                    {validImages.length} images
                                 </div>
                             )}
                         </>
@@ -139,13 +139,13 @@ export function ImageGalleryFallback({ images, title, className = "" }: ImageGal
                             >
                                 {imageErrors[index + 1] ? (
                                     <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                                        <span className="text-gray-400 text-xs">خطأ</span>
+                                        <span className="text-gray-400 text-xs">Error</span>
                                     </div>
                                 ) : (
                                     <>
                                         <Image
                                             src={image}
-                                            alt={`${title} - صورة ${index + 2}`}
+                                            alt={`${title} - Image ${index + 2}`}
                                             fill
                                             className="object-cover group-hover:scale-105 transition-transform duration-300"
                                             onError={() => handleImageError(index + 1)}
@@ -178,7 +178,7 @@ export function ImageGalleryFallback({ images, title, className = "" }: ImageGal
                         <button
                             onClick={() => setIsOpen(false)}
                             className="absolute top-4 right-4 text-white hover:text-gray-300 z-10 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 hover:scale-110"
-                            title="إغلاق (Esc)"
+                            title="Close (Esc)"
                         >
                             <X size={24} />
                         </button>
@@ -189,14 +189,14 @@ export function ImageGalleryFallback({ images, title, className = "" }: ImageGal
                                 <button
                                     onClick={prevImage}
                                     className="absolute left-4 text-white hover:text-gray-300 z-10 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 hover:scale-110"
-                                    title="الصورة السابقة (←)"
+                                    title="Previous Image (←)"
                                 >
                                     <ChevronLeft size={32} />
                                 </button>
                                 <button
                                     onClick={nextImage}
                                     className="absolute right-4 text-white hover:text-gray-300 z-10 p-3 rounded-full bg-black/50 hover:bg-black/70 transition-all duration-200 hover:scale-110"
-                                    title="الصورة التالية (→)"
+                                    title="Next Image (→)"
                                 >
                                     <ChevronRight size={32} />
                                 </button>
@@ -208,12 +208,12 @@ export function ImageGalleryFallback({ images, title, className = "" }: ImageGal
                             {imageErrors[currentIndex] ? (
                                 <div className="text-white text-center">
                                     <div className="text-4xl mb-4">⚠️</div>
-                                    <div className="text-xl">فشل في تحميل الصورة</div>
+                                    <div className="text-xl">Image loading failed</div>
                                 </div>
                             ) : (
                                 <Image
                                     src={images[currentIndex]}
-                                    alt={`${title} - صورة ${currentIndex + 1}`}
+                                    alt={`${title} - Image ${currentIndex + 1}`}
                                     fill
                                     className="object-contain drop-shadow-2xl"
                                     priority
@@ -230,7 +230,7 @@ export function ImageGalleryFallback({ images, title, className = "" }: ImageGal
                         {/* Image Counter */}
                         {images.length > 1 && (
                             <div className="absolute bottom-20 left-1/2 transform -translate-x-1/2 text-white bg-black/60 px-4 py-2 rounded-full text-sm backdrop-blur-sm">
-                                {currentIndex + 1} من {images.length}
+                                {currentIndex + 1} of {images.length}
                             </div>
                         )}
 
@@ -251,7 +251,7 @@ export function ImageGalleryFallback({ images, title, className = "" }: ImageGal
                                         ) : (
                                             <Image
                                                 src={image}
-                                                alt={`صورة مصغرة ${index + 1}`}
+                                                alt={`Small Image ${index + 1}`}
                                                 fill
                                                 className="object-cover"
                                                 onError={() => handleImageError(index)}

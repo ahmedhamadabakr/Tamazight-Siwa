@@ -72,7 +72,7 @@ export function ReviewsList({
 
   const handleHelpfulVote = async (reviewId: string) => {
     if (!currentUserId) {
-      alert('يجب تسجيل الدخول للتصويت')
+      alert('You must be logged in to vote helpful')
       return
     }
 
@@ -154,7 +154,7 @@ export function ReviewsList({
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
-                    النوع
+                    Verified
                   </label>
                   <select
                     value={filters.verified}
@@ -229,7 +229,7 @@ export function ReviewsList({
                     {review.verified && (
                       <div className="flex items-center gap-1 text-green-600">
                         <Shield className="w-4 h-4" />
-                        <span className="text-xs">موثق</span>
+                        <span className="text-xs">Verified</span>
                       </div>
                     )}
                   </div>
@@ -296,7 +296,7 @@ export function ReviewsList({
 
               {review.status === 'pending' && (
                 <span className="text-xs text-yellow-600 bg-yellow-100 px-2 py-1 rounded">
-                  في انتظار المراجعة
+                  Pending Review
                 </span>
               )}
             </div>

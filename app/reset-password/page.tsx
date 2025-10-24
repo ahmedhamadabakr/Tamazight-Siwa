@@ -45,12 +45,12 @@ export default function ResetPasswordPage() {
       setIsTokenValid(data.success)
 
       if (!data.success) {
-        toast.error(data.message || 'الرابط غير صالح أو منتهي الصلاحية')
+        toast.error(data.message || 'Invalid or expired token')
       }
     } catch (error) {
       console.error('Error verifying token:', error)
       setIsTokenValid(false)
-      toast.error('حدث خطأ في التحقق من الرابط')
+      toast.error('An error occurred while verifying the token')
     }
   }
 
@@ -58,17 +58,17 @@ export default function ResetPasswordPage() {
     e.preventDefault()
 
     if (!password || !confirmPassword) {
-      toast.error('يرجى ملء جميع الحقول')
+      toast.error('Please fill in all fields')
       return
     }
 
     if (password.length < 6) {
-      toast.error('كلمة المرور يجب أن تكون 6 أحرف على الأقل')
+      toast.error('Password must be at least 6 characters long')
       return
     }
 
     if (password !== confirmPassword) {
-      toast.error('كلمات المرور غير متطابقة')
+      toast.error('Passwords do not match')
       return
     }
 
@@ -87,13 +87,13 @@ export default function ResetPasswordPage() {
 
       if (response.ok && data.success) {
         setIsPasswordReset(true)
-        toast.success('تم تغيير كلمة المرور بنجاح')
+        toast.success('Password reset successfully')
       } else {
-        toast.error(data.message || 'حدث خطأ في تغيير كلمة المرور')
+        toast.error(data.message || 'An error occurred while resetting the password')
       }
     } catch (error) {
       console.error('Error:', error)
-      toast.error('حدث خطأ في الاتصال بالخادم')
+      toast.error('An error occurred while connecting to the server')
     } finally {
       setIsLoading(false)
     }
@@ -105,7 +105,7 @@ export default function ResetPasswordPage() {
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
         <div className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-600">جاري التحقق من الرابط...</p>
+          <p className="text-gray-600">Verifying token...</p>
         </div>
       </div>
     )
@@ -125,23 +125,23 @@ export default function ResetPasswordPage() {
           </div>
           
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            رابط غير صالح
+            Invalid or expired token
           </h1>
           
           <p className="text-gray-600 mb-6">
-            الرابط المستخدم غير صالح أو منتهي الصلاحية. يرجى طلب رابط جديد.
+            The link used is invalid or expired. Please request a new link.
           </p>
           
           <div className="space-y-3">
             <Link href="/forgot-password">
               <Button className="w-full">
-                طلب رابط جديد
+                Request new link
               </Button>
             </Link>
             
             <Link href="/login">
               <Button variant="outline" className="w-full">
-                العودة لتسجيل الدخول
+                Return to login
               </Button>
             </Link>
           </div>
@@ -164,18 +164,18 @@ export default function ResetPasswordPage() {
           </div>
           
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            تم تغيير كلمة المرور
+            Password reset successful
           </h1>
           
           <p className="text-gray-600 mb-6">
-            تم تغيير كلمة المرور بنجاح. يمكنك الآن تسجيل الدخول باستخدام كلمة المرور الجديدة.
+            Password reset successfully. You can now log in using your new password.
           </p>
           
           <Button
             onClick={() => router.push('/login')}
             className="w-full"
           >
-            تسجيل الدخول
+            Login
           </Button>
         </motion.div>
       </div>
@@ -196,18 +196,18 @@ export default function ResetPasswordPage() {
           </div>
           
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            إعادة تعيين كلمة المرور
+            Reset Password
           </h1>
           
           <p className="text-gray-600">
-            أدخل كلمة المرور الجديدة لحسابك
+            Enter your new password
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              كلمة المرور الجديدة
+              New password
             </label>
             <div className="relative">
               <input
@@ -230,13 +230,13 @@ export default function ResetPasswordPage() {
               </button>
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              يجب أن تكون كلمة المرور 6 أحرف على الأقل
+              Password must be at least 6 characters long
             </p>
           </div>
 
           <div>
             <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              تأكيد كلمة المرور
+              Confirm password
             </label>
             <div className="relative">
               <input
@@ -245,7 +245,7 @@ export default function ResetPasswordPage() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-                placeholder="أعد إدخال كلمة المرور"
+                placeholder="Confirm password"
                 required
                 disabled={isLoading}
                 minLength={6}
@@ -263,15 +263,15 @@ export default function ResetPasswordPage() {
           <Button
             type="submit"
             disabled={isLoading}
-            className="w-full"
+            className="w-full"  
           >
             {isLoading ? (
               <div className="flex items-center justify-center">
                 <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white ml-2"></div>
-                جاري التحديث...
+                Updating password...
               </div>
             ) : (
-              'تحديث كلمة المرور'
+              'Update password'
             )}
           </Button>
         </form>
@@ -279,7 +279,7 @@ export default function ResetPasswordPage() {
         <div className="mt-6 text-center">
           <Link href="/login">
             <Button variant="ghost" className="text-sm">
-              العودة لتسجيل الدخول
+              Return to login
             </Button>
           </Link>
         </div>

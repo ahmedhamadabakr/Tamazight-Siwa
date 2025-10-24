@@ -24,7 +24,7 @@ export async function POST(
 
     if (!id || !ObjectId.isValid(id)) {
       return NextResponse.json(
-        { success: false, message: 'معرف الحجز غير صحيح' },
+        { success: false, message: 'Invalid booking ID' }, 
         { status: 400 }
       )
     }
@@ -35,7 +35,7 @@ export async function POST(
     // Find the booking with user and tour details
     const matchCondition: any = { _id: new ObjectId(id) }
 
-    if (session.user.role !== 'admin' && session.user.role !== 'manager') {
+    if (session.user.role !== 'manager') {
       matchCondition.user = new ObjectId(session.user.id)
     }
 
@@ -95,7 +95,7 @@ export async function POST(
 
     if (!booking || booking.length === 0) {
       return NextResponse.json(
-        { success: false, message: 'الحجز غير موجود' },
+        { success: false, message: 'Booking not found' },
         { status: 404 }
       )
     }
@@ -142,13 +142,13 @@ export async function POST(
 
     return NextResponse.json({
       success: true,
-      message: 'تم إرسال تأكيد الحجز بنجاح إلى البريد الإلكتروني'
+      message: 'Booking confirmation email sent successfully'
     })
 
   } catch (error) {
     console.error('Error sending email:', error)
     return NextResponse.json(
-      { success: false, message: 'حدث خطأ في إرسال البريد الإلكتروني' },
+      { success: false, message: 'An error occurred while sending email' },
       { status: 500 }
     )
   }
@@ -165,14 +165,14 @@ function generateBookingEmailHTML(booking: any): string {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'مؤكد'
-      case 'pending': return 'في الانتظار'
-      case 'cancelled': return 'ملغي'
-      case 'completed': return 'مكتمل'
-      case 'paid': return 'مدفوع'
-      case 'on-demand': return 'تحت الطلب'
-      case 'refunded': return 'مسترد'
-      case 'failed': return 'فشل'
+      case 'confirmed': return 'Confirmed'
+      case 'pending': return 'Pending'
+      case 'cancelled': return 'Cancelled'
+      case 'completed': return 'Completed'
+      case 'paid': return 'Paid'
+      case 'on-demand': return 'On-demand'
+      case 'refunded': return 'Refunded'
+      case 'failed': return 'Failed'
       default: return status
     }
   }
@@ -183,7 +183,7 @@ function generateBookingEmailHTML(booking: any): string {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>تأكيد الحجز</title>
+      <title>Booking Confirmation</title>
       <style>
         body {
           font-family: 'Arial', sans-serif;
@@ -297,84 +297,84 @@ function generateBookingEmailHTML(booking: any): string {
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎉 تم تأكيد حجزك بنجاح!</h1>
-          <p>رقم الحجز: ${booking.bookingReference}</p>
+          <h1>🎉 Booking confirmed!</h1>
+          <p>Booking Reference: ${booking.bookingReference}</p>
         </div>
         
         <div class="content">
           <div class="greeting">
-            مرحباً ${booking.user.name}،
+            Hello ${booking.user.name},
           </div>
           
-          <p>نشكرك لاختيارك رحلاتنا! تم تأكيد حجزك بنجاح وإليك تفاصيل رحلتك:</p>
+          <p>Thank you for choosing our tours! Your booking has been confirmed and here are your tour details:</p>
           
           <div class="section">
-            <div class="section-title">📍 تفاصيل الرحلة</div>
+            <div class="section-title">📍 Tour Details</div>
             <div class="info-row">
-              <span class="info-label">اسم الرحلة:</span>
+              <span class="info-label">Tour Name:</span>
               <span class="info-value">${booking.tour.title}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">الوجهة:</span>
+              <span class="info-label">Destination:</span>
               <span class="info-value">${booking.tour.destination}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">تاريخ البداية:</span>
+              <span class="info-label">Start Date:</span>
               <span class="info-value">${formatDate(booking.tour.startDate)}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">تاريخ النهاية:</span>
+              <span class="info-label">End Date:</span>
               <span class="info-value">${formatDate(booking.tour.endDate)}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">المدة:</span>
-              <span class="info-value">${booking.tour.duration} أيام</span>
+              <span class="info-label">Duration:</span>
+              <span class="info-value">${booking.tour.duration} days</span>
             </div>
             <div class="info-row">
-              <span class="info-label">عدد الأفراد:</span>
-              <span class="info-value">${booking.travelers} أشخاص</span>
+              <span class="info-label">Number of travelers:</span>
+              <span class="info-value">${booking.travelers} people</span>
             </div>
           </div>
           
           <div class="section">
-            <div class="section-title">📋 حالة الحجز</div>
+            <div class="section-title">📋 Booking Status</div>
             <div class="info-row">
-              <span class="info-label">حالة الحجز:</span>
+              <span class="info-label">Booking Status:</span>
               <span class="status-badge">${getStatusText(booking.status)}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">حالة الدفع:</span>
+              <span class="info-label">Payment Status:</span>
               <span class="status-badge">${getStatusText(booking.paymentStatus)}</span>
             </div>
           </div>
           
           ${booking.specialRequests ? `
           <div class="section">
-            <div class="section-title">📝 الطلبات الخاصة</div>
+            <div class="section-title">📝 Special Requests</div>
             <p>${booking.specialRequests}</p>
           </div>
           ` : ''}
           
           <div class="total-amount">
-            💰 المبلغ الإجمالي: ${booking.totalAmount.toLocaleString()} ريال سعودي
+            💰 Total Amount: ${booking.totalAmount.toLocaleString()} dollars
           </div>
           
           <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #92400e; margin-bottom: 10px;">📌 ملاحظات مهمة:</h3>
+            <h3 style="color: #92400e; margin-bottom: 10px;">📌 Important Notes:</h3>
             <ul style="color: #92400e; margin: 0; padding-right: 20px;">
-              <li>يرجى الاحتفاظ برقم الحجز للمراجعة</li>
-              <li>يمكن إلغاء الحجز قبل 48 ساعة من موعد الرحلة</li>
-              <li>سيتم التواصل معك قبل موعد الرحلة بـ 24 ساعة</li>
+              <li>Please keep your booking reference for review</li>
+              <li>You can cancel the booking before 48 hours from the tour date</li>
+              <li>We will contact you 24 hours before the tour date</li>
             </ul>
           </div>
         </div>
         
         <div class="footer">
-          <p><strong>شكراً لثقتك بنا!</strong></p>
+          <p><strong>Thank you for choosing us!</strong></p>
           <div class="contact-info">
-            <p>📞 للاستفسارات: 966501234567+</p>
-            <p>📧 البريد الإلكتروني: info@tamazight-siwa.com</p>
-            <p>🌐 الموقع الإلكتروني: www.tamazight-siwa.com</p>
+            <p>📞 For inquiries: 966501234567+</p>
+            <p>📧 Email: info@tamazight-siwa.com</p>
+            <p>🌐 Website: www.tamazight-siwa.com</p>
           </div>
         </div>
       </div>
@@ -394,52 +394,52 @@ function generateBookingEmailText(booking: any): string {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'مؤكد'
-      case 'pending': return 'في الانتظار'
-      case 'cancelled': return 'ملغي'
-      case 'completed': return 'مكتمل'
-      case 'paid': return 'مدفوع'
-      case 'on-demand': return 'تحت الطلب'
-      case 'refunded': return 'مسترد'
-      case 'failed': return 'فشل'
+      case 'confirmed': return 'Confirmed'
+      case 'pending': return 'Pending'
+      case 'cancelled': return 'Cancelled'
+      case 'completed': return 'Completed'
+      case 'paid': return 'Paid'
+      case 'on-demand': return 'On-demand'
+      case 'refunded': return 'Refunded'
+      case 'failed': return 'Failed'
       default: return status
     }
   }
 
   return `
-تم تأكيد حجزك بنجاح!
+Booking confirmed!
 
-مرحباً ${booking.user.name},
+Hello ${booking.user.name},
 
-نشكرك لاختيارك رحلاتنا! تم تأكيد حجزك بنجاح.
+Thank you for choosing our tours! Your booking has been confirmed.
 
-رقم الحجز: ${booking.bookingReference}
+Booking Reference: ${booking.bookingReference}
 
-تفاصيل الرحلة:
-- اسم الرحلة: ${booking.tour.title}
-- الوجهة: ${booking.tour.destination}
-- تاريخ البداية: ${formatDate(booking.tour.startDate)}
-- تاريخ النهاية: ${formatDate(booking.tour.endDate)}
-- المدة: ${booking.tour.duration} أيام
-- عدد الأفراد: ${booking.travelers} أشخاص
+Tour Details:
+- Tour Name: ${booking.tour.title}
+- Destination: ${booking.tour.destination}
+- Start Date: ${formatDate(booking.tour.startDate)}
+- End Date: ${formatDate(booking.tour.endDate)}
+- Duration: ${booking.tour.duration} days
+- Number of travelers: ${booking.travelers} people
 
-حالة الحجز: ${getStatusText(booking.status)}
-حالة الدفع: ${getStatusText(booking.paymentStatus)}
+Booking Status: ${getStatusText(booking.status)}
+Payment Status: ${getStatusText(booking.paymentStatus)}
 
-${booking.specialRequests ? `الطلبات الخاصة: ${booking.specialRequests}` : ''}
+${booking.specialRequests ? `Special Requests: ${booking.specialRequests}` : ''}
 
-المبلغ الإجمالي: ${booking.totalAmount.toLocaleString()} ريال سعودي
+Total Amount: ${booking.totalAmount.toLocaleString()} dollars
 
-ملاحظات مهمة:
-- يرجى الاحتفاظ برقم الحجز للمراجعة
-- يمكن إلغاء الحجز قبل 48 ساعة من موعد الرحلة
-- سيتم التواصل معك قبل موعد الرحلة بـ 24 ساعة
+Important Notes:
+- Please keep your booking reference for review
+- You can cancel the booking before 48 hours from the tour date
+- We will contact you 24 hours before the tour date
 
-للاستفسارات:
-هاتف: 966501234567+
-بريد إلكتروني: info@tamazight-siwa.com
+For inquiries:
+Phone: 966501234567+
+Email: info@tamazight-siwa.com
 
-شكراً لثقتك بنا!
-فريق تمازيغت سيوة
+Thank you for choosing us!
+Tamazight Siwa Team
   `
 }

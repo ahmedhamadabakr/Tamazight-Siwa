@@ -16,7 +16,7 @@ export default function ForgotPasswordPage() {
     e.preventDefault()
     
     if (!email) {
-      toast.error('يرجى إدخال البريد الإلكتروني')
+      toast.error('Please enter your email address')
       return
     }
 
@@ -35,13 +35,13 @@ export default function ForgotPasswordPage() {
 
       if (response.ok && data.success) {
         setIsEmailSent(true)
-        toast.success('تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني')
+        toast.success('A reset password link has been sent to your email address')
       } else {
-        toast.error(data.message || 'حدث خطأ في إرسال البريد الإلكتروني')
+        toast.error(data.message || 'An error occurred while sending the email')
       }
     } catch (error) {
       console.error('Error:', error)
-      toast.error('حدث خطأ في الاتصال بالخادم')
+      toast.error('An error occurred while sending the email')
     } finally {
       setIsLoading(false)
     }
@@ -60,19 +60,19 @@ export default function ForgotPasswordPage() {
           </div>
           
           <h1 className="text-2xl font-bold text-gray-900 mb-4">
-            تم إرسال البريد الإلكتروني
+            Email Sent Successfully
           </h1>
           
           <p className="text-gray-600 mb-6">
-            تم إرسال رابط إعادة تعيين كلمة المرور إلى:
+            A reset password link has been sent to:
             <br />
             <span className="font-medium text-gray-900">{email}</span>
           </p>
           
           <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
             <p className="text-blue-800 text-sm">
-              يرجى فحص بريدك الإلكتروني والنقر على الرابط لإعادة تعيين كلمة المرور.
-              إذا لم تجد البريد، تحقق من مجلد الرسائل غير المرغوب فيها.
+              Please check your email and click on the link to reset your password.
+              If you do not find the email, check your spam folder.
             </p>
           </div>
           
@@ -82,13 +82,13 @@ export default function ForgotPasswordPage() {
               variant="outline"
               className="w-full"
             >
-              إرسال مرة أخرى
+              Send Again
             </Button>
             
             <Link href="/login">
               <Button variant="ghost" className="w-full">
                 <ArrowLeft className="w-4 h-4 ml-2" />
-                العودة لتسجيل الدخول
+                Return to Login
               </Button>
             </Link>
           </div>
@@ -110,18 +110,18 @@ export default function ForgotPasswordPage() {
           </div>
           
           <h1 className="text-2xl font-bold text-gray-900 mb-2">
-            نسيت كلمة المرور؟
+            Forgot Password?
           </h1>
           
           <p className="text-gray-600">
-            أدخل بريدك الإلكتروني وسنرسل لك رابط لإعادة تعيين كلمة المرور
+            Enter your email address and we will send you a link to reset your password
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              البريد الإلكتروني
+              Email
             </label>
             <input
               type="email"
@@ -129,7 +129,7 @@ export default function ForgotPasswordPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-              placeholder="أدخل بريدك الإلكتروني"
+              placeholder="Enter your email address"
               required
               disabled={isLoading}
             />
@@ -143,10 +143,10 @@ export default function ForgotPasswordPage() {
             {isLoading ? (
               <div className="flex items-center justify-center">
                 <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-white ml-2"></div>
-                جاري الإرسال...
+                Sending...
               </div>
             ) : (
-              'إرسال رابط إعادة التعيين'
+              'Send Reset Link'
             )}
           </Button>
         </form>
@@ -155,7 +155,7 @@ export default function ForgotPasswordPage() {
           <Link href="/login">
             <Button variant="ghost" className="text-sm">
               <ArrowLeft className="w-4 h-4 ml-2" />
-              العودة لتسجيل الدخول
+              Return to Login
             </Button>
           </Link>
         </div>
