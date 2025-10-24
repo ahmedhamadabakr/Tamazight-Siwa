@@ -6,7 +6,17 @@ import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Analytics from '@/components/dashboard/analytics';
 import { UsersLoading } from '@/components/dashboard/users-loading';
-
+import { 
+  Calendar, 
+  Users as UsersIcon, 
+  CreditCard, 
+  TrendingUp,
+  MapPin,
+  Clock,
+  CheckCircle,
+  XCircle
+} from 'lucide-react';
+import Link from 'next/link';
 
 interface User {
   _id: string;
@@ -19,46 +29,91 @@ interface User {
   updatedAt: string;
 }
 
-export default function Users() {
+interface Booking {
+  _id: string;
+  user: {
+    name: string;
+    email: string;
+  };
+  tour: {
+    title: string;
+    destination: string;
+    price: number;
+  };
+  travelers: number;
+  totalAmount: number;
+  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
+  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed';
+  createdAt: string;
+}
+
+export default function ManagerDashboard() {
   const [users, setUsers] = useState<User[]>([]);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const { data: session, status: sessionStatus } = useSession();
 
   useEffect(() => {
-    if (sessionStatus === 'loading') return; // Wait for session to load
+    if (sessionStatus === 'loading') return;
 
-    if (!session?.user || session.user.role !== 'manager') {
-      // Redirect to home or an unauthorized page
+    if (!session?.user || (session.user as any).role !== 'manager') {
       router.push('/');
       return;
     }
     
-    fetchUsers();
+    fetchData();
   }, [session, sessionStatus, router]);
 
-  const fetchUsers = async () => {
+  const fetchData = async () => {
     try {
-      const params = new URLSearchParams();
+      // Fetch users and bookings in parallel
+      const [usersResponse, bookingsResponse] = await Promise.all([
+        fetch('/api/users'),
+        fetch('/api/admin/bookings')
+      ]);
 
-      const response = await fetch(`/api/users?${params.toString()}`);
-      const data = await response.json();
-      if (data.success) {
-        setUsers(data.data || []);
+      const usersData = await usersResponse.json();
+      const bookingsData = await bookingsResponse.json();
+
+      if (usersData.success) {
+        setUsers(usersData.data || []);
+      }
+
+      if (bookingsData.success) {
+        setBookings(bookingsData.data || []);
       }
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const stats = {
+  const userStats = {
     total: users.length,
     active: users.filter(u => u.status === 'active').length,
     inactive: users.filter(u => u.status === 'inactive').length,
     pending: users.filter(u => u.status === 'pending').length,
   };
+
+  const bookingStats = {
+    total: bookings.length,
+    confirmed: bookings.filter(b => b.status === 'confirmed').length,
+    pending: bookings.filter(b => b.status === 'pending').length,
+    completed: bookings.filter(b => b.status === 'completed').length,
+    cancelled: bookings.filter(b => b.status === 'cancelled').length,
+    totalRevenue: bookings
+      .filter(b => b.paymentStatus === 'paid')
+      .reduce((sum, b) => sum + b.totalAmount, 0),
+    totalTravelers: bookings
+      .filter(b => b.status !== 'cancelled')
+      .reduce((sum, b) => sum + b.travelers, 0)
+  };
+
+  const recentBookings = bookings
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 5);
 
   if (loading || sessionStatus === 'loading') {
     return (
@@ -66,7 +121,7 @@ export default function Users() {
     );
   }
 
-  if (!session || session.user?.role !== 'manager') {
+  if (!session || (session.user as any)?.role !== 'manager') {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-100">
         <div className="text-center p-8 bg-white shadow-lg rounded-lg">
@@ -85,17 +140,152 @@ export default function Users() {
 
   return (
     <DashboardLayout>
-    <div>
-      <h1 className="text-3xl font-bold mb-6">User Analytics</h1>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold text-gray-900">لوحة تحكم المدير</h1>
+          <div className="flex space-x-3 space-x-reverse">
+            <Link
+              href="/admin/bookings"
+              className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            >
+              إدارة الحجوزات
+            </Link>
+          </div>
+        </div>
 
-      {/* Statistics Cards - Responsive Grid */}
-  <Analytics
-          active={stats.active}
-          total={stats.total}
-          inactive={stats.inactive}
-          pending={stats.pending}
-        />
-    </div>
+        {/* User Statistics */}
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">إحصائيات المستخدمين</h2>
+          <Analytics
+            active={userStats.active}
+            total={userStats.total}
+            inactive={userStats.inactive}
+            pending={userStats.pending}
+          />
+        </div>
+
+        {/* Booking Statistics */}
+        <div>
+          <h2 className="text-xl font-semibold text-gray-800 mb-4">إحصائيات الحجوزات</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Calendar className="w-6 h-6 text-blue-600" />
+                </div>
+                <div className="mr-4">
+                  <p className="text-sm text-gray-600">إجمالي الحجوزات</p>
+                  <p className="text-2xl font-bold text-gray-900">{bookingStats.total}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="mr-4">
+                  <p className="text-sm text-gray-600">الحجوزات المؤكدة</p>
+                  <p className="text-2xl font-bold text-gray-900">{bookingStats.confirmed}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center">
+                  <Clock className="w-6 h-6 text-yellow-600" />
+                </div>
+                <div className="mr-4">
+                  <p className="text-sm text-gray-600">في الانتظار</p>
+                  <p className="text-2xl font-bold text-gray-900">{bookingStats.pending}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <div className="flex items-center">
+                <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                  <CreditCard className="w-6 h-6 text-green-600" />
+                </div>
+                <div className="mr-4">
+                  <p className="text-sm text-gray-600">إجمالي الإيرادات</p>
+                  <p className="text-2xl font-bold text-gray-900">{bookingStats.totalRevenue.toLocaleString()} ريال</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Additional Stats */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <UsersIcon className="w-6 h-6 text-purple-600" />
+              </div>
+              <div className="mr-4">
+                <p className="text-sm text-gray-600">إجمالي المسافرين</p>
+                <p className="text-2xl font-bold text-gray-900">{bookingStats.totalTravelers}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="flex items-center">
+              <div className="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                <XCircle className="w-6 h-6 text-red-600" />
+              </div>
+              <div className="mr-4">
+                <p className="text-sm text-gray-600">الحجوزات الملغية</p>
+                <p className="text-2xl font-bold text-gray-900">{bookingStats.cancelled}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Bookings */}
+        <div className="bg-white rounded-lg shadow-sm border">
+          <div className="px-6 py-4 border-b">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold text-gray-900">أحدث الحجوزات</h3>
+              <button
+                onClick={() => router.push('/admin/bookings')}
+                className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+              >
+                عرض الكل
+              </button>
+            </div>
+          </div>
+          <div className="p-6">
+            {recentBookings.length === 0 ? (
+              <p className="text-gray-500 text-center py-4">لا توجد حجوزات حديثة</p>
+            ) : (
+              <div className="space-y-4">
+                {recentBookings.map((booking) => (
+                  <div key={booking._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors cursor-pointer"
+                       onClick={() => window.open(`/booking-confirmation/${booking._id}`, '_blank')}>
+                    <div className="flex items-center space-x-4 space-x-reverse">
+                      <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                        <MapPin className="w-5 h-5 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">{booking.tour.title}</p>
+                        <p className="text-sm text-gray-500">{booking.user.name} • {booking.travelers} أشخاص</p>
+                      </div>
+                    </div>
+                    <div className="text-left">
+                      <p className="font-medium text-gray-900">{booking.totalAmount.toLocaleString()} ريال</p>
+                      <p className="text-sm text-gray-500">{new Date(booking.createdAt).toLocaleDateString('ar-SA')}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </DashboardLayout>
   );
 }

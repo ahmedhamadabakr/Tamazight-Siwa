@@ -5,6 +5,7 @@ import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { User, Plane, LogOut } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { BookingCard } from '@/components/BookingCard'
 
 interface User {
   _id: string
@@ -23,8 +24,11 @@ interface Trip {
   startDate: string
   endDate: string
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
+  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed'
   bookingDate: string
   price: number
+  travelers: number
+  bookingReference: string
 }
 
 interface UserDashboardProps {
@@ -104,7 +108,7 @@ export default function UserDashboard({ params }: UserDashboardProps) {
       method: 'PUT',
       headers: { 
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${session?.accessToken}`
+        'Authorization': `Bearer ${(session as any)?.accessToken}`
       },
       body: JSON.stringify(updateData), // Only send name and phone
     })
@@ -357,69 +361,68 @@ export default function UserDashboard({ params }: UserDashboardProps) {
 
           {activeTab === 'trips' && (
             <>
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">My Trips</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-800">حجوزاتي</h2>
+                <div className="text-sm text-gray-500">
+                  إجمالي الحجوزات: {trips.length}
+                </div>
+              </div>
+              
               {trips.length === 0 ? (
-                <div className="text-center py-10">
-                  <p className="text-gray-500 mb-4">No trips yet</p>
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <Plane className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد حجوزات بعد</h3>
+                  <p className="text-gray-500 mb-6">ابدأ رحلتك القادمة معنا واستكشف وجهات رائعة</p>
                   <button
                     onClick={() => router.push('/tours')}
-                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm"
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
                   >
-                    Browse Trips
+                    تصفح الرحلات المتاحة
                   </button>
                 </div>
               ) : (
-                <div className="overflow-x-auto rounded-lg border border-gray-200">
-                  <table className="min-w-full text-sm text-left">
-                    <thead className="bg-gray-100 text-gray-700">
-                      <tr>
-                        <th className="px-6 py-3">Destination</th>
-                        <th className="px-6 py-3">Booking Date</th>
-                        <th className="px-6 py-3">Duration</th>
-                        <th className="px-6 py-3">Price</th>
-                        <th className="px-6 py-3">Status</th>
-                        <th className="px-6 py-3">Actions</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-100">
-                      {trips.map((trip) => (
-                        <tr
-                          key={trip._id}
-                          className={`hover:bg-gray-50 ${
-                            trip.status === 'cancelled' ? 'bg-red-50/40' : ''
-                          }`}
-                        >
-                          <td className="px-6 py-3">{trip.destination}</td>
-                          <td className="px-6 py-3">
-                            {new Date(trip.bookingDate).toLocaleDateString('en-US')}
-                          </td>
-                          <td className="px-6 py-3">
-                            {new Date(trip.startDate).toLocaleDateString('en-US')} -{' '}
-                            {new Date(trip.endDate).toLocaleDateString('en-US')}
-                          </td>
-                          <td className="px-6 py-3">${trip.price}</td>
-                          <td className="px-6 py-3">{getStatusBadge(trip.status)}</td>
-                          <td className="px-6 py-3 text-sm space-x-2">
-                            {(trip.status === 'pending' || trip.status === 'confirmed') && (
-                              <button
-                                onClick={() => cancelTrip(trip._id)}
-                                className="text-red-600 hover:text-red-900"
-                              >
-                                Cancel
-                              </button>
-                            )}
-                            <button
-                              onClick={() => router.push(`/bookings/${trip._id}`)}
-                              className="text-blue-600 hover:text-blue-900"
-                            >
-                              Details
-                            </button>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+                <>
+                  {/* Stats Summary */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-green-600">
+                        {trips.filter(t => t.status === 'confirmed').length}
+                      </div>
+                      <div className="text-sm text-green-700">مؤكدة</div>
+                    </div>
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-yellow-600">
+                        {trips.filter(t => t.status === 'pending').length}
+                      </div>
+                      <div className="text-sm text-yellow-700">في الانتظار</div>
+                    </div>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {trips.filter(t => t.status === 'completed').length}
+                      </div>
+                      <div className="text-sm text-blue-700">مكتملة</div>
+                    </div>
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-red-600">
+                        {trips.filter(t => t.status === 'cancelled').length}
+                      </div>
+                      <div className="text-sm text-red-700">ملغية</div>
+                    </div>
+                  </div>
+
+                  {/* Bookings List */}
+                  <div className="space-y-4">
+                    {trips.map((trip) => (
+                      <BookingCard
+                        key={trip._id}
+                        booking={trip}
+                        onCancel={() => fetchUserTrips(userId)}
+                      />
+                    ))}
+                  </div>
+                </>
               )}
             </>
           )}

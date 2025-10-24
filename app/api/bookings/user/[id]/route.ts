@@ -30,10 +30,10 @@ export async function GET(
 ) {
   try {
     // Get user session
-    const session = await getServerSession(getAuthOptions());
-    
+    const session = await getServerSession(await getAuthOptions()) as any;
+
     // Check if user is authenticated
-    if (!session?.user) {
+    if (!session?.user?.id) {
       return NextResponse.json(
         { success: false, message: 'غير مصرح' },
         { status: 401 }
@@ -42,8 +42,18 @@ export async function GET(
 
     const userId = params.id;
 
-    // Verify the requesting user is the same as the requested user or an admin
-    if (session.user.role !== 'admin' && session.user.id !== userId) {
+    console.log('User bookings request:', {
+      requestedUserId: userId,
+      sessionUserId: session.user.id,
+      userRole: session.user.role,
+      isAdmin: session.user.role === 'admin',
+      isManager: session.user.role === 'manager',
+      isSameUser: session.user.id === userId
+    });
+
+    // Verify the requesting user is the same as the requested user or an admin/manager
+    if (session.user.role !== 'admin' && session.user.role !== 'manager' && session.user.id !== userId) {
+      console.log('Access denied for user bookings');
       return NextResponse.json(
         { success: false, message: 'غير مصرح لك بالوصول إلى هذه البيانات' },
         { status: 403 }
@@ -54,7 +64,9 @@ export async function GET(
     const client = await getMongoClient();
     const db = client.db();
 
-    // Find all bookings for the user with trip details
+    console.log('Fetching bookings for user:', userId);
+
+    // Find all bookings for the user with tour details
     const bookings = await db
       .collection<IBooking>(bookingCollectionName)
       .aggregate([
@@ -65,25 +77,28 @@ export async function GET(
         },
         {
           $lookup: {
-            from: 'trips',
+            from: 'tours',
             localField: 'trip',
             foreignField: '_id',
-            as: 'trip'
+            as: 'tour'
           }
         },
-        { $unwind: '$trip' },
+        { $unwind: '$tour' },
         {
           $project: {
-            'trip.destination': 1,
-            'trip.startDate': 1,
-            'trip.endDate': 1,
-            'trip.price': 1,
+            'tour._id': 1,
+            'tour.title': 1,
+            'tour.destination': 1,
+            'tour.startDate': 1,
+            'tour.endDate': 1,
+            'tour.price': 1,
             status: 1,
             paymentStatus: 1,
             totalAmount: 1,
             numberOfTravelers: 1,
+            travelers: '$numberOfTravelers',
             specialRequests: 1,
-            
+            bookingReference: 1,
             createdAt: 1,
             updatedAt: 1
           }
@@ -92,22 +107,28 @@ export async function GET(
       ])
       .toArray();
 
+    console.log('Found bookings for user:', bookings.length);
+    if (bookings.length > 0) {
+      console.log('Sample booking:', {
+        _id: bookings[0]._id,
+        hasTour: !!bookings[0].tour,
+        status: bookings[0].status
+      });
+    }
+
     // Format the response
-    const formattedBookings: BookingResponse[] = bookings.map(booking => ({
+    const formattedBookings = bookings.map(booking => ({
       _id: booking._id.toString(),
-      trip: {
-        _id: booking.trip._id.toString(),
-        destination: booking.trip.destination,
-        startDate: booking.trip.startDate,
-        endDate: booking.trip.endDate,
-        price: booking.trip.price
-      },
-      status: booking.status,
+      destination: booking.tour.title || booking.tour.destination,
       bookingDate: booking.createdAt,
+      startDate: booking.tour.startDate,
+      endDate: booking.tour.endDate,
+      price: booking.totalAmount,
+      status: booking.status,
       paymentStatus: booking.paymentStatus,
-      totalAmount: booking.totalAmount,
-      numberOfTravelers: booking.numberOfTravelers,
-      specialRequests: booking.specialRequests || ''
+      travelers: booking.numberOfTravelers || booking.travelers,
+      specialRequests: booking.specialRequests || '',
+      bookingReference: booking.bookingReference || ''
     }));
 
     return NextResponse.json({
@@ -118,8 +139,8 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching user bookings:', error);
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         message: 'حدث خطأ أثناء جلب حجوزات المستخدم',
         error: error instanceof Error ? error.message : 'Unknown error'
       },
@@ -136,12 +157,12 @@ async function createBookingsCollection(db: any) {
         $jsonSchema: bookingSchema.$jsonSchema
       }
     });
-    
+
     // Create indexes
     await db.collection(bookingCollectionName).createIndex({ user: 1 });
     await db.collection(bookingCollectionName).createIndex({ trip: 1 });
     await db.collection(bookingCollectionName).createIndex({ status: 1 });
-    
+
     console.log(`Created collection ${bookingCollectionName} with schema validation`);
   } catch (error) {
     // Collection might already exist, which is fine

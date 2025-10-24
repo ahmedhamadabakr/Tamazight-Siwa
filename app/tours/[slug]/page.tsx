@@ -12,6 +12,8 @@ import { useSession } from "next-auth/react"
 import { Session } from "next-auth";
 import { BookingForm } from '@/components/BookingForm'
 import { ImageGalleryFallback } from '@/components/ImageGalleryFallback'
+import { TourLoading } from '@/components/tour/tour-loading'
+import { TourNotFound } from '@/components/tour/tour-not-found'
 import {
   Dialog,
   DialogContent,
@@ -80,11 +82,11 @@ export default function TourDetailsPage() {
 
 
   if (isLoading) {
-    return <div>Loading...</div>; // Add a proper loading state
+    return <TourLoading />;
   }
 
   if (!tour) {
-    return <div>Tour not found</div>; // Handle case when tour is not found
+    return <TourNotFound />;
   }
 
   return (
@@ -166,6 +168,8 @@ export default function TourDetailsPage() {
                   </DialogHeader>
                   <BookingForm
                     tourId={tour.id}
+                    tourTitle={tour.title}
+                    destination={tour.location}
                     price={tour.price}
                     onSuccess={() => {
                       setIsBookingOpen(false)
