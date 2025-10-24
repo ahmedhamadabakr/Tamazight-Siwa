@@ -119,9 +119,9 @@ export async function POST(
 
     // Send email
     const mailOptions = {
-      from: `"تمازيغت سيوة للسياحة" <${process.env.GMAIL_USER}>`,
+      from: `"Tamazight Siwa" <${process.env.GMAIL_USER}>`,
       to: bookingData.user.email,
-      subject: `تأكيد حجز الرحلة - ${bookingData.bookingReference}`,
+      subject: `Booking Confirmation - ${bookingData.bookingReference}`,
       text: emailText,
       html: emailHtml
     }

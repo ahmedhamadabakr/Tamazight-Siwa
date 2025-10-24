@@ -216,7 +216,7 @@ export default function ResetPasswordPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors"
-                placeholder="أدخل كلمة المرور الجديدة"
+                placeholder="Enter new password"
                 required
                 disabled={isLoading}
                 minLength={6}

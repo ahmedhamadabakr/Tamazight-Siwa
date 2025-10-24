@@ -65,8 +65,8 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
             <div className={`bg-gray-200 flex items-center justify-center min-h-[200px] rounded-lg ${className}`}>
                 <div className="text-center text-gray-500">
                     <div className="text-4xl mb-2">📷</div>
-                    <div className="text-lg font-medium">لا توجد صور</div>
-                    <div className="text-sm">لم يتم رفع صور لهذه الرحلة بعد</div>
+                    <div className="text-lg font-medium">No images found</div>
+                    <div className="text-sm">No images uploaded for this tour yet</div>
                 </div>
             </div>
         )
@@ -83,7 +83,7 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                 >
                     <CloudinaryImage
                         src={images[0]}
-                        alt={`${title} - الصورة الرئيسية`}
+                        alt={`${title} - Main Image`}
                         fill
                         className="group-hover:scale-105 transition-transform duration-300"
                         priority
@@ -95,7 +95,7 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                     </div>
                     {images.length > 1 && (
                         <div className="absolute bottom-2 right-2 bg-black/70 text-white text-sm px-3 py-1 rounded-full">
-                            {images.length} صور
+                            {images.length} images
                         </div>
                     )}
                 </div>
@@ -111,7 +111,7 @@ export function ImageGallery({ images, title, className = "" }: ImageGalleryProp
                             >
                                 <CloudinaryImage
                                     src={image}
-                                    alt={`${title} - صورة ${index + 2}`}
+                                    alt={`${title} - Image ${index + 2}`}
                                     fill
                                     className="group-hover:scale-105 transition-transform duration-300"
                                     quality={75}

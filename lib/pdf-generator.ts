@@ -34,14 +34,14 @@ export function generateBookingHTML(booking: BookingData): string {
 
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'confirmed': return 'مؤكد'
-      case 'pending': return 'في الانتظار'
-      case 'cancelled': return 'ملغي'
-      case 'completed': return 'مكتمل'
-      case 'paid': return 'مدفوع'
-      case 'on-demand': return 'تحت الطلب'
-      case 'refunded': return 'مسترد'
-      case 'failed': return 'فشل'
+      case 'confirmed': return 'confirmed'
+      case 'pending': return 'pending'
+      case 'cancelled': return 'cancelled'
+      case 'completed': return 'completed'
+      case 'paid': return 'paid'
+      case 'on-demand': return 'on-demand'
+      case 'refunded': return 'refunded'
+      case 'failed': return 'failed'
       default: return status
     }
   }
@@ -52,7 +52,7 @@ export function generateBookingHTML(booking: BookingData): string {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>تأكيد الحجز - ${booking.bookingReference}</title>
+      <title>Booking Confirmation - ${booking.bookingReference}</title>
       <style>
         * {
           margin: 0;
@@ -296,82 +296,82 @@ export function generateBookingHTML(booking: BookingData): string {
     <body>
       <div class="container">
         <div class="header">
-          <h1>تأكيد الحجز</h1>
-          <p>رقم المرجع: ${booking.bookingReference}</p>
+          <h1>Booking Confirmation</h1>
+          <p>Booking Reference: ${booking.bookingReference}</p>
         </div>
         
         <div class="content">
           <div class="info-grid">
             <div class="section">
-              <h2 class="section-title">معلومات الرحلة</h2>
+              <h2 class="section-title">Tour Information</h2>
               
               <div class="info-item">
-                <div class="info-label">اسم الرحلة:</div>
+                <div class="info-label">Tour Name:</div>
                 <div class="info-value">${booking.tour.title}</div>
               </div>
               
               <div class="info-item">
-                <div class="info-label">الوجهة:</div>
+                <div class="info-label">Destination:</div>
                 <div class="info-value">${booking.tour.destination}</div>
               </div>
               
               <div class="info-item">
-                <div class="info-label">تاريخ البداية:</div>
+                <div class="info-label">Start Date:</div>
                 <div class="info-value">${formatDate(booking.tour.startDate)}</div>
               </div>
               
               <div class="info-item">
-                <div class="info-label">تاريخ النهاية:</div>
+                <div class="info-label">End Date:</div>
                 <div class="info-value">${formatDate(booking.tour.endDate)}</div>
               </div>
               
               <div class="info-item">
-                <div class="info-label">المدة:</div>
-                <div class="info-value">${booking.tour.duration} أيام</div>
+                <div class="info-label">Duration:</div>
+                <div class="info-value">${booking.tour.duration} days</div>
               </div>
               
               <div class="info-item">
-                <div class="info-label">عدد الأفراد:</div>
-                <div class="info-value">${booking.travelers} أشخاص</div>
+                <div class="info-label">Travelers:</div>
+                <div class="info-value">${booking.travelers} people</div>
               </div>
             </div>
             
             <div class="section">
-              <h2 class="section-title">معلومات العميل</h2>
+              <h2 class="section-title">Customer Information</h2>
               
               <div class="info-item">
-                <div class="info-label">الاسم:</div>
+                <div class="info-label">Name:</div>
                 <div class="info-value">${booking.user.name}</div>
               </div>
               
               <div class="info-item">
-                <div class="info-label">البريد الإلكتروني:</div>
+                <div class="info-label">Email:</div>
                 <div class="info-value">${booking.user.email}</div>
               </div>
               
               ${booking.user.phone ? `
               <div class="info-item">
-                <div class="info-label">رقم الهاتف:</div>
+                <div class="info-label">Phone:</div>
                 <div class="info-value">${booking.user.phone}</div>
               </div>
               ` : ''}
               
               <div class="info-item">
-                <div class="info-label">حالة الحجز:</div>
+                <div class="info-label">Booking Status:</div>
                 <div class="info-value">
                   <span class="status-badge status-${booking.status}">${getStatusText(booking.status)}</span>
                 </div>
               </div>
               
               <div class="info-item">
-                <div class="info-label">حالة الدفع:</div>
+                <div class="info-label">Payment Status:</div>
                 <div class="info-value">
                   <span class="status-badge status-${booking.paymentStatus}">${getStatusText(booking.paymentStatus)}</span>
                 </div>
               </div>
               
               <div class="info-item">
-                <div class="info-label">تاريخ الحجز:</div>
+                <div class="info-label">Booking Date:</div>
                 <div class="info-value">${formatDate(booking.createdAt)}</div>
               </div>
             </div>
@@ -379,41 +379,41 @@ export function generateBookingHTML(booking: BookingData): string {
           
           ${booking.specialRequests ? `
           <div class="section">
-            <h2 class="section-title">الطلبات الخاصة</h2>
+            <h2 class="section-title">Special Requests</h2>
             <div class="special-requests">
-              <h4>تفاصيل الطلبات الخاصة:</h4>
+              <h4>Special Requests Details:</h4>
               <p>${booking.specialRequests}</p>
             </div>
           </div>
           ` : ''}
           
           <div class="section">
-            <h2 class="section-title">ملخص التكلفة</h2>
+            <h2 class="section-title">Cost Summary</h2>
             <div class="price-summary">
               <div class="price-row">
-                <span><strong>سعر الفرد الواحد:</strong></span>
-                <span><strong>${booking.tour.price.toLocaleString()} ريال سعودي</strong></span>
+                <span><strong>Price per person:</strong></span>
+                <span><strong>${booking.tour.price.toLocaleString()}Dollars</strong></span>
               </div>
               <div class="price-row">
-                <span><strong>عدد الأفراد:</strong></span>
-                <span><strong>${booking.travelers} أشخاص</strong></span>
+                <span><strong>Number of people:</strong></span>
+                <span><strong>${booking.travelers} people</strong></span>
               </div>
               <div class="price-total">
-                <div>المجموع الكلي: ${booking.totalAmount.toLocaleString()} ريال سعودي</div>
+                <div>Total amount: ${booking.totalAmount.toLocaleString()} Dollars</div>
               </div>
             </div>
           </div>
         </div>
         
         <div class="footer">
-          <h3>ملاحظات مهمة</h3>
+          <h3>Important Notes</h3>
           <ul>
-            <li>يرجى الاحتفاظ بهذا التأكيد للمراجعة عند السفر</li>
-            <li>يمكن إلغاء الحجز قبل 48 ساعة من موعد الرحلة مع استرداد كامل</li>
-            <li>للاستفسارات والدعم الفني: 966501234567+</li>
-            <li>البريد الإلكتروني للدعم: info@tamazight-siwa.com</li>
-            <li>يرجى التأكد من صحة جميع البيانات المذكورة أعلاه</li>
-            <li>في حالة وجود أي خطأ، يرجى التواصل معنا فوراً</li>
+            <li>Please keep this confirmation for your records</li>
+            <li>You can cancel the booking before 48 hours from the tour date</li>
+            <li>For inquiries: 966501234567+</li>
+            <li>Email: info@tamazight-siwa.com</li>
+            <li>Please verify the accuracy of all the information above</li>
+            <li>In case of any error, please contact us immediately</li>
           </ul>
         </div>
       </div>

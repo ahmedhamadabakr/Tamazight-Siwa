@@ -120,15 +120,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                         }
                     }
 
-                    // إضافة صور تجريبية إذا لم نجد أي صور
-                    if (processedImages.length === 0) {
-                    
-                        processedImages = [
-                            'https://via.placeholder.com/400x300/3B82F6/FFFFFF?text=صورة+تجريبية+1',
-                            'https://via.placeholder.com/400x300/10B981/FFFFFF?text=صورة+تجريبية+2'
-                        ];
-                    }
-
+    
 
                     setTour({
                         _id: tourData._id || '',

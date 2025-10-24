@@ -26,7 +26,7 @@ export async function GET(
 
     if (!ObjectId.isValid(params.id)) {
       return NextResponse.json(
-        { success: false, message: 'معرف التقييم غير صحيح' },
+        { success: false, message: 'Invalid review ID' },
         { status: 400 }
       )
     }
@@ -35,7 +35,7 @@ export async function GET(
 
     if (!review) {
       return NextResponse.json(
-        { success: false, message: 'التقييم غير موجود' },
+        { success: false, message: 'Review not found' },
         { status: 404 }
       )
     }
@@ -48,7 +48,7 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching review:', error)
     return NextResponse.json(
-      { success: false, message: 'فشل في جلب التقييم' },
+      { success: false, message: 'An error occurred while fetching the review' },
       { status: 500 }
     )
   }
@@ -65,7 +65,7 @@ export async function PUT(
 
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح لك بهذا الإجراء' },
+        { success: false, message: 'You are not authorized to perform this action' },
         { status: 403 }
       )
     }
@@ -75,7 +75,7 @@ export async function PUT(
 
     if (!ObjectId.isValid(params.id)) {
       return NextResponse.json(
-        { success: false, message: 'معرف التقييم غير صحيح' },
+        { success: false, message: 'Invalid review ID' },
         { status: 400 }
       )
     }
@@ -106,7 +106,7 @@ export async function PUT(
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
-        { success: false, message: 'التقييم غير موجود' },
+        { success: false, message: 'Review not found' },
         { status: 404 }
       )
     }
@@ -116,13 +116,13 @@ export async function PUT(
     return NextResponse.json({
       success: true,
       data: updatedReview,
-      message: 'تم تحديث التقييم بنجاح'
+      message: 'Review updated successfully'
     })
 
   } catch (error) {
     console.error('Error updating review:', error)
     return NextResponse.json(
-      { success: false, message: 'فشل في تحديث التقييم' },
+      { success: false, message: 'An error occurred while updating the review' },
       { status: 500 }
     )
   }
@@ -139,7 +139,7 @@ export async function DELETE(
 
     if (!session?.user) {
       return NextResponse.json(
-        { success: false, message: 'يجب تسجيل الدخول' },
+        { success: false, message: 'You must be logged in' },
         { status: 401 }
       )
     }
@@ -149,7 +149,7 @@ export async function DELETE(
 
     if (!ObjectId.isValid(params.id)) {
       return NextResponse.json(
-        { success: false, message: 'معرف التقييم غير صحيح' },
+        { success: false, message: 'Invalid review ID' },
         { status: 400 }
       )
     }
@@ -159,7 +159,7 @@ export async function DELETE(
 
     if (!review) {
       return NextResponse.json(
-        { success: false, message: 'التقييم غير موجود' },
+        { success: false, message: 'Review not found' },
         { status: 404 }
       )
     }
@@ -167,7 +167,7 @@ export async function DELETE(
     // Only allow deletion by review owner or manager
     if (review.userId !== session.user.id && session.user.role !== 'manager') {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح لك بحذف هذا التقييم' },
+        { success: false, message: 'You are not authorized to delete this review' },
         { status: 403 }
       )
     }
@@ -176,20 +176,20 @@ export async function DELETE(
 
     if (result.deletedCount === 0) {
       return NextResponse.json(
-        { success: false, message: 'فشل في حذف التقييم' },
+        { success: false, message: 'An error occurred while deleting the review' },
         { status: 500 }
       )
     }
 
     return NextResponse.json({
       success: true,
-      message: 'تم حذف التقييم بنجاح'
+      message: 'Review deleted successfully'
     })
 
   } catch (error) {
     console.error('Error deleting review:', error)
     return NextResponse.json(
-      { success: false, message: 'فشل في حذف التقييم' },
+      { success: false, message: 'An error occurred while deleting the review' },
       { status: 500 }
     )
   }

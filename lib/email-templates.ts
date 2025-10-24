@@ -17,7 +17,7 @@ export function generateBookingConfirmationEmail(data: BookingEmailData): string
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تأكيد الحجز</title>
+    <title>Booking Confirmation</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -133,67 +133,67 @@ export function generateBookingConfirmationEmail(data: BookingEmailData): string
     <div class="container">
         <div class="header">
             <div class="success-icon">✓</div>
-            <h1>تم تأكيد حجزك بنجاح!</h1>
-            <p>مرحباً ${data.customerName}</p>
+            <h1>Booking Confirmation</h1>
+            <p>Hello ${data.customerName}</p>
         </div>
         
         <div class="content">
             <div class="section">
-                <h2>تفاصيل الحجز</h2>
+                <h2>Booking Details</h2>
                 <div class="info-item">
-                    <span class="info-label">رقم الحجز</span>
+                    <span class="info-label">Booking Reference</span>
                     <span class="info-value">${data.bookingReference}</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">اسم الرحلة</span>
+                    <span class="info-label">Tour Title</span>
                     <span class="info-value">${data.tourTitle}</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">الوجهة</span>
+                    <span class="info-label">Destination</span>
                     <span class="info-value">${data.destination}</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">تاريخ البداية</span>
+                    <span class="info-label">Start Date</span>
                     <span class="info-value">${new Date(data.startDate).toLocaleDateString('ar-EG')}</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">تاريخ النهاية</span>
+                    <span class="info-label">End Date</span>
                     <span class="info-value">${new Date(data.endDate).toLocaleDateString('ar-EG')}</span>
                 </div>
                 <div class="info-item">
-                    <span class="info-label">عدد الأفراد</span>
-                    <span class="info-value">${data.travelers} أشخاص</span>
+                    <span class="info-label">Number of People</span>
+                    <span class="info-value">${data.travelers} People</span>
                 </div>
                 ${data.specialRequests ? `
                 <div class="info-item">
-                    <span class="info-label">الطلبات الخاصة</span>
+                    <span class="info-label">Special Requests</span>
                     <span class="info-value">${data.specialRequests}</span>
                 </div>
                 ` : ''}
             </div>
 
             <div class="section">
-                <h2>ملخص الأسعار</h2>
+                <h2>Price Summary</h2>
                 <div class="price-summary">
                     <div class="price-total">
-                        المبلغ الإجمالي: ${data.totalAmount.toLocaleString()} ريال سعودي
+                        Total Amount: ${data.totalAmount.toLocaleString()} Dollars
                     </div>
                 </div>
             </div>
 
             <div style="text-align: center;">
-                <a href="#" class="button">عرض تفاصيل الحجز</a>
+                <a href="#" class="button">View Booking Details</a>
             </div>
         </div>
 
         <div class="footer">
-            <p><strong>ملاحظات مهمة:</strong></p>
-            <p>• يرجى الاحتفاظ برقم الحجز للمراجعة</p>
-            <p>• يمكن إلغاء الحجز قبل 48 ساعة من موعد الرحلة</p>
-            <p>• في حالة وجود أي استفسارات، يرجى التواصل معنا</p>
+            <p><strong>Important Notes:</strong></p>
+            <p> Please keep your booking reference for your records</p>
+            <p>You can cancel the booking before 48 hours from the tour date</p>
+            <p>In case of any inquiries, please contact us</p>
             <br>
-            <p>شكراً لاختياركم خدماتنا</p>
-            <p>للاستفسارات: 966501234567+ | info@example.com</p>
+            <p>Thank you for choosing our services</p>
+            <p>For inquiries: 966501234567+ | info@example.com</p>
         </div>
     </div>
 </body>
@@ -213,7 +213,7 @@ export function generateBookingCancellationEmail(data: {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إلغاء الحجز</title>
+    <title>Booking Cancellation</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -262,34 +262,34 @@ export function generateBookingCancellationEmail(data: {
 <body>
     <div class="container">
         <div class="header">
-            <h1>تم إلغاء حجزك</h1>
-            <p>مرحباً ${data.customerName}</p>
+            <h1>Booking Cancellation</h1>
+            <p>Hello ${data.customerName}</p>
         </div>
         
         <div class="content">
-            <p>نأسف لإلغاء حجزك. تم إلغاء الحجز التالي بنجاح:</p>
+            <p>We are sorry to cancel your booking. The following booking has been canceled successfully:</p>
             
             <div class="info-item">
-                <span>رقم الحجز:</span>
+                <span>Booking Reference:</span>
                 <span>${data.bookingReference}</span>
             </div>
             <div class="info-item">
-                <span>اسم الرحلة:</span>
+                <span>Tour Title:</span>
                 <span>${data.tourTitle}</span>
             </div>
             
             ${data.refundAmount ? `
             <div class="info-item">
-                <span>مبلغ الاسترداد:</span>
-                <span>${data.refundAmount.toLocaleString()} ريال</span>
+                <span>Refund Amount:</span>
+                <span>${data.refundAmount.toLocaleString()} Dollars</span>
             </div>
-            <p>سيتم استرداد المبلغ خلال 5-7 أيام عمل.</p>
+            <p>Refund will be processed within 5-7 business days.</p>
             ` : ''}
         </div>
 
         <div class="footer">
-            <p>نتطلع لخدمتكم في المستقبل</p>
-            <p>للاستفسارات: 966501234567+ | info@example.com</p>
+            <p>Thank you for choosing our services</p>
+            <p>For inquiries: 966501234567+ | info@example.com</p>
         </div>
     </div>
 </body>

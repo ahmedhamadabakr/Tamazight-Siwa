@@ -123,7 +123,7 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
     <>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="travelers">عدد الأفراد (الحد الأقصى 5)</Label>
+          <Label htmlFor="travelers">Number of travelers (max 5) </Label>
           <Input
             id="travelers"
             type="number"
@@ -136,13 +136,13 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="specialRequests">طلبات خاصة (اختياري)</Label>
+          <Label htmlFor="specialRequests">Special requests (optional)</Label>
           <textarea
             id="specialRequests"
             value={specialRequests}
             onChange={(e) => setSpecialRequests(e.target.value)}
             className="w-full p-2 border rounded-md min-h-[100px]"
-            placeholder="أي متطلبات خاصة أو حساسية من أطعمة معينة؟"
+            placeholder="Any special requests or food sensitivities?"
           />
         </div>
 

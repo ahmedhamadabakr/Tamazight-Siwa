@@ -41,7 +41,7 @@ export async function sendBookingConfirmationEmail(
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>تأكيد الحجز</title>
+      <title>Booking Confirmation</title>
       <style>
         body {
           font-family: 'Arial', sans-serif;
@@ -145,68 +145,68 @@ export async function sendBookingConfirmationEmail(
     <body>
       <div class="container">
         <div class="header">
-          <h1>🎉 تم تأكيد حجزك بنجاح!</h1>
-          <p>رقم الحجز: ${bookingData.bookingReference}</p>
+          <h1>Booking Confirmation</h1>
+          <p>Booking Reference: ${bookingData.bookingReference}</p>
         </div>
         
         <div class="content">
           <div class="greeting">
-            مرحباً ${bookingData.customerName}،
+            Hello ${bookingData.customerName},
           </div>
           
-          <p>نشكرك لاختيارك رحلاتنا! تم تأكيد حجزك بنجاح وإليك تفاصيل رحلتك:</p>
+          <p>Thank you for choosing our tours! Your booking has been confirmed and here are your tour details:</p>
           
           <div class="section">
-            <div class="section-title">📍 تفاصيل الرحلة</div>
+            <div class="section-title">Tour Details</div>
             <div class="info-row">
-              <span class="info-label">اسم الرحلة:</span>
+              <span class="info-label">Tour Title:</span>
               <span class="info-value">${bookingData.tourTitle}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">الوجهة:</span>
+              <span class="info-label">Destination:</span>
               <span class="info-value">${bookingData.destination}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">تاريخ البداية:</span>
+              <span class="info-label">Start Date:</span>
               <span class="info-value">${formatDate(bookingData.startDate)}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">تاريخ النهاية:</span>
+              <span class="info-label">End Date:</span>
               <span class="info-value">${formatDate(bookingData.endDate)}</span>
             </div>
             <div class="info-row">
-              <span class="info-label">عدد الأفراد:</span>
-              <span class="info-value">${bookingData.travelers} أشخاص</span>
+              <span class="info-label">Number of People:</span>
+              <span class="info-value">${bookingData.travelers} People</span>
             </div>
           </div>
           
           ${bookingData.specialRequests ? `
           <div class="section">
-            <div class="section-title">📝 الطلبات الخاصة</div>
+            <div class="section-title">Special Requests</div>
             <p>${bookingData.specialRequests}</p>
           </div>
           ` : ''}
           
           <div class="total-amount">
-            💰 المبلغ الإجمالي: ${bookingData.totalAmount.toLocaleString()} ريال سعودي
+            Total Amount: ${bookingData.totalAmount.toLocaleString()} Dollars
           </div>
           
           <div style="background: #fef3c7; padding: 15px; border-radius: 8px; margin: 20px 0;">
-            <h3 style="color: #92400e; margin-bottom: 10px;">📌 ملاحظات مهمة:</h3>
+            <h3 style="color: #92400e; margin-bottom: 10px;">Important Notes:</h3>
             <ul style="color: #92400e; margin: 0; padding-right: 20px;">
-              <li>يرجى الاحتفاظ برقم الحجز للمراجعة</li>
-              <li>يمكن إلغاء الحجز قبل 48 ساعة من موعد الرحلة</li>
-              <li>سيتم التواصل معك قبل موعد الرحلة بـ 24 ساعة</li>
+              <li>Please keep your booking reference for your records</li>
+              <li>You can cancel the booking before 48 hours from the tour date</li>
+              <li>We will contact you 24 hours before the tour date</li>
             </ul>
           </div>
         </div>
         
         <div class="footer">
-          <p><strong>شكراً لثقتك بنا!</strong></p>
+          <p><strong>Thank you for your trust!</strong></p>
           <div class="contact-info">
-            <p>📞 للاستفسارات: 966501234567+</p>
-            <p>📧 البريد الإلكتروني: info@tamazight-siwa.com</p>
-            <p>🌐 الموقع الإلكتروني: www.tamazight-siwa.com</p>
+            <p>📞 For inquiries: 966501234567+</p>
+            <p>📧 Email: info@tamazight-siwa.com</p>
+            <p>🌐 website: www.tamazight-siwa.com</p>
           </div>
         </div>
       </div>
@@ -215,42 +215,40 @@ export async function sendBookingConfirmationEmail(
   `
 
   const emailText = `
-تم تأكيد حجزك بنجاح!
+Hello ${bookingData.customerName},
 
-مرحباً ${bookingData.customerName},
+Thank you for choosing our tours! Your booking has been confirmed.
 
-نشكرك لاختيارك رحلاتنا! تم تأكيد حجزك بنجاح.
+Booking Reference: ${bookingData.bookingReference}
 
-رقم الحجز: ${bookingData.bookingReference}
+Tour Details:
+- Tour Title: ${bookingData.tourTitle}
+- Destination: ${bookingData.destination}
+- Start Date: ${formatDate(bookingData.startDate)}
+- End Date: ${formatDate(bookingData.endDate)}
+- Number of People: ${bookingData.travelers} People
 
-تفاصيل الرحلة:
-- اسم الرحلة: ${bookingData.tourTitle}
-- الوجهة: ${bookingData.destination}
-- تاريخ البداية: ${formatDate(bookingData.startDate)}
-- تاريخ النهاية: ${formatDate(bookingData.endDate)}
-- عدد الأفراد: ${bookingData.travelers} أشخاص
+${bookingData.specialRequests ? `Special Requests: ${bookingData.specialRequests}` : ''}
 
-${bookingData.specialRequests ? `الطلبات الخاصة: ${bookingData.specialRequests}` : ''}
+Total Amount: ${bookingData.totalAmount.toLocaleString()} Dollars
 
-المبلغ الإجمالي: ${bookingData.totalAmount.toLocaleString()} ريال سعودي
+Important Notes:
+- Please keep your booking reference for your records
+- You can cancel the booking before 48 hours from the tour date
+- We will contact you 24 hours before the tour date
 
-ملاحظات مهمة:
-- يرجى الاحتفاظ برقم الحجز للمراجعة
-- يمكن إلغاء الحجز قبل 48 ساعة من موعد الرحلة
-- سيتم التواصل معك قبل موعد الرحلة بـ 24 ساعة
+For inquiries:
+Phone: 966501234567+
+Email: info@tamazight-siwa.com
 
-للاستفسارات:
-هاتف: 966501234567+
-بريد إلكتروني: info@tamazight-siwa.com
-
-شكراً لثقتك بنا!
-فريق تمازيغت سيوة
+Thank you for your trust!
+Tamazight Siwa Team
   `
 
   const mailOptions = {
-    from: `"تمازيغت سيوة للسياحة" <${process.env.GMAIL_USER}>`,
+    from: `"Tamazight Siwa" <${process.env.GMAIL_USER}>`,
     to: customerEmail,
-    subject: `تأكيد حجز الرحلة - ${bookingData.bookingReference}`,
+    subject: `Booking Confirmation - ${bookingData.bookingReference}`,
     text: emailText,
     html: emailHtml
   }

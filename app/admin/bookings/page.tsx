@@ -309,7 +309,7 @@ export default function AdminBookings() {
               <div className="mr-4">
                 <p className="text-sm text-gray-600">Total Earnings</p>
                 <p className="text-2xl font-bold text-gray-900">
-                  {bookings.reduce((sum, b) => sum + b.totalAmount, 0).toLocaleString()} ريال
+                  {bookings.reduce((sum, b) => sum + b.totalAmount, 0).toLocaleString()} Dollars
                 </p>
               </div>
             </div>
@@ -389,7 +389,7 @@ export default function AdminBookings() {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm font-medium text-gray-900">
-                        {booking.totalAmount.toLocaleString()} ريال
+                        {booking.totalAmount.toLocaleString()} Dollars
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

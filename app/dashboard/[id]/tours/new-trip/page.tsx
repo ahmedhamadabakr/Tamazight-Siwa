@@ -204,7 +204,7 @@ export default function NewTrip() {
             <div className="grid md:grid-cols-2 gap-6">
               <div>
                 <label className="text-sm font-medium text-gray-600 block mb-1">
-                  تاريخ بداية الرحلة
+                 Start Date
                 </label>
                 <input
                   type="date"
@@ -216,7 +216,7 @@ export default function NewTrip() {
               </div>
               <div>
                 <label className="text-sm font-medium text-gray-600 block mb-1">
-                  تاريخ نهاية الرحلة
+                 End Date
                 </label>
                 <input
                   type="date"

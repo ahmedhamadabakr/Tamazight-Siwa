@@ -108,9 +108,9 @@ export function BookingConfirmationModal({
               >
                 <div className="flex items-center space-x-2 space-x-reverse">
                   <Users className="w-5 h-5 text-gray-400" />
-                  <span className="text-gray-600">عدد الأفراد</span>
+                  <span className="text-gray-600">Passengers</span>
                 </div>
-                <span className="font-medium text-gray-900">{bookingData.travelers} أشخاص</span>
+                <span className="font-medium text-gray-900">{bookingData.travelers} passengers</span>
               </motion.div>
 
               <motion.div

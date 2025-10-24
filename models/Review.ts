@@ -45,33 +45,33 @@ export function validateReview(data: Partial<Review>): { isValid: boolean; error
   const errors: string[] = []
 
   if (!data.tourId || data.tourId.trim().length === 0) {
-    errors.push('معرف الرحلة مطلوب')
+    errors.push('Tour ID is required')
   }
 
   if (!data.userId || data.userId.trim().length === 0) {
-    errors.push('معرف المستخدم مطلوب')
+    errors.push('User ID is required')
   }
 
   if (!data.rating || data.rating < 1 || data.rating > 5) {
-    errors.push('التقييم يجب أن يكون بين 1 و 5 نجوم')
+    errors.push('Rating must be between 1 and 5 stars')
   }
 
   if (!data.title || data.title.trim().length === 0) {
-    errors.push('عنوان التقييم مطلوب')
+    errors.push('Review title is required')
   } else if (data.title.length > 100) {
-    errors.push('عنوان التقييم يجب أن يكون أقل من 100 حرف')
+    errors.push('Review title must be less than 100 characters')
   }
 
   if (!data.comment || data.comment.trim().length === 0) {
-    errors.push('نص التقييم مطلوب')
+    errors.push('Review comment is required')
   } else if (data.comment.length < 10) {
-    errors.push('نص التقييم يجب أن يكون على الأقل 10 أحرف')
+    errors.push('Review comment must be at least 10 characters')
   } else if (data.comment.length > 1000) {
-    errors.push('نص التقييم يجب أن يكون أقل من 1000 حرف')
+    errors.push('Review comment must be less than 1000 characters')
   }
 
   if (data.images && data.images.length > 5) {
-    errors.push('يمكن إرفاق حتى 5 صور فقط')
+    errors.push('Can only attach up to 5 images')
   }
 
   return {

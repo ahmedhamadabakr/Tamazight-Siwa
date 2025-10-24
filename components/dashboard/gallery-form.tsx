@@ -28,7 +28,7 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
   const [formData, setFormData] = useState({
     title: image?.title || '',
     description: image?.description || '',
-    category: image?.category || 'طبيعة',
+    category: image?.category || 'Nature',
     isActive: image?.isActive ?? true,
   });
   const [cloudinaryData, setCloudinaryData] = useState<{
@@ -105,7 +105,7 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
       <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
         <div className="flex justify-between items-center p-6 border-b">
           <h3 className="text-xl font-semibold">
-            {image ? 'تعديل الصورة' : 'إضافة صورة جديدة'}
+            {image ? 'Edit Image' : 'Add New Image'}
           </h3>
           <button
             onClick={onClose}
@@ -119,7 +119,7 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
           {/* Image Upload */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              الصورة *
+              Image *
             </label>
             <CloudinaryUpload
               onUploadSuccess={handleUploadSuccess}

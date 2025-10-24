@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح لك بتنفيذ هذا الإجراء' },
+        { success: false, message: 'You are not authorized to perform this action' },
         { status: 403 }
       );
     }
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     if (!file) {
       return NextResponse.json(
-        { success: false, message: 'لم يتم إرفاق ملف' },
+        { success: false, message: 'File not attached' },
         { status: 400 }
       );
     }
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json(
-        { success: false, message: 'نوع الملف غير مدعوم. يرجى اختيار صورة (JPG, PNG, GIF, WebP)' },
+        { success: false, message: 'File type not supported. Please select an image (JPG, PNG, GIF, WebP)' },
         { status: 400 }
       );
     }
@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
     const maxSize = 10 * 1024 * 1024; // 10MB
     if (file.size > maxSize) {
       return NextResponse.json(
-        { success: false, message: 'حجم الملف يجب أن يكون أقل من 10 ميجابايت' },
+        { success: false, message: 'File size must be less than 10MB' },
         { status: 400 }
       );
     }
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     console.error('Error uploading to Cloudinary:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to upload image' },
+      { success: false, message: 'An error occurred while uploading the image' },
       { status: 500 }
     );
   }
@@ -149,7 +149,7 @@ export async function DELETE(request: NextRequest) {
       });
     } else {
       return NextResponse.json(
-        { success: false, message: 'Failed to delete image from Cloudinary' },
+        { success: false, message: 'An error occurred while deleting the image' },
         { status: 400 }
       );
     }
@@ -157,7 +157,7 @@ export async function DELETE(request: NextRequest) {
   } catch (error) {
     console.error('Error deleting from Cloudinary:', error);
     return NextResponse.json(
-      { success: false, message: 'Failed to delete image from Cloudinary' },
+      { success: false, message: 'An error occurred while deleting the image' },
       { status: 500 }
     );
   }

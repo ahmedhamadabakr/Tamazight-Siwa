@@ -48,7 +48,7 @@ interface BookingsListProps {
   title?: string
 }
 
-export function BookingsList({ limit, showFilters = true, title = "الحجوزات" }: BookingsListProps) {
+export function BookingsList({ limit, showFilters = true, title = "Bookings" }: BookingsListProps) {
   const [bookings, setBookings] = useState<Booking[]>([])
   const [filteredBookings, setFilteredBookings] = useState<Booking[]>([])
   const [loading, setLoading] = useState(true)
@@ -319,7 +319,7 @@ export function BookingsList({ limit, showFilters = true, title = "الحجوز�
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">
-                    {booking.totalAmount.toLocaleString()} ريال
+                    {booking.totalAmount.toLocaleString()} Dollars
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
