@@ -16,7 +16,7 @@ export async function GET(
 
     if (!ObjectId.isValid(params.id)) {
       return NextResponse.json(
-        { success: false, message: 'معرف الصورة غير صحيح' },
+        { success: false, message: 'Invalid image ID' },
         { status: 400 }
       );
     }
@@ -25,7 +25,7 @@ export async function GET(
 
     if (!image) {
       return NextResponse.json(
-        { success: false, message: 'الصورة غير موجودة' },
+        { success: false, message: 'Image not found' },
         { status: 404 }
       );
     }
@@ -38,7 +38,7 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching gallery image:', error);
     return NextResponse.json(
-      { success: false, message: 'فشل في جلب الصورة' },
+      { success: false, message: 'Failed to fetch image' },
       { status: 500 }
     );
   }
@@ -55,7 +55,7 @@ export async function PUT(
     
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح لك بهذا الإجراء' },
+        { success: false, message: 'You are not authorized to perform this action' },
         { status: 403 }
       );
     }
@@ -65,7 +65,7 @@ export async function PUT(
 
     if (!ObjectId.isValid(params.id)) {
       return NextResponse.json(
-        { success: false, message: 'معرف الصورة غير صحيح' },
+        { success: false, message: 'Invalid image ID' },
         { status: 400 }
       );
     }
@@ -99,7 +99,7 @@ export async function PUT(
 
     if (result.matchedCount === 0) {
       return NextResponse.json(
-        { success: false, message: 'الصورة غير موجودة' },
+        { success: false, message: 'Image not found' },
         { status: 404 }
       );
     }
@@ -109,13 +109,13 @@ export async function PUT(
     return NextResponse.json({
       success: true,
       data: updatedImage,
-      message: 'تم تحديث الصورة بنجاح'
+      message: 'Image updated successfully'  
     });
 
   } catch (error) {
     console.error('Error updating gallery image:', error);
     return NextResponse.json(
-      { success: false, message: 'فشل في تحديث الصورة' },
+      { success: false, message: 'Failed to update image' },
       { status: 500 }
     );
   }
@@ -132,7 +132,7 @@ export async function DELETE(
     
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
-        { success: false, message: 'غير مصرح لك بهذا الإجراء' },
+        { success: false, message: 'You are not authorized to perform this action' },
         { status: 403 }
       );
     }
@@ -142,7 +142,7 @@ export async function DELETE(
 
     if (!ObjectId.isValid(params.id)) {
       return NextResponse.json(
-        { success: false, message: 'معرف الصورة غير صحيح' },
+        { success: false, message: 'Invalid image ID' },
         { status: 400 }
       );
     }
@@ -152,7 +152,7 @@ export async function DELETE(
     
     if (!image) {
       return NextResponse.json(
-        { success: false, message: 'الصورة غير موجودة' },
+        { success: false, message: 'Image not found' },
         { status: 404 }
       );
     }
@@ -162,7 +162,7 @@ export async function DELETE(
 
     if (result.deletedCount === 0) {
       return NextResponse.json(
-        { success: false, message: 'فشل في حذف الصورة من قاعدة البيانات' },
+        { success: false, message: 'Failed to delete image from database' },
         { status: 500 }
       );
     }
@@ -185,13 +185,13 @@ export async function DELETE(
 
     return NextResponse.json({
       success: true,
-      message: 'تم حذف الصورة بنجاح'
+      message: 'Image deleted successfully'
     });
 
   } catch (error) {
     console.error('Error deleting gallery image:', error);
     return NextResponse.json(
-      { success: false, message: 'فشل في حذف الصورة' },
+      { success: false, message: 'Failed to delete image' },
       { status: 500 }
     );
   }

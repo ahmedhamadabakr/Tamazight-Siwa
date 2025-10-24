@@ -15,11 +15,12 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search');
     const category = searchParams.get('category');
     const isPublic = searchParams.get('public') === 'true';
+    const showHidden = searchParams.get('showHidden') === 'true';
 
     let query: any = {};
 
-    // If it's a public request, only show active images
-    if (isPublic) {
+    // If it's a public request, only show active images (unless showHidden is true)
+    if (isPublic && !showHidden) {
       query.isActive = true;
     }
 

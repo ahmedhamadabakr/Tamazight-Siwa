@@ -22,13 +22,13 @@ interface GalleryImage {
 }
 
 const categories = [
-  { key: "all", label: "الكل" },
-  { key: "طبيعة", label: "طبيعة" },
-  { key: "تراث", label: "تراث" },
-  { key: "مناظر", label: "مناظر" },
-  { key: "أنشطة", label: "أنشطة" },
-  { key: "طعام", label: "طعام" },
-  { key: "أخرى", label: "أخرى" }
+  { key: "all", label: "All" },
+  { key: "Nature", label: "Nature" },
+  { key: " Heritage", label: " Heritage" },
+  { key: "Landmarks", label: "Landmarks" },
+  { key: "Activities", label: "Activities" },
+  { key: "Food", label: "Food" },
+  { key: "Other", label: "Other" }
 ]
 
 export default function GalleryPage() {
@@ -147,7 +147,7 @@ export default function GalleryPage() {
             <div>
               <Camera className="mx-auto w-8 h-8 text-primary mb-2" />
               <div className="text-2xl font-bold text-primary">{categories.length - 1}</div>
-              <div className="text-sm text-muted-foreground">فئات</div>
+              <div className="text-sm text-muted-foreground">Categories</div>
             </div>
             <div>
               <Users className="mx-auto w-8 h-8 text-primary mb-2" />
@@ -201,14 +201,14 @@ export default function GalleryPage() {
                   className="group relative overflow-hidden rounded-xl shadow-md hover:shadow-2xl cursor-pointer"
                   onClick={() => setLightbox({ src: image.imageUrl, title: image.title })}
                 >
-                  <div className="relative aspect-[4/3]">
+                  <div className="relative w-full h-64 rounded-xl overflow-hidden">
                     <CloudinaryImage
                       src={image.imageUrl}
                       alt={image.title}
                       fill
-                      className="group-hover:scale-110 transition-transform duration-500"
-                      quality={80}
-                      transformation="w_400,h_300,c_fill,q_80,f_auto"
+                      className="group-hover:scale-110 transition-transform duration-500 w-full h-full object-cover"
+                      quality={100}
+                      transformation="w_400,h_300,c_fill,q_100,f_auto"
                     />
 
                     {/* Overlay */}
@@ -223,7 +223,7 @@ export default function GalleryPage() {
                     <div className="absolute bottom-0 left-0 right-0 p-4 text-white translate-y-full group-hover:translate-y-0 transition-transform duration-500">
                       <h3 className="font-bold text-lg">{image.title}</h3>
                       <p className="text-sm opacity-80">
-                        {image.description || 'اكتشف جمال واحة سيوة'}
+                        {image.description || 'No description available'}
                       </p>
                     </div>
                   </div>
@@ -274,9 +274,9 @@ export default function GalleryPage() {
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="relative aspect-square rounded-lg overflow-hidden">
+              <div key={i} className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer">
                 <Image
-                  src={`/placeholder.svg`}
+                  src='/cleopatra-bath-natural-spring-siwa.jpg'
                   alt={`Instagram Post ${i}`}
                   fill
                   className="object-cover hover:scale-110 transition-transform duration-500"

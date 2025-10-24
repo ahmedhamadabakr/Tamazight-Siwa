@@ -14,27 +14,27 @@ export interface GalleryImage {
   updatedAt: Date;
 }
 
-export const GALLERY_CATEGORIES = ['طبيعة', 'تراث', 'مناظر', 'أنشطة', 'طعام', 'أخرى'];
+export const GALLERY_CATEGORIES = ['Nature', 'Heritage', 'Landmarks', 'Activities', 'Food', 'Other'];
 
 export function validateGalleryImage(data: Partial<GalleryImage>): { isValid: boolean; errors: string[] } {
   const errors: string[] = [];
 
   if (!data.title || data.title.trim().length === 0) {
-    errors.push('عنوان الصورة مطلوب');
+    errors.push('Image title is required');
   } else if (data.title.length > 100) {
-    errors.push('عنوان الصورة يجب أن يكون أقل من 100 حرف');
+    errors.push('Image title must be less than 100 characters');
   }
 
   if (!data.imageUrl || data.imageUrl.trim().length === 0) {
-    errors.push('رابط الصورة مطلوب');
+    errors.push('Image URL is required');
   }
 
   if (!data.category || !GALLERY_CATEGORIES.includes(data.category)) {
-    errors.push('فئة الصورة غير صحيحة');
+    errors.push('Image category is invalid');
   }
 
   if (data.description && data.description.length > 500) {
-    errors.push('وصف الصورة يجب أن يكون أقل من 500 حرف');
+    errors.push('Image description must be less than 500 characters');
   }
 
   return {

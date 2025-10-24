@@ -41,10 +41,14 @@ const fetchTours = async () => {
     <section className="py-20 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6 text-balance">Featured Experiences</h2>
+          <div className="inline-block bg-accent/10 rounded-full px-6 py-2 mb-4">
+            <span className="text-accent font-medium">🌟 Featured Experiences</span>
+          </div>
+          <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6 text-balance">
+            Discover Siwa's Magic
+          </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto text-pretty">
-            Discover our carefully curated selection of authentic Siwa experiences, from desert adventures to cultural
-            immersion
+            Discover our carefully curated selection of authentic Siwa experiences, from desert adventures to cultural immersion
           </p>
         </div>
 
@@ -63,7 +67,7 @@ const fetchTours = async () => {
                 {/* Image Count Badge */}
                 {tour.images.length > 1 && (
                   <div className="absolute top-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-                    {tour.images.length} صور
+                    {tour.images.length} Photos
                   </div>
                 )}
 
@@ -71,7 +75,7 @@ const fetchTours = async () => {
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="text-white text-center p-4">
                     <h4 className="font-bold text-lg mb-2">{tour.title}</h4>
-                    <p className="text-sm opacity-90">اضغط لمشاهدة التفاصيل</p>
+                    <p className="text-sm opacity-90">Click to view details</p>
                   </div>
                 </div>
               </div>
@@ -97,7 +101,7 @@ const fetchTours = async () => {
                 
                 <Link href={`/tours/${tour.slug || tour.id}`} className="w-full mt-auto">
                   <Button variant="outline" className="w-full hover:bg-primary hover:text-white transition-colors">
-                    اكتشف المزيد
+                    Discover More
                   </Button>
                 </Link>
               </CardContent>

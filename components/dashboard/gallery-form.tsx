@@ -51,7 +51,7 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
   const [loading, setLoading] = useState(false);
   const [uploadError, setUploadError] = useState<string>('');
 
-  const categories = ['طبيعة', 'تراث', 'مناظر', 'أنشطة', 'طعام', 'أخرى'];
+  const categories = ['Nature', 'Heritage', 'Landmarks', 'Activities', 'Food', 'Other'];
 
   const handleUploadSuccess = (result: {
     imageUrl: string;
@@ -77,12 +77,12 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
     try {
       // Validate required fields
       if (!formData.title.trim()) {
-        setUploadError('يرجى إدخال عنوان الصورة');
+        setUploadError('Please enter an image title');
         return;
       }
 
       if (!cloudinaryData?.imageUrl) {
-        setUploadError('يرجى اختيار صورة');
+        setUploadError('Please select an image');
         return;
       }
 
@@ -94,7 +94,7 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
       onClose();
     } catch (error) {
       console.error('Error saving image:', error);
-      setUploadError('فشل في حفظ الصورة');
+      setUploadError('Failed to save image');
     } finally {
       setLoading(false);
     }
@@ -136,14 +136,14 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              عنوان الصورة *
+              Image Title *
             </label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData({ ...formData, title: e.target.value })}
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="أدخل عنوان الصورة"
+              placeholder="Enter image title"
               required
             />
           </div>
@@ -151,14 +151,14 @@ export default function GalleryForm({ image, onClose, onSave }: GalleryFormProps
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              وصف الصورة
+              Image Description
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               rows={3}
               className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="أدخل وصف الصورة (اختياري)"
+              placeholder="Enter image description (optional)"
             />
           </div>
 

@@ -28,7 +28,7 @@ interface GalleryStats {
   categories: { [key: string]: number }
 }
 
-const CATEGORIES = ['طبيعة', 'تراث', 'مناظر', 'أنشطة', 'طعام', 'أخرى']
+const CATEGORIES = ['Nature', 'Heritage', 'Landmarks', 'Activities', 'Food', 'Other']
 
 export default function GalleryManager() {
   const [images, setImages] = useState<GalleryImage[]>([])
@@ -108,7 +108,7 @@ export default function GalleryManager() {
 
   // Delete image
   const handleDelete = async (id: string) => {
-    if (!confirm('هل أنت متأكد من حذف هذه الصورة؟')) return
+    if (!confirm('Are you sure you want to delete this image?')) return
 
     try {
       const response = await fetch(`/api/gallery/${id}`, {
@@ -119,11 +119,11 @@ export default function GalleryManager() {
       if (data.success) {
         await fetchImages() // Refresh list
       } else {
-        alert(data.message || 'فشل في حذف الصورة')
+        alert(data.message || 'Failed to delete image')
       }
     } catch (error) {
       console.error('Error deleting image:', error)
-      alert('حدث خطأ أثناء حذف الصورة')
+      alert('Failed to delete image')
     }
   }
 
@@ -140,11 +140,11 @@ export default function GalleryManager() {
       if (data.success) {
         await fetchImages() // Refresh list
       } else {
-        alert(data.message || 'فشل في تحديث حالة الصورة')
+        alert(data.message || 'Failed to update image status')
       }
     } catch (error) {
       console.error('Error updating status:', error)
-      alert('حدث خطأ أثناء تحديث الحالة')
+      alert('Failed to update image status')
     }
   }
 
@@ -166,7 +166,7 @@ export default function GalleryManager() {
         setShowForm(false)
         setEditingImage(null)
       } else {
-        throw new Error(data.message || 'فشل في حفظ الصورة')
+        throw new Error(data.message || 'Failed to save image')
       }
     } catch (error) {
       console.error('Error saving image:', error)
@@ -177,7 +177,7 @@ export default function GalleryManager() {
   // Format file size
   const formatFileSize = (bytes?: number) => {
     if (!bytes) return 'غير محدد'
-    const sizes = ['بايت', 'كيلوبايت', 'ميجابايت', 'جيجابايت']
+    const sizes = ['Byte', 'KB', 'MB', 'GB']
     const i = Math.floor(Math.log(bytes) / Math.log(1024))
     return Math.round(bytes / Math.pow(1024, i) * 100) / 100 + ' ' + sizes[i]
   }
@@ -186,7 +186,7 @@ export default function GalleryManager() {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">إدارة معرض الصور</h1>
+        <h1 className="text-3xl font-bold text-gray-900">Gallery Manager</h1>
         <button
           onClick={() => {
             setEditingImage(null)
@@ -195,7 +195,7 @@ export default function GalleryManager() {
           className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
         >
           <Plus className="h-4 w-4" />
-          إضافة صورة جديدة
+          Add New Image
         </button>
       </div>
 
@@ -206,7 +206,7 @@ export default function GalleryManager() {
             <ImageIcon className="h-8 w-8 text-blue-600" />
             <div className="mr-4">
               <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
-              <p className="text-gray-600">إجمالي الصور</p>
+              <p className="text-gray-600">Total Images</p>
             </div>
           </div>
         </div>
@@ -215,7 +215,7 @@ export default function GalleryManager() {
             <Eye className="h-8 w-8 text-green-600" />
             <div className="mr-4">
               <p className="text-2xl font-semibold text-gray-900">{stats.active}</p>
-              <p className="text-gray-600">صور نشطة</p>
+              <p className="text-gray-600">Active Images</p>
             </div>
           </div>
         </div>
@@ -224,7 +224,7 @@ export default function GalleryManager() {
             <EyeOff className="h-8 w-8 text-red-600" />
             <div className="mr-4">
               <p className="text-2xl font-semibold text-gray-900">{stats.inactive}</p>
-              <p className="text-gray-600">صور غير نشطة</p>
+              <p className="text-gray-600">Inactive Images</p>
             </div>
           </div>
         </div>
@@ -233,7 +233,7 @@ export default function GalleryManager() {
             <Filter className="h-8 w-8 text-purple-600" />
             <div className="mr-4">
               <p className="text-2xl font-semibold text-gray-900">{Object.keys(stats.categories).length}</p>
-              <p className="text-gray-600">فئات</p>
+              <p className="text-gray-600">Categories</p>
             </div>
           </div>
         </div>
@@ -246,7 +246,7 @@ export default function GalleryManager() {
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
-              placeholder="البحث في العناوين والأوصاف..."
+              placeholder="Search by title and description..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pr-10 pl-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
@@ -257,7 +257,7 @@ export default function GalleryManager() {
             onChange={(e) => setCategoryFilter(e.target.value)}
             className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
           >
-            <option value="">جميع الفئات</option>
+            <option value="">All Categories</option>
             {CATEGORIES.map(cat => (
               <option key={cat} value={cat}>
                 {cat} ({stats.categories[cat] || 0})
@@ -283,9 +283,9 @@ export default function GalleryManager() {
       ) : filteredImages.length === 0 ? (
         <div className="text-center py-12">
           <ImageIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-900 mb-2">لا توجد صور</h3>
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No images found</h3>
           <p className="text-gray-600">
-            {searchTerm || categoryFilter ? 'لم يتم العثور على صور تطابق البحث' : 'ابدأ بإضافة صور جديدة'}
+            {searchTerm || categoryFilter ? 'No images match your search' : 'Start adding new images'}
           </p>
         </div>
       ) : (
@@ -304,7 +304,7 @@ export default function GalleryManager() {
                   <span className={`px-2 py-1 text-xs rounded-full ${
                     image.isActive ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
                   }`}>
-                    {image.isActive ? 'نشط' : 'غير نشط'}
+                    {image.isActive ? 'Active' : 'Inactive'}
                   </span>
                 </div>
               </div>
@@ -326,7 +326,7 @@ export default function GalleryManager() {
                         : 'bg-green-100 text-green-700 hover:bg-green-200'
                     }`}
                   >
-                    {image.isActive ? 'إخفاء' : 'إظهار'}
+                    {image.isActive ? 'Hide' : 'Show'}
                   </button>
                   <button
                     onClick={() => {
@@ -335,13 +335,13 @@ export default function GalleryManager() {
                     }}
                     className="flex-1 bg-blue-100 text-blue-700 px-3 py-1 text-xs rounded hover:bg-blue-200"
                   >
-                    تعديل
+                    Edit
                   </button>
                   <button
                     onClick={() => handleDelete(image._id)}
                     className="flex-1 bg-red-100 text-red-700 px-3 py-1 text-xs rounded hover:bg-red-200"
                   >
-                    حذف
+                    Delete
                   </button>
                 </div>
               </div>

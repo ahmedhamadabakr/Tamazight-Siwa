@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import { Plus, Edit, Trash2, Eye, Upload } from 'lucide-react';
 import GalleryForm from '@/components/dashboard/gallery-form';
+import { UsersLoading } from '@/components/dashboard/users-loading';
 
 interface GalleryImage {
     _id: string;
@@ -146,9 +147,7 @@ export default function GalleryDashboard() {
 
     if (loading || sessionStatus === 'loading') {
         return (
-            <div className="flex items-center justify-center h-64">
-                <div className="text-center">Loading...</div>
-            </div>
+           <UsersLoading />
         );
     }
 

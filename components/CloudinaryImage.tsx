@@ -147,7 +147,7 @@ export function CloudinaryImage({
         sizes={sizes}
         className={`transition-opacity duration-300 ${
           isLoading ? 'opacity-0' : 'opacity-100'
-        } ${fill ? 'object-cover' : ''}`}
+        } ${fill ? 'object-cover' : (className?.includes('object-cover') ? 'object-cover' : 'object-contain')}`}
         onLoad={handleLoad}
         onError={handleError}
       />
