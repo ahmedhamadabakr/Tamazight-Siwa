@@ -30,29 +30,66 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (status === 'unauthenticated') {
+    console.log('Session status:', status, 'Session data:', session)
+
+    if (status === 'loading') {
+      toast.error('جاري التحقق من تسجيل الدخول...')
+      return
+    }
+
+    if (status === 'unauthenticated' || !session?.user) {
+      toast.error('يجب تسجيل الدخول أولاً')
       router.push(`/login?callbackUrl=/tours/${tourId}`)
       return
     }
 
+    // Client-side validation
+    if (!tourId) {
+      toast.error('خطأ', {
+        description: 'معرف الرحلة غير موجود'
+      });
+      return;
+    }
+
+    if (travelers < 1 || travelers > 5) {
+      toast.error('خطأ', {
+        description: 'عدد المسافرين يجب أن يكون بين 1 و 5'
+      });
+      return;
+    }
+
+    if (!price || price <= 0) {
+      toast.error('خطأ', {
+        description: 'سعر الرحلة غير صحيح'
+      });
+      return;
+    }
+
     setIsLoading(true)
+    
+    const bookingData = {
+      tourId,
+      numberOfTravelers: travelers,
+      specialRequests,
+      totalAmount: price * travelers
+    }
+    
+    console.log('Sending booking data:', bookingData)
+    
     try {
       const response = await fetch('/api/bookings', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          tourId,
-          numberOfTravelers: travelers,
-          specialRequests,
-          totalAmount: price * travelers
-        }),
+        body: JSON.stringify(bookingData),
       })
 
       const data = await response.json()
+      console.log('Booking response:', { status: response.status, data })
 
       if (!response.ok) {
+        console.error('Booking failed:', data)
         throw new Error(data.message || 'فشل في إتمام الحجز')
       }
 
@@ -109,7 +146,31 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
           />
         </div>
 
-        <div className="pt-2">
+        <div className="pt-2 space-y-2">
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full"
+            onClick={async () => {
+              console.log('Testing API connection...')
+              try {
+                const response = await fetch('/api/test-booking', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ test: 'data', tourId, travelers })
+                })
+                const data = await response.json()
+                console.log('Test API response:', data)
+                toast.success('API Test: ' + (data.success ? 'Success' : 'Failed'))
+              } catch (error) {
+                console.error('Test API error:', error)
+                toast.error('API Test Failed')
+              }
+            }}
+          >
+            اختبار الاتصال
+          </Button>
+          
           <Button
             type="submit"
             className="w-full"

@@ -11,6 +11,8 @@ export interface Tour {
   category: string;
   featured: boolean;
   status: 'active' | 'inactive';
+  startDate: Date;
+  endDate: Date;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -26,6 +28,8 @@ export interface CreateTourData {
   category: string;
   featured?: boolean;
   status?: 'active' | 'inactive';
+  startDate: Date;
+  endDate: Date;
 }
 
 export interface UpdateTourData extends Partial<CreateTourData> {

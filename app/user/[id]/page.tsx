@@ -24,7 +24,7 @@ interface Trip {
   startDate: string
   endDate: string
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
-  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed'
+  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed' | 'on-demand'
   bookingDate: string
   price: number
   travelers: number

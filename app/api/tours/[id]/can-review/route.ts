@@ -30,7 +30,7 @@ export async function GET(
         data: {
           canReview: false,
           reason: 'not_logged_in',
-          message: 'يجب تسجيل الدخول لإضافة تقييم'
+          message: 'Please log in to add a review'
         }
       })
     }
@@ -38,23 +38,14 @@ export async function GET(
     const db = await dbConnect()
     const tourId = params.id
 
-    // Check if user has booked this tour
+    // Check if user has booked this tour (optional - for verified badge)
     const booking = await db.collection('bookings').findOne({
       tour: ObjectId.createFromHexString(tourId),
       user: ObjectId.createFromHexString(session.user.id),
       status: { $in: ['confirmed', 'completed'] }
     })
 
-    if (!booking) {
-      return NextResponse.json({
-        success: true,
-        data: {
-          canReview: false,
-          reason: 'no_booking',
-          message: 'يجب أن تكون قد حجزت هذه الرحلة لتتمكن من تقييمها'
-        }
-      })
-    }
+    const hasBooking = !!booking
 
     // Check if user already reviewed this tour
     const existingReview = await db.collection(reviewCollectionName).findOne({
@@ -68,7 +59,7 @@ export async function GET(
         data: {
           canReview: false,
           reason: 'already_reviewed',
-          message: 'لقد قمت بتقييم هذه الرحلة من قبل',
+          message: 'You have already reviewed this tour',
           existingReview: {
             id: existingReview._id,
             status: existingReview.status,
@@ -79,26 +70,26 @@ export async function GET(
       })
     }
 
-    // Check if booking is completed (optional - for better UX)
-    const isCompleted = booking.status === 'completed'
-    
+    // Allow all logged-in users to review
     return NextResponse.json({
       success: true,
       data: {
         canReview: true,
         reason: 'eligible',
-        message: isCompleted 
-          ? 'يمكنك الآن تقييم هذه الرحلة' 
-          : 'يمكنك تقييم هذه الرحلة (حجزك مؤكد)',
-        bookingStatus: booking.status,
-        bookingDate: booking.createdAt
+        message: hasBooking
+          ? 'You can review this tour (you have a confirmed booking)'
+          : 'You can review this tour',
+        hasBooking,
+        verified: hasBooking, // Will be marked as verified if user has booking
+        bookingStatus: booking?.status,
+        bookingDate: booking?.createdAt
       }
     })
 
   } catch (error) {
     console.error('Error checking review eligibility:', error)
     return NextResponse.json(
-      { success: false, message: 'فشل في التحقق من إمكانية التقييم' },
+      { success: false, message: 'Failed to check review eligibility' },
       { status: 500 }
     )
   }

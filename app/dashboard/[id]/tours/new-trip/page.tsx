@@ -20,6 +20,8 @@ export default function NewTrip() {
     difficulty: string;
     highlights: string[];
     images: string[];
+    startDate: string;
+    endDate: string;
   }>({
     title: '',
     description: '',
@@ -32,6 +34,8 @@ export default function NewTrip() {
     difficulty: 'Easy',
     highlights: [],
     images: [],
+    startDate: '',
+    endDate: '',
   })
 
   const [images, setImages] = useState<string[]>([])
@@ -175,7 +179,7 @@ export default function NewTrip() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-600 block mb-1">Price ($)</label>
+                <label className="text-sm font-medium text-gray-600 block mb-1">Price (SAR)</label>
                 <input
                   type="number"
                   value={formData.price}
@@ -190,6 +194,35 @@ export default function NewTrip() {
                   type="text"
                   value={formData.location}
                   onChange={e => setFormData({ ...formData, location: e.target.value })}
+                  className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+            </div>
+
+            {/* Start Date / End Date */}
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <label className="text-sm font-medium text-gray-600 block mb-1">
+                  تاريخ بداية الرحلة
+                </label>
+                <input
+                  type="date"
+                  value={formData.startDate}
+                  onChange={e => setFormData({ ...formData, startDate: e.target.value })}
+                  className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  required
+                />
+              </div>
+              <div>
+                <label className="text-sm font-medium text-gray-600 block mb-1">
+                  تاريخ نهاية الرحلة
+                </label>
+                <input
+                  type="date"
+                  value={formData.endDate}
+                  onChange={e => setFormData({ ...formData, endDate: e.target.value })}
+                  min={formData.startDate}
                   className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   required
                 />

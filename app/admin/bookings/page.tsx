@@ -38,7 +38,7 @@ interface Booking {
   travelers: number
   totalAmount: number
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
-  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed'
+  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed' | 'on-demand'
   bookingReference: string
   specialRequests?: string
   createdAt: string
@@ -244,6 +244,7 @@ export default function AdminBookings() {
                 <option value="all">جميع الحالات</option>
                 <option value="pending">في الانتظار</option>
                 <option value="paid">مدفوع</option>
+                <option value="on-demand">تحت الطلب</option>
                 <option value="refunded">مسترد</option>
                 <option value="failed">فشل</option>
               </select>
@@ -360,7 +361,7 @@ export default function AdminBookings() {
                         {booking.bookingReference}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {new Date(booking.createdAt).toLocaleDateString('ar-SA')}
+                        {new Date(booking.createdAt).toLocaleDateString('ar-EG')}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

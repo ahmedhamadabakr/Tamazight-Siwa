@@ -16,7 +16,7 @@ interface BookingResponse {
   };
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
   bookingDate: Date;
-  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed';
+  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed' | 'on-demand';
   totalAmount: number;
   numberOfTravelers: number;
   user: string;

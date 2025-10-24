@@ -43,7 +43,7 @@ interface Booking {
   travelers: number;
   totalAmount: number;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
-  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed';
+  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed' | 'on-demand';
   createdAt: string;
 }
 
@@ -277,7 +277,7 @@ export default function ManagerDashboard() {
                     </div>
                     <div className="text-left">
                       <p className="font-medium text-gray-900">{booking.totalAmount.toLocaleString()} ريال</p>
-                      <p className="text-sm text-gray-500">{new Date(booking.createdAt).toLocaleDateString('ar-SA')}</p>
+                      <p className="text-sm text-gray-500">{new Date(booking.createdAt).toLocaleDateString('ar-EG')}</p>
                     </div>
                   </div>
                 ))}

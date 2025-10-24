@@ -202,7 +202,7 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
                   <div>
                     <p className="font-medium text-gray-900">تاريخ الرحلة</p>
                     <p className="text-gray-600">
-                      {new Date(booking.tour.startDate).toLocaleDateString('ar-SA')} - {new Date(booking.tour.endDate).toLocaleDateString('ar-SA')}
+                      {new Date(booking.tour.startDate).toLocaleDateString('us-US')} - {new Date(booking.tour.endDate).toLocaleDateString('us-US')}
                     </p>
                   </div>
                 </div>
@@ -277,7 +277,7 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-600">سعر الفرد الواحد</span>
-                  <span className="text-gray-900">{booking.tour.price.toLocaleString()} ريال</span>
+                  <span className="text-gray-900">{booking.tour.price.toLocaleString()}Dollar</span>
                 </div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-600">عدد الأفراد</span>
@@ -285,7 +285,7 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
                 </div>
                 <div className="flex items-center justify-between text-lg font-semibold border-t pt-2">
                   <span className="text-gray-900">المجموع الكلي</span>
-                  <span className="text-blue-600">{booking.totalAmount.toLocaleString()} ريال</span>
+                  <span className="text-blue-600">{booking.totalAmount.toLocaleString()} Dollar</span>
                 </div>
               </div>
             </div>

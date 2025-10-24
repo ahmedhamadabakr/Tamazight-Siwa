@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     console.error('Error fetching reviews:', error)
     return NextResponse.json(
-      { success: false, message: 'فشل في جلب التقييمات' },
+      { success: false, message: 'Failed to fetch reviews' },
       { status: 500 }
     )
   }
@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
 
     if (!session?.user) {
       return NextResponse.json(
-        { success: false, message: 'يجب تسجيل الدخول لإضافة تقييم' },
+        { success: false, message: 'Please log in to add a review' },
         { status: 401 }
       )
     }
@@ -120,19 +120,14 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user has booked this tour (REQUIRED for adding review)
+    // Check if user has booked this tour (for verified badge)
     const booking = await db.collection('bookings').findOne({
       tour: ObjectId.createFromHexString(tourId),
       user: ObjectId.createFromHexString(session.user.id),
       status: { $in: ['confirmed', 'completed'] }
     })
 
-    if (!booking) {
-      return NextResponse.json(
-        { success: false, message: 'يجب أن تكون قد حجزت هذه الرحلة لتتمكن من تقييمها' },
-        { status: 403 }
-      )
-    }
+    const hasBooking = !!booking
 
     // Check if user already reviewed this tour
     const existingReview = await db.collection(reviewCollectionName).findOne({
@@ -142,7 +137,7 @@ export async function POST(request: NextRequest) {
 
     if (existingReview) {
       return NextResponse.json(
-        { success: false, message: 'لقد قمت بتقييم هذه الرحلة من قبل' },
+        { success: false, message: 'You have already reviewed this tour' },
         { status: 400 }
       )
     }
@@ -159,7 +154,7 @@ export async function POST(request: NextRequest) {
       images: images || [],
       helpful: 0,
       helpfulVotes: [],
-      verified: true, // Always true since booking is required
+      verified: hasBooking, // True only if user has booking
       status: 'pending', // Reviews need approval
       createdAt: new Date(),
       updatedAt: new Date()
@@ -171,13 +166,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       data: insertedReview,
-      message: 'تم إرسال التقييم وسيتم مراجعته قريباً'
+      message: 'Review submitted and will be reviewed soon'
     })
 
   } catch (error) {
     console.error('Error creating review:', error)
     return NextResponse.json(
-      { success: false, message: 'فشل في إضافة التقييم' },
+      { success: false, message: 'Failed to add review' },
       { status: 500 }
     )
   }

@@ -154,11 +154,11 @@ export function generateBookingConfirmationEmail(data: BookingEmailData): string
                 </div>
                 <div class="info-item">
                     <span class="info-label">تاريخ البداية</span>
-                    <span class="info-value">${new Date(data.startDate).toLocaleDateString('ar-SA')}</span>
+                    <span class="info-value">${new Date(data.startDate).toLocaleDateString('ar-EG')}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">تاريخ النهاية</span>
-                    <span class="info-value">${new Date(data.endDate).toLocaleDateString('ar-SA')}</span>
+                    <span class="info-value">${new Date(data.endDate).toLocaleDateString('ar-EG')}</span>
                 </div>
                 <div class="info-item">
                     <span class="info-label">عدد الأفراد</span>

@@ -27,7 +27,7 @@ interface BookingCardProps {
     endDate: string
     price: number
     status: 'pending' | 'confirmed' | 'completed' | 'cancelled'
-    paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed'
+    paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed' | 'on-demand'
     travelers: number
     bookingReference: string
   }
@@ -162,7 +162,7 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="flex items-center space-x-2 space-x-reverse text-sm text-gray-600">
             <Calendar className="w-4 h-4" />
-            <span>تاريخ الحجز: {new Date(booking.bookingDate).toLocaleDateString('ar-SA')}</span>
+            <span>تاريخ الحجز: {new Date(booking.bookingDate).toLocaleDateString('ar-EG')}</span>
           </div>
           
           <div className="flex items-center space-x-2 space-x-reverse text-sm text-gray-600">
@@ -173,7 +173,7 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
           <div className="flex items-center space-x-2 space-x-reverse text-sm text-gray-600">
             <Calendar className="w-4 h-4" />
             <span>
-              {new Date(booking.startDate).toLocaleDateString('ar-SA')} - {new Date(booking.endDate).toLocaleDateString('ar-SA')}
+              {new Date(booking.startDate).toLocaleDateString('ar-EG')} - {new Date(booking.endDate).toLocaleDateString('ar-EG')}
             </span>
           </div>
           
@@ -186,7 +186,7 @@ export function BookingCard({ booking, onCancel }: BookingCardProps) {
         {/* Price */}
         <div className="flex items-center justify-between mb-4 pt-4 border-t">
           <span className="text-sm text-gray-600">المبلغ الإجمالي</span>
-          <span className="text-lg font-bold text-blue-600">{booking.price.toLocaleString()} ريال</span>
+          <span className="text-lg font-bold text-blue-600">{booking.price.toLocaleString()} Dollar</span>
         </div>
 
         {/* Actions */}

@@ -29,6 +29,8 @@ type Tour = {
     location: string;
     highlights: string[];
     images: string[];
+    startDate: string;
+    endDate: string;
 };
 
 interface EditTourPageProps {
@@ -57,6 +59,8 @@ export default function EditTourPage({ params }: EditTourPageProps) {
         location: '',
         highlights: [],
         images: [],
+        startDate: '',
+        endDate: '',
     });
 
     const [newHighlight, setNewHighlight] = useState('');
@@ -138,6 +142,8 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                         location: tourData.location || '',
                         highlights: Array.isArray(tourData.highlights) ? tourData.highlights : [],
                         images: processedImages,
+                        startDate: tourData.startDate ? new Date(tourData.startDate).toISOString().split('T')[0] : '',
+                        endDate: tourData.endDate ? new Date(tourData.endDate).toISOString().split('T')[0] : '',
                     });
 
                     setImagePreviews(processedImages);
@@ -467,6 +473,42 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                     placeholder="Example: Siwa Oasis, Egypt"
                                     required
                                 />
+                            </div>
+
+                            {/* Tour Dates */}
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label htmlFor="startDate" className="block text-sm font-medium text-gray-700 mb-2">
+                                        <FiClock className="inline w-4 h-4 mr-1" />
+                                        تاريخ بداية الرحلة *
+                                    </label>
+                                    <input
+                                        type="date"
+                                        id="startDate"
+                                        name="startDate"
+                                        value={tour.startDate}
+                                        onChange={handleChange}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
+
+                                <div>
+                                    <label htmlFor="endDate" className="block text-sm font-medium text-gray-700 mb-2">
+                                        <FiClock className="inline w-4 h-4 mr-1" />
+                                        تاريخ نهاية الرحلة *
+                                    </label>
+                                    <input
+                                        type="date"
+                                        id="endDate"
+                                        name="endDate"
+                                        value={tour.endDate}
+                                        onChange={handleChange}
+                                        min={tour.startDate}
+                                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                        required
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>

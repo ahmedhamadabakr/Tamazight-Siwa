@@ -5,7 +5,7 @@ export interface IBooking {
   user: ObjectId;
   trip: ObjectId;
   status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
-  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed';
+  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed' | 'on-demand';
   totalAmount: number;
   numberOfTravelers: number;
   specialRequests?: string;
@@ -18,7 +18,7 @@ export const bookingCollectionName = 'bookings';
 export const bookingSchema = {
   $jsonSchema: {
     bsonType: 'object',
-    required: ['user', 'trip', 'status', 'paymentStatus', 'totalAmount', 'numberOfTravelers'],
+    required: ['user', 'trip', 'status', 'paymentStatus', 'totalAmount', 'numberOfTravelers', 'bookingReference'],
     properties: {
       user: {
         bsonType: 'objectId',
@@ -33,7 +33,7 @@ export const bookingSchema = {
         description: 'must be a valid status and is required'
       },
       paymentStatus: {
-        enum: ['pending', 'paid', 'refunded', 'failed'],
+        enum: ['pending', 'paid', 'refunded', 'failed', 'on-demand'],
         description: 'must be a valid payment status and is required'
       },
       totalAmount: {
@@ -42,21 +42,25 @@ export const bookingSchema = {
         description: 'must be a positive number and is required'
       },
       numberOfTravelers: {
-        bsonType: 'int',
+        bsonType: 'number',
         minimum: 1,
-        description: 'must be a positive integer and is required'
+        description: 'must be a positive number and is required'
       },
       specialRequests: {
         bsonType: 'string',
         description: 'must be a string if field exists'
       },
+      bookingReference: {
+        bsonType: 'string',
+        description: 'must be a string'
+      },
       createdAt: {
         bsonType: 'date',
-        description: 'must be a date and is required'
+        description: 'must be a date'
       },
       updatedAt: {
         bsonType: 'date',
-        description: 'must be a date and is required'
+        description: 'must be a date'
       }
     }
   }

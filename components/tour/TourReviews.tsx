@@ -25,6 +25,8 @@ export function TourReviews({ tourId, currentUserId, className = '' }: TourRevie
     message: string
     existingReview?: any
     bookingStatus?: string
+    hasBooking?: boolean
+    verified?: boolean
   } | null>(null)
 
   // Check if user can review this tour
@@ -33,7 +35,7 @@ export function TourReviews({ tourId, currentUserId, className = '' }: TourRevie
       setReviewEligibility({
         canReview: false,
         reason: 'not_logged_in',
-        message: 'يجب تسجيل الدخول لإضافة تقييم'
+        message: 'Please log in to add a review'
       })
       return
     }
@@ -131,7 +133,7 @@ export function TourReviews({ tourId, currentUserId, className = '' }: TourRevie
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-2">
           <MessageSquare className="h-6 w-6" />
-          تقييمات الرحلة
+          Tour Reviews
         </h2>
         
         {reviewEligibility?.canReview && !showReviewForm && (
@@ -140,7 +142,7 @@ export function TourReviews({ tourId, currentUserId, className = '' }: TourRevie
             className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center gap-2"
           >
             <Plus className="h-4 w-4" />
-            إضافة تقييم
+            Add Review
           </button>
         )}
       </div>
@@ -170,9 +172,9 @@ export function TourReviews({ tourId, currentUserId, className = '' }: TourRevie
                 <MessageSquare className="h-5 w-5 text-blue-600" />
                 <p className="text-blue-800">
                   <a href="/login" className="font-medium hover:underline">
-                    سجل دخولك
+                    Log in
                   </a>
-                  {' '}لتتمكن من إضافة تقييم لهذه الرحلة
+                  {' '}to add a review for this tour
                 </p>
               </>
             )}
@@ -181,12 +183,12 @@ export function TourReviews({ tourId, currentUserId, className = '' }: TourRevie
                 <Star className="h-5 w-5 text-green-600" />
                 <div>
                   <p className="text-green-800 font-medium">
-                    شكراً لك! لقد قمت بتقييم هذه الرحلة من قبل
+                    Thank you! You have already reviewed this tour
                   </p>
                   {reviewEligibility.existingReview && (
                     <p className="text-green-700 text-sm mt-1">
-                      تقييمك: {reviewEligibility.existingReview.rating} نجوم - {reviewEligibility.existingReview.title}
-                      {reviewEligibility.existingReview.status === 'pending' && ' (في انتظار المراجعة)'}
+                      Your review: {reviewEligibility.existingReview.rating} stars - {reviewEligibility.existingReview.title}
+                      {reviewEligibility.existingReview.status === 'pending' && ' (pending review)'}
                     </p>
                   )}
                 </div>
@@ -194,13 +196,13 @@ export function TourReviews({ tourId, currentUserId, className = '' }: TourRevie
             )}
             {reviewEligibility.reason === 'no_booking' && (
               <>
-                <MessageSquare className="h-5 w-5 text-yellow-600" />
+                <MessageSquare className="h-5 w-5 text-blue-600" />
                 <div>
-                  <p className="text-yellow-800 font-medium">
-                    يجب حجز الرحلة أولاً لتتمكن من تقييمها
+                  <p className="text-blue-800 font-medium">
+                    يمكنك تقييم هذه الرحلة
                   </p>
-                  <p className="text-yellow-700 text-sm mt-1">
-                    فقط المسافرون الذين حجزوا الرحلة يمكنهم إضافة تقييمات
+                  <p className="text-blue-700 text-sm mt-1">
+                    شاركنا رأيك وتجربتك مع هذه الرحلة
                   </p>
                 </div>
               </>
@@ -210,17 +212,33 @@ export function TourReviews({ tourId, currentUserId, className = '' }: TourRevie
       )}
 
       {/* Booking Status Info */}
-      {reviewEligibility?.canReview && reviewEligibility.bookingStatus && (
-        <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+      {reviewEligibility?.canReview && (
+        <div className={`border rounded-lg p-4 ${
+          reviewEligibility.hasBooking 
+            ? 'bg-green-50 border-green-200' 
+            : 'bg-blue-50 border-blue-200'
+        }`}>
           <div className="flex items-center gap-2">
-            <Star className="h-5 w-5 text-green-600" />
+            <Star className={`h-5 w-5 ${
+              reviewEligibility.hasBooking ? 'text-green-600' : 'text-blue-600'
+            }`} />
             <div>
-              <p className="text-green-800 font-medium">
+              <p className={`font-medium ${
+                reviewEligibility.hasBooking ? 'text-green-800' : 'text-blue-800'
+              }`}>
                 {reviewEligibility.message}
               </p>
-              <p className="text-green-700 text-sm mt-1">
-                حالة الحجز: {reviewEligibility.bookingStatus === 'confirmed' ? 'مؤكد' : 'مكتمل'}
-              </p>
+              {reviewEligibility.hasBooking && reviewEligibility.bookingStatus && (
+                <p className="text-green-700 text-sm mt-1">
+                  Booking status: {reviewEligibility.bookingStatus === 'confirmed' ? 'Confirmed' : 'Completed'}
+                  {' '}• Your review will be verified
+                </p>
+              )}
+              {!reviewEligibility.hasBooking && (
+                <p className="text-blue-700 text-sm mt-1">
+                  You can add a review based on your knowledge of the tour
+                </p>
+              )}
             </div>
           </div>
         </div>

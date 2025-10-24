@@ -114,13 +114,33 @@ export async function POST(request: NextRequest) {
       images,
       category,
       featured = false,
-      status = 'active'
+      status = 'active',
+      startDate,
+      endDate
     } = body;
 
     // Basic validation
-    if (!title || !description || !duration || !price || !location || !category) {
+    if (!title || !description || !duration || !price || !location || !category || !startDate || !endDate) {
       return NextResponse.json(
         { success: false, error: 'All fields are required' },
+        { status: 400 }
+      );
+    }
+
+    // Validate dates
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    
+    if (start >= end) {
+      return NextResponse.json(
+        { success: false, error: 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية' },
+        { status: 400 }
+      );
+    }
+
+    if (start < new Date()) {
+      return NextResponse.json(
+        { success: false, error: 'تاريخ البداية يجب أن يكون في المستقبل' },
         { status: 400 }
       );
     }
@@ -147,6 +167,8 @@ export async function POST(request: NextRequest) {
       category,
       featured: Boolean(featured),
       status,
+      startDate: new Date(startDate),
+      endDate: new Date(endDate),
       createdAt: new Date(),
       updatedAt: new Date(),
     };

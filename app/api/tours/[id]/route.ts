@@ -101,7 +101,9 @@ export async function PUT(
       groupSize,
       highlights,
       featured,
-      status
+      status,
+      startDate,
+      endDate
     } = body;
 
     // Basic validation
@@ -112,7 +114,20 @@ export async function PUT(
       );
     }
 
-    const updateData = {
+    // Validate dates if provided
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      
+      if (start >= end) {
+        return NextResponse.json(
+          { success: false, error: 'تاريخ النهاية يجب أن يكون بعد تاريخ البداية' },
+          { status: 400 }
+        );
+      }
+    }
+
+    const updateData: any = {
       title,
       slug: tourSlug,
       description,
@@ -128,6 +143,14 @@ export async function PUT(
       status,
       updatedAt: new Date(),
     };
+
+    // Add dates if provided
+    if (startDate) {
+      updateData.startDate = new Date(startDate);
+    }
+    if (endDate) {
+      updateData.endDate = new Date(endDate);
+    }
 
     const result = await db.collection('tours').updateOne(
       { _id: new ObjectId(id) },

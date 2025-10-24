@@ -353,7 +353,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
                       )}
                     </div>
                     <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <span>{new Date(review.createdAt).toLocaleDateString('ar-SA')}</span>
+                      <span>{new Date(review.createdAt).toLocaleDateString('ar-EG')}</span>
                     </div>
                   </div>
                 </div>

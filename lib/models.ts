@@ -12,6 +12,8 @@ export interface IUser {
   phone?: string;
   emailVerified?: Date;
   isActive: boolean;
+  resetToken?: string; // Reset password token
+  resetTokenExpiry?: Date; // Reset token expiry date
   createdAt?: Date;
   updatedAt?: Date;
   role: "user" | "manager" | "admin"; // Added role field

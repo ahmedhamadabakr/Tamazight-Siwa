@@ -14,6 +14,7 @@ import { BookingForm } from '@/components/BookingForm'
 import { ImageGalleryFallback } from '@/components/ImageGalleryFallback'
 import { TourLoading } from '@/components/tour/tour-loading'
 import { TourNotFound } from '@/components/tour/tour-not-found'
+import { TourReviews } from '@/components/tour/TourReviews'
 import {
   Dialog,
   DialogContent,
@@ -188,6 +189,15 @@ export default function TourDetailsPage() {
               <Button variant="outline" className="w-full">Contact Us</Button>
             </Link>
           </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-16 border-t pt-16">
+          <TourReviews 
+            tourId={tour.id} 
+            currentUserId={session.data?.user?.id}
+            className="max-w-4xl"
+          />
         </div>
       </div>
     </div>
