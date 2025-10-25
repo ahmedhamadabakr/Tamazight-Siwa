@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { database } from '@/lib/models';
 import { hash } from 'bcryptjs';
 
 export async function POST(req: Request) {
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     }
 
     // Find the verification token
-    const verificationToken = await prisma.findVerificationToken(token);
+    const verificationToken = await database.findVerificationToken(token);
 
     if (!verificationToken) {
       return NextResponse.json(
@@ -38,9 +38,9 @@ export async function POST(req: Request) {
     }
 
     // Find the user by ID and update
-    const user = await prisma.findUserById(verificationToken.userId);
+    const user = await database.findUserById(verificationToken.userId);
     if (user) {
-      await prisma.updateUser(verificationToken.userId, {
+      await database.updateUser(verificationToken.userId, {
         emailVerified: new Date(),
         isActive: true,
         ...(hashedPassword && { password: hashedPassword })
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
     }
 
     // Delete the used verification token
-    await prisma.deleteVerificationToken(token);
+    await database.deleteVerificationToken(token);
 
     return NextResponse.json({
       success: true,

@@ -1,13 +1,13 @@
 import nodemailer from "nodemailer";
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma"; // Import prisma
+import { database } from "@/lib/models"; // Import database
 import crypto from "crypto"; // Import crypto for token generation
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json(); // Only need email from request body
 
   // Find the user by email
-  const user = await prisma.findUserByEmail(email);
+  const user = await database.findUserByEmail(email);
   if (!user) {
     return NextResponse.json(
       { success: false, error: "User not found" },
@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   const expires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours expiration
 
   // Save the verification token to the database
-  await prisma.createVerificationToken({
+  await database.createVerificationToken({
     userId: user._id as any, // Cast to any as ObjectId type might not match directly
     token,
     identifier: email, // Can be email or userId string

@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { database } from '@/lib/models';
 import { hash } from 'bcryptjs';
 
 interface VerificationRequest {
@@ -29,15 +29,15 @@ export async function POST(req: Request) {
       );
     }
 
-    console.log('Verification attempt:', { 
-      email, 
+    console.log('Verification attempt:', {
+      email,
       name: name ? 'provided' : 'missing',
       password: password ? 'provided' : 'missing'
     });
 
     // Find verification code (case insensitive)
-    const verificationCode = await prisma.findVerificationCode(code);
-    
+    const verificationCode = await database.findVerificationCode(code);
+
     if (!verificationCode) {
       console.log('No matching verification code found');
       return NextResponse.json(
@@ -45,7 +45,7 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    
+
     // Check if the email matches (case insensitive)
     if (verificationCode.email.toLowerCase() !== email.toLowerCase()) {
       console.log('Email does not match verification code');
@@ -54,7 +54,7 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-    
+
     // Debug log
     console.log('Matching verification code:', {
       code: verificationCode.code,
@@ -68,8 +68,8 @@ export async function POST(req: Request) {
     // Check if code exists
     if (!verificationCode) {
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: 'Invalid verification code',
           debug: 'Could not fetch verification codes'
         },
@@ -80,8 +80,8 @@ export async function POST(req: Request) {
     // Check if code is expired
     if (new Date() > new Date(verificationCode.expires)) {
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: 'Verification code expired. Please request a new code.',
         },
         { status: 400 }
@@ -91,8 +91,8 @@ export async function POST(req: Request) {
     // Check if code has already been used
     if (verificationCode.used) {
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: 'This verification code has already been used. Please request a new code if you need to verify again.',
         },
         { status: 400 }
@@ -100,7 +100,7 @@ export async function POST(req: Request) {
     }
 
     // Check if email already exists
-    const existingUser = await prisma.findUserByEmail(email);
+    const existingUser = await database.findUserByEmail(email);
     if (existingUser) {
       return NextResponse.json(
         { success: false, error: 'This email is already in use' },
@@ -112,7 +112,7 @@ export async function POST(req: Request) {
     const hashedPassword = await hash(password, 12);
 
     // Create the user account
-    const user = await prisma.createUser({
+    const user = await database.createUser({
       name,
       email,
       password: hashedPassword,
@@ -121,7 +121,7 @@ export async function POST(req: Request) {
     });
 
     // Mark verification code as used
-    await prisma.updateVerificationCode(verificationCode.code, { used: true });
+    await database.updateVerificationCode(verificationCode.code, { used: true });
 
     return NextResponse.json({
       success: true,
