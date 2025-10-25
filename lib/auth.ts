@@ -1,63 +1,165 @@
 import { Session } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { JWT } from "next-auth/jwt"
+import { MongoDBAdapter } from "@auth/mongodb-adapter"
 import { getMongoClient } from "@/lib/mongodb"
-import bcrypt from "bcryptjs"
-import jwt from "jsonwebtoken"
+import { database } from "@/lib/models"
+import { comparePassword, generateAccessToken, generateRefreshToken } from "@/lib/security"
+import { SECURITY_CONFIG, validateSecurityEnv } from "@/lib/security/config"
+import { rateLimitService } from "@/lib/security/rate-limit"
+
+// Validate environment variables on startup
+validateSecurityEnv()
 
 // Type alias for NextAuth configuration
 type NextAuthOptions = {
+  adapter?: any
   providers: any[]
-  session?: { strategy: "jwt" | "database" }
+  session?: { strategy: "jwt" | "database"; maxAge?: number }
   callbacks?: any
   pages?: { signIn?: string }
+  cookies?: any
+  events?: any
 }
 
 export async function getAuthOptions(): Promise<NextAuthOptions> {
+  const client = await getMongoClient()
+
   return {
+    adapter: MongoDBAdapter(client),
     providers: [
       CredentialsProvider({
         name: "credentials",
         credentials: {
           email: { label: "Email", type: "email" },
-          password: { label: "Password", type: "password" }
+          password: { label: "Password", type: "password" },
+          rememberMe: { label: "Remember Me", type: "checkbox" }
         },
-        async authorize(credentials) {
+        async authorize(credentials, req) {
           if (!credentials?.email || !credentials?.password) {
             return null
           }
 
           try {
-            const client = await getMongoClient()
-            const db = client.db()
-            const user = await db.collection('users').findOne({
-              email: credentials.email
+            // Get client IP for rate limiting
+            const clientIP = req?.headers?.['x-forwarded-for'] ||
+              req?.headers?.['x-real-ip'] ||
+              '127.0.0.1'
+            const ip = Array.isArray(clientIP) ? clientIP[0] : clientIP.toString().split(',')[0]
+
+            // Check rate limiting for IP
+            const ipRateLimit = await rateLimitService.checkLoginAttempts(ip)
+            if (!ipRateLimit.allowed) {
+              await database.logSecurityEvent({
+                eventType: 'RATE_LIMIT_EXCEEDED',
+                ipAddress: ip,
+                details: { identifier: ip, type: 'ip' }
+              })
+              return null
+            }
+
+            // Check rate limiting for email
+            const emailRateLimit = await rateLimitService.checkLoginAttempts(credentials.email)
+            if (!emailRateLimit.allowed) {
+              await database.logSecurityEvent({
+                eventType: 'RATE_LIMIT_EXCEEDED',
+                ipAddress: ip,
+                details: { identifier: credentials.email, type: 'email' }
+              })
+              return null
+            }
+
+            // Find user by email
+            const user = await database.findUserByEmail(credentials.email)
+            if (!user) {
+              await rateLimitService.recordLoginAttempt(ip, false)
+              await rateLimitService.recordLoginAttempt(credentials.email, false)
+              await database.logSecurityEvent({
+                eventType: 'LOGIN_FAILED',
+                ipAddress: ip,
+                details: { reason: 'user_not_found', email: credentials.email }
+              })
+              return null
+            }
+
+            // Check if account is locked
+            if (user.lockoutUntil && user.lockoutUntil > new Date()) {
+              await database.logSecurityEvent({
+                userId: user._id,
+                eventType: 'ACCOUNT_LOCKED',
+                ipAddress: ip,
+                details: { lockoutUntil: user.lockoutUntil }
+              })
+              return null
+            }
+
+            // Verify password
+            const isPasswordValid = await comparePassword(credentials.password, user.password)
+            if (!isPasswordValid) {
+              await rateLimitService.recordLoginAttempt(ip, false)
+              await rateLimitService.recordLoginAttempt(credentials.email, false)
+              await database.incrementLoginAttempts(credentials.email)
+
+              // Check if account should be locked
+              if (await rateLimitService.shouldLockAccount(credentials.email)) {
+                await database.lockAccount(credentials.email, SECURITY_CONFIG.LOGIN_LOCKOUT_DURATION)
+                await database.logSecurityEvent({
+                  userId: user._id,
+                  eventType: 'ACCOUNT_LOCKED',
+                  ipAddress: ip,
+                  details: { reason: 'max_attempts_exceeded' }
+                })
+              }
+
+              await database.logSecurityEvent({
+                userId: user._id,
+                eventType: 'LOGIN_FAILED',
+                ipAddress: ip,
+                details: { reason: 'invalid_password' }
+              })
+              return null
+            }
+
+            // Check if user account is active
+            if (!user.isActive) {
+              await database.logSecurityEvent({
+                userId: user._id,
+                eventType: 'LOGIN_FAILED',
+                ipAddress: ip,
+                details: { reason: 'account_inactive' }
+              })
+              return null
+            }
+
+            // Successful login - reset rate limits and login attempts
+            await rateLimitService.recordLoginAttempt(ip, true)
+            await rateLimitService.recordLoginAttempt(credentials.email, true)
+            await database.resetLoginAttempts(credentials.email)
+            await database.updateLastLogin(user._id!, ip)
+
+            // Generate and store refresh token
+            const rememberMe = credentials.rememberMe === 'true'
+            const refreshTokenData = generateRefreshToken(rememberMe ? 90 : 30)
+            refreshTokenData.ipAddress = ip
+            refreshTokenData.deviceInfo = req?.headers?.['user-agent'] || 'Unknown'
+
+            await database.addRefreshToken(user._id!, refreshTokenData)
+
+            await database.logSecurityEvent({
+              userId: user._id,
+              eventType: 'LOGIN_SUCCESS',
+              ipAddress: ip,
+              details: { rememberMe }
             })
 
-            if (!user) {
-              return null
-            }
-
-            const isPasswordValid = await bcrypt.compare(
-              credentials.password,
-              user.password
-            )
-
-            if (!isPasswordValid) {
-              return null
-            }
-
-            // Check if user is active
-            if (!user.isActive) {
-              return null
-            }
-
             return {
-              id: user._id.toString(),
+              id: user._id!.toString(),
               email: user.email,
               name: user.name,
               image: user.image || null,
               role: user.role,
+              refreshToken: refreshTokenData.token,
+              rememberMe
             }
           } catch (error) {
             console.error('Auth error:', error)
@@ -68,35 +170,77 @@ export async function getAuthOptions(): Promise<NextAuthOptions> {
     ],
     session: {
       strategy: "jwt",
+      maxAge: 15 * 60, // 15 minutes for access token
     },
     callbacks: {
-      async jwt({ token, user, account }: { token: JWT; user?: any; account?: any }): Promise<JWT> {
+      async jwt({ token, user }: { token: JWT; user?: any }): Promise<JWT> {
         if (user) {
           token.role = user.role
           token.image = user.image
-          // Generate a persistent access token
-          token.accessToken = jwt.sign(
-            {
-              userId: user.id,
-              email: user.email,
-              role: user.role
-            },
-            process.env.JWT_SECRET || 'fallback-secret',
-            { expiresIn: '30d' } // Long-lived token
-          )
+          token.refreshToken = user.refreshToken
+
+          // Generate short-lived access token
+          token.accessToken = generateAccessToken({
+            userId: user.id,
+            email: user.email,
+            role: user.role
+          })
         }
         return token
       },
       async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
         if (token && session.user) {
           (session.user as any).id = token.sub!
-          ;(session.user as any).role = token.role
-          ;(session.user as any).image = token.image
-          ;(session.user as any).accessToken = token.accessToken as string
+            ; (session.user as any).role = token.role
+            ; (session.user as any).image = token.image
+            ; (session.user as any).accessToken = token.accessToken as string
           session.accessToken = token.accessToken as string
         }
         return session
       },
+    },
+    cookies: {
+      sessionToken: {
+        name: process.env.NODE_ENV === 'production'
+          ? '__Secure-next-auth.session-token'
+          : 'next-auth.session-token',
+        options: {
+          ...SECURITY_CONFIG.COOKIE_CONFIG,
+          secure: process.env.NODE_ENV === 'production',
+        }
+      },
+      callbackUrl: {
+        name: process.env.NODE_ENV === 'production'
+          ? '__Secure-next-auth.callback-url'
+          : 'next-auth.callback-url',
+        options: {
+          ...SECURITY_CONFIG.COOKIE_CONFIG,
+          secure: process.env.NODE_ENV === 'production',
+        }
+      },
+      csrfToken: {
+        name: process.env.NODE_ENV === 'production'
+          ? '__Host-next-auth.csrf-token'
+          : 'next-auth.csrf-token',
+        options: {
+          ...SECURITY_CONFIG.COOKIE_CONFIG,
+          secure: process.env.NODE_ENV === 'production',
+        }
+      }
+    },
+    events: {
+      async signOut({ token }: { token: JWT }) {
+        if (token?.refreshToken) {
+          try {
+            const user = await database.findUserByRefreshToken(token.refreshToken as string)
+            if (user) {
+              await database.removeRefreshToken(user._id!, token.refreshToken as string)
+            }
+          } catch (error) {
+            console.error('Error removing refresh token on signout:', error)
+          }
+        }
+      }
     },
     pages: {
       signIn: '/login',
