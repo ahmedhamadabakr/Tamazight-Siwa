@@ -15,6 +15,7 @@ import { ImageGalleryFallback } from '@/components/ImageGalleryFallback'
 import { TourLoading } from '@/components/tour/tour-loading'
 import { TourNotFound } from '@/components/tour/tour-not-found'
 import { TourReviews } from '@/components/tour/TourReviews'
+import { TourBreadcrumbs } from '@/components/tour/TourBreadcrumbs'
 import {
   Dialog,
   DialogContent,
@@ -92,6 +93,14 @@ export default function TourDetailsPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Breadcrumbs */}
+      <div className="max-w-5xl mx-auto px-4 pt-4">
+        <TourBreadcrumbs 
+          tourTitle={tour.title} 
+          tourSlug={tour.slug || slug as string}
+        />
+      </div>
+
       {/* Hero Section with Title */}
       <section className="relative h-[60vh]">
         {tour.images && tour.images.length > 0 ? (
