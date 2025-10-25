@@ -23,10 +23,19 @@ type NextAuthOptions = {
 }
 
 export async function getAuthOptions(): Promise<NextAuthOptions> {
-  const client = await getMongoClient()
+  // Only connect to database during runtime, not build time
+  let adapter = undefined
+  if (process.env.NODE_ENV !== 'production' || process.env.VERCEL_ENV === 'production') {
+    try {
+      const client = await getMongoClient()
+      adapter = MongoDBAdapter(client)
+    } catch (error) {
+      console.warn('Database connection not available during build time')
+    }
+  }
 
   return {
-    adapter: MongoDBAdapter(client),
+    adapter,
     providers: [
       CredentialsProvider({
         name: "credentials",

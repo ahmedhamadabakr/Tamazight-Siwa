@@ -1,0 +1,24 @@
+User-agent: *
+Allow: /
+
+# Optimize crawling
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /dashboard/
+Disallow: /test-*/
+Disallow: /verify-*/
+Disallow: /reset-password/
+Disallow: /forgot-password/
+
+# Allow important pages
+Allow: /tours/
+Allow: /gallery/
+Allow: /about/
+Allow: /contact/
+
+# Sitemap location
+Sitemap: https://siwa-with-us.com/sitemap.xml
+
+# Crawl delay for better server performance
+Crawl-delay: 1

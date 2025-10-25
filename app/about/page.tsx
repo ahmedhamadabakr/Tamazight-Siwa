@@ -79,7 +79,7 @@ export default function AboutContent() {
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20" />
         <Image
-          src="/siwa-oasis-palm-trees-desert-landscape.jpg"
+          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=600&fit=crop"
           alt="Siwa Oasis landscape with palm trees and desert"
           fill
           className="object-cover"
@@ -149,12 +149,12 @@ export default function AboutContent() {
           >
             {" "}
             <Image
-              src="/traditional-siwa-architecture-mud-brick-buildings.jpg"
+              src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=600&h=500&fit=crop"
               alt="Traditional Siwa mud-brick architecture"
               width={600}
               height={500}
               placeholder="blur"
-              blurDataURL="/traditional-siwa-architecture-mud-brick-buildings-blur.jpg"
+              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
               className="rounded-lg shadow-lg"
             />{" "}
           </motion.div>{" "}

@@ -1,0 +1,32 @@
+{
+  "name": "Siwa With Us - Desert Experiences",
+  "short_name": "Siwa With Us",
+  "description": "Authentic desert experiences and eco-tourism in Siwa Oasis, Egypt",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#D4A574",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "categories": ["travel", "tourism", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr"
+}

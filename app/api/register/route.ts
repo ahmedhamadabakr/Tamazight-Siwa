@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@/lib/models';
-import { 
-  validateRegistrationData, 
-  hashPassword, 
+import {
+  validateRegistrationData,
+  hashPassword,
   validatePasswordStrength,
   generateEmailVerificationToken,
-  SecurityErrorCodes 
+  SecurityErrorCodes
 } from '@/lib/security';
 import { rateLimitService } from '@/lib/security/rate-limit';
 import { SECURITY_CONFIG } from '@/lib/security/config';
@@ -28,15 +28,15 @@ export async function POST(request: NextRequest) {
       });
 
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: {
             code: SecurityErrorCodes.RATE_LIMIT_EXCEEDED,
             message: `Too many registration attempts. Try again in ${ipRateLimit.retryAfter} seconds.`,
             details: { retryAfter: ipRateLimit.retryAfter }
           }
         },
-        { 
+        {
           status: 429,
           headers: {
             'Retry-After': ipRateLimit.retryAfter?.toString() || '3600'
@@ -47,15 +47,15 @@ export async function POST(request: NextRequest) {
 
     // Parse and validate request body
     const body = await request.json();
-    
+
     let validatedData;
     try {
       validatedData = validateRegistrationData(body);
     } catch (error) {
       await rateLimitService.recordLoginAttempt(`register_${clientIP}`, false);
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: {
             code: SecurityErrorCodes.INVALID_INPUT,
             message: 'Invalid input data',
@@ -73,8 +73,8 @@ export async function POST(request: NextRequest) {
     if (!passwordStrength.isValid) {
       await rateLimitService.recordLoginAttempt(`register_${clientIP}`, false);
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: {
             code: SecurityErrorCodes.WEAK_PASSWORD,
             message: 'Password is too weak',
@@ -93,8 +93,8 @@ export async function POST(request: NextRequest) {
     if (existingUser) {
       await rateLimitService.recordLoginAttempt(`register_${clientIP}`, false);
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: {
             code: SecurityErrorCodes.INVALID_INPUT,
             message: 'This email is already registered'
@@ -182,16 +182,16 @@ export async function POST(request: NextRequest) {
       await transporter.sendMail(mailOptions);
     } catch (emailError) {
       console.error('Failed to send verification email:', emailError);
-      
+
       // Clean up the created user if email fails
-      await database.updateUser(newUser._id!, { 
+      await database.updateUser(newUser._id!, {
         emailVerificationToken: undefined,
-        emailVerificationExpiry: undefined 
+        emailVerificationExpiry: undefined
       });
 
       return NextResponse.json(
-        { 
-          success: false, 
+        {
+          success: false,
           error: {
             code: 'EMAIL_SEND_FAILED',
             message: 'Failed to send verification email. Please try again.'
@@ -224,7 +224,7 @@ export async function POST(request: NextRequest) {
 
   } catch (error) {
     console.error('Registration error:', error);
-    
+
     // Log security event for unexpected errors
     try {
       const clientIP = rateLimitService.getClientIP(request);
@@ -238,8 +238,8 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(
-      { 
-        success: false, 
+      {
+        success: false,
         error: {
           code: 'SERVER_ERROR',
           message: 'An unexpected error occurred during registration. Please try again.'
