@@ -83,7 +83,7 @@ export async function PUT(
     const body = await request.json()
     const { status, adminResponse } = body
 
-    const updateData: any = { 
+    const updateData: any = {
       updatedAt: new Date()
     }
 

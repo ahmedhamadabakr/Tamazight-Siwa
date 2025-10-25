@@ -50,13 +50,20 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
       const params = new URLSearchParams()
       if (searchTerm) params.append('search', searchTerm)
       if (statusFilter) params.append('status', statusFilter)
+      else params.append('admin', 'true') // Get all reviews for admin
 
+      console.log('Fetching reviews with params:', params.toString())
       const response = await fetch(`/api/reviews?${params.toString()}`)
       const data = await response.json()
+
+      console.log('Reviews API response:', data)
 
       if (data.success) {
         setReviews(data.data.reviews)
         calculateStats(data.data.reviews)
+        console.log('Reviews loaded:', data.data.reviews.length)
+      } else {
+        console.error('API Error:', data.message)
       }
     } catch (error) {
       console.error('Error fetching reviews:', error)

@@ -13,6 +13,7 @@ import {
   Menu,
   X,
   Image,
+  Star,
 } from 'lucide-react';
 import { useSession } from 'next-auth/react';
 
@@ -47,6 +48,7 @@ export function DashboardLayout({ children }: SidebarProps) {
     { href: `/dashboard/${session?.user?.id}`, label: 'Overview', icon: BarChart3 },
     { href: `/dashboard/${session?.user?.id}/users`, label: 'Users Management', icon: Users },
     { href: `/dashboard/${session?.user?.id}/tours`, label: 'Tours Management', icon: MapPin },
+    { href: `/dashboard/${session?.user?.id}/reviews`, label: 'Reviews Management', icon: Star },
     { href: `/dashboard/${session?.user?.id}/gallery`, label: 'Gallery Management', icon: Image },
   ];
 

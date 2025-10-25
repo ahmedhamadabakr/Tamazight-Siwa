@@ -22,10 +22,25 @@ export async function GET(request: NextRequest) {
     const tourId = searchParams.get('tourId')
     const userId = searchParams.get('userId')
     const status = searchParams.get('status')
+    const admin = searchParams.get('admin')
+    const search = searchParams.get('search')
     const page = parseInt(searchParams.get('page') || '1')
-    const limit = parseInt(searchParams.get('limit') || '10')
+    const limit = parseInt(searchParams.get('limit') || '50') // Increase limit for admin
     const sortBy = searchParams.get('sortBy') || 'createdAt'
     const sortOrder = searchParams.get('sortOrder') || 'desc'
+
+    // Check if user is admin for admin requests
+    if (admin === 'true') {
+      const authOptions = await getAuthOptions()
+      const session = await getServerSession(authOptions) as CustomSession
+
+      if (!session?.user || session.user.role !== 'manager') {
+        return NextResponse.json(
+          { success: false, message: 'Unauthorized' },
+          { status: 403 }
+        )
+      }
+    }
 
     const db = await dbConnect()
     const collection = db.collection(reviewCollectionName)
@@ -42,9 +57,18 @@ export async function GET(request: NextRequest) {
 
     if (status) {
       query.status = status
-    } else {
-      // Default to approved reviews for public viewing
+    } else if (admin !== 'true') {
+      // Default to approved reviews for public viewing only
       query.status = 'approved'
+    }
+
+    // Add search functionality
+    if (search) {
+      query.$or = [
+        { title: { $regex: search, $options: 'i' } },
+        { comment: { $regex: search, $options: 'i' } },
+        { userName: { $regex: search, $options: 'i' } }
+      ]
     }
 
     const skip = (page - 1) * limit
