@@ -1,6 +1,6 @@
 "use client";
 
-import { Navigation } from "@/components/navigation";
+import { ClientOnlyNavigation } from "@/components/ClientOnlyNavigation";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -74,7 +74,7 @@ function TeamCard({
 export default function AboutContent() {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <ClientOnlyNavigation />
       {/* Hero Section */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20" />

@@ -1,4 +1,4 @@
-import { Navigation } from "@/components/navigation"
+import { ClientOnlyNavigation } from "@/components/ClientOnlyNavigation"
 import { HeroSection } from "@/components/hero-section"
 import { FeaturedTours } from "@/components/featured-tours"
 import { StatsSection } from "@/components/stats-section"
@@ -41,7 +41,7 @@ export default function HomePage() {
       <SEOPerformanceOptimizer />
       
       <main className="min-h-screen">
-        <Navigation />
+        <ClientOnlyNavigation />
         <HeroSection />
         <FeaturedTours />
         <StatsSection />

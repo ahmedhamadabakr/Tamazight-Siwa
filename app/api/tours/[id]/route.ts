@@ -24,28 +24,9 @@ export async function GET(
 
     const tour = await db.collection('tours').findOne(query);
 
-    if (tour) {
-      console.log('Tour details:', {
-        _id: tour._id,
-        title: tour.title,
-        description: tour.description,
-        duration: tour.duration,
-        price: tour.price,
-        location: tour.location,
-        images: tour.images,
-        category: tour.category,
-        difficulty: tour.difficulty,
-        groupSize: tour.groupSize,
-        highlights: tour.highlights,
-        featured: tour.featured,
-        status: tour.status,
-        createdAt: tour.createdAt,
-        updatedAt: tour.updatedAt
-      });
-    }
+  
 
     if (!tour) {
-      console.log('Tour not found with query:', query);
       return NextResponse.json(
         { success: false, error: 'Tour not found' },
         { status: 404 }

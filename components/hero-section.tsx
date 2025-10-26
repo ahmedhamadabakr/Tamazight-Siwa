@@ -5,13 +5,7 @@ import { OptimizedImage } from "@/components/OptimizedImage"
 import { HeroContent } from "@/components/HeroContent"
 import { HeroSEO } from "@/components/HeroSEO"
 import { HeroPerformanceOptimizer } from "@/components/HeroPerformanceOptimizer"
-import dynamic from "next/dynamic"
 
-// Lazy load video component for better initial performance
-const LazyVideo = dynamic(() => import("@/components/LazyVideo"), {
-  loading: () => <div className="absolute inset-0 bg-gray-900 animate-pulse" />,
-  ssr: false
-})
 
 // Memoized floating card components for better performance
 const FloatingCard = memo(({ children, className }: { children: React.ReactNode, className: string }) => (
@@ -28,6 +22,8 @@ export function HeroSection() {
 
   // Preload video on user interaction for better UX
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+    
     const handleUserInteraction = () => {
       setShouldPreloadVideo(true)
       document.removeEventListener('mousemove', handleUserInteraction)
@@ -54,7 +50,19 @@ export function HeroSection() {
       <section className="relative h-screen flex items-center justify-center overflow-hidden">
       {/* Background Video/Image */}
       {showVideo && shouldPreloadVideo ? (
-        <LazyVideo />
+        <div className="absolute inset-0">
+          <video
+            className="absolute inset-0 w-full h-full object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+          >
+            <source src="/Siwa/WhatsApp Video 2025-10-11 at 14.15.44_a55f796c.mp4" type="video/mp4" />
+            <source src="/Siwa/WhatsApp Video 2025-10-11 at 14.16.53_71a463c0.mp4" type="video/mp4" />
+          </video>
+        </div>
       ) : (
         <div className="absolute inset-0">
           <OptimizedImage

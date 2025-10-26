@@ -41,15 +41,9 @@ export function CloudinaryImage({
 
   // Generate optimized Cloudinary URL
   const getOptimizedUrl = (originalUrl: string, customTransformation?: string) => {
-    // Debug logging
-    console.log('CloudinaryImage Debug:', {
-      originalUrl,
-      isCloudinaryUrl,
-      customTransformation
-    })
+
 
     if (!isCloudinaryUrl) {
-      console.log('Not a Cloudinary URL, returning original:', originalUrl)
       return originalUrl
     }
 
@@ -90,12 +84,6 @@ export function CloudinaryImage({
 
       url.pathname = pathParts.join('/')
       const optimizedUrl = url.toString()
-      
-      console.log('Cloudinary URL optimized:', {
-        original: originalUrl,
-        optimized: optimizedUrl,
-        transformations
-      })
       
       return optimizedUrl
     } catch (error) {

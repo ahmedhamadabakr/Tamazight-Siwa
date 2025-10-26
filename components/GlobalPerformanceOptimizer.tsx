@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState } from "react"
 import { PerformanceMonitor } from "@/components/PerformanceMonitor"
 
 // Global performance optimization system
@@ -9,6 +9,8 @@ export function GlobalPerformanceOptimizer() {
   useEffect(() => {
     // Critical resource preloading
     const preloadCriticalResources = () => {
+      if (typeof window === 'undefined' || typeof document === 'undefined') return;
+      
       const criticalImages = [
         '/siwa-oasis-sunset-salt-lakes-reflection.jpg',
         '/logo.png',
@@ -24,19 +26,12 @@ export function GlobalPerformanceOptimizer() {
       })
     }
 
-    // Optimize font loading
-    const optimizeFonts = () => {
-      const fontLink = document.createElement('link')
-      fontLink.rel = 'preload'
-      fontLink.as = 'font'
-      fontLink.type = 'font/woff2'
-      fontLink.crossOrigin = 'anonymous'
-      fontLink.href = '/fonts/cairo-variable.woff2'
-      document.head.appendChild(fontLink)
-    }
+
 
     // Lazy load non-critical resources
     const lazyLoadResources = () => {
+      if (typeof window === 'undefined' || typeof IntersectionObserver === 'undefined') return;
+      
       const observer = new IntersectionObserver(
         (entries) => {
           entries.forEach(entry => {
@@ -61,6 +56,8 @@ export function GlobalPerformanceOptimizer() {
 
     // Service Worker registration for caching
     const registerServiceWorker = async () => {
+      if (typeof window === 'undefined' || typeof navigator === 'undefined') return;
+      
       if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
         try {
           await navigator.serviceWorker.register('/sw.js')
@@ -72,6 +69,8 @@ export function GlobalPerformanceOptimizer() {
 
     // Connection-aware loading
     const optimizeForConnection = () => {
+      if (typeof window === 'undefined' || typeof navigator === 'undefined') return;
+      
       const connection = (navigator as any).connection
       if (connection) {
         const isSlowConnection = connection.effectiveType === 'slow-2g' || connection.effectiveType === '2g'
@@ -87,6 +86,8 @@ export function GlobalPerformanceOptimizer() {
 
     // Memory management
     const optimizeMemory = () => {
+      if (typeof window === 'undefined') return () => {};
+      
       // Clean up unused resources periodically
       const cleanup = () => {
         if (window.gc && typeof window.gc === 'function') {
@@ -102,7 +103,6 @@ export function GlobalPerformanceOptimizer() {
 
     // Initialize optimizations
     preloadCriticalResources()
-    optimizeFonts()
     lazyLoadResources()
     registerServiceWorker()
     optimizeForConnection()
@@ -113,16 +113,22 @@ export function GlobalPerformanceOptimizer() {
       setIsVisible(!document.hidden)
     }
 
-    document.addEventListener('visibilitychange', handleVisibilityChange)
+    if (typeof document !== 'undefined') {
+      document.addEventListener('visibilitychange', handleVisibilityChange)
+    }
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange)
+      if (typeof document !== 'undefined') {
+        document.removeEventListener('visibilitychange', handleVisibilityChange)
+      }
       cleanupMemory()
     }
   }, [])
 
   // Pause expensive operations when tab is not visible
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+    
     if (!isVisible) {
       // Pause animations, videos, etc.
       document.querySelectorAll('video').forEach(video => {

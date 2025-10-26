@@ -44,9 +44,6 @@ export async function GET(req: Request) {
     const client = await getMongoClient()
     const db = client.db()
 
-    console.log('Fetching bookings for admin/manager...')
-    console.log('User role:', session.user.role)
-    console.log('Collection name:', bookingCollectionName)
 
     // Get all bookings with user and tour details
     const bookings = await db.collection(bookingCollectionName).aggregate([
@@ -105,13 +102,7 @@ export async function GET(req: Request) {
       }
     ]).toArray()
 
-    console.log('Found bookings:', bookings.length)
-    console.log('Sample booking:', bookings[0] ? {
-      _id: bookings[0]._id,
-      hasUser: !!bookings[0].user,
-      hasTour: !!bookings[0].tour,
-      status: bookings[0].status
-    } : 'No bookings found')
+   
 
     return NextResponse.json({
       success: true,

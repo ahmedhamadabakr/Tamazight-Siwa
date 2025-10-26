@@ -1,5 +1,5 @@
 "use client"
-import { Navigation } from "@/components/navigation"
+import { ClientOnlyNavigation } from "@/components/ClientOnlyNavigation"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
@@ -14,7 +14,7 @@ import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/
 export default function ContactPage() {
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <ClientOnlyNavigation />
 
       {/* Hero Section */}
       <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">

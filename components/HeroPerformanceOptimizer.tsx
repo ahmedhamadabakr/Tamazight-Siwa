@@ -16,6 +16,20 @@ export function HeroPerformanceOptimizer() {
         // Preload hero background image
         preloadImage('/siwa-oasis-sunset-salt-lakes-reflection.jpg')
 
+        // Remove preload for missing resources to avoid 404 errors
+        const removeUnusedPreloads = () => {
+            const preloadLinks = document.querySelectorAll('link[rel="preload"]')
+            preloadLinks.forEach(link => {
+                const href = link.getAttribute('href')
+                if (href && (href.includes('cairo-variable.woff2') || href.includes('logo.png'))) {
+                    link.remove()
+                }
+            })
+        }
+
+        // Clean up unused preloads after a short delay
+        setTimeout(removeUnusedPreloads, 1000)
+
         // Optimize scroll performance
         let ticking = false
         const handleScroll = () => {

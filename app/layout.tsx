@@ -108,7 +108,6 @@ export default function RootLayout({
 
         {/* Preload critical resources */}
         <link rel="preload" href="/siwa-oasis-sunset-salt-lakes-reflection.jpg" as="image" />
-        <link rel="preload" href="/logo.png" as="image" />
 
         {/* Canonical and alternate languages */}
         <link rel="canonical" href="https://siwa-with-us.com" />

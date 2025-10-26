@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { signIn, getSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { useState, useEffect } from 'react';
+import { signIn, getSession, useSession } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -17,13 +17,71 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const { data: session, status } = useSession();
+  
+  // Get callback URL from search params
+  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const urlError = searchParams.get('error');
+
+  // Set error from URL params
+  useEffect(() => {
+    if (urlError) {
+      switch (urlError) {
+        case 'authentication_required':
+          setError('Please sign in to access this page');
+          break;
+        case 'middleware_error':
+          setError('Authentication error. Please try again.');
+          break;
+        default:
+          setError('An error occurred. Please try again.');
+      }
+    }
+  }, [urlError]);
+
+  // Redirect if already logged in
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      const userRole = (session.user as any).role;
+      let redirectPath = callbackUrl;
+      
+      // Override callback URL based on user role if it's just the home page
+      if (callbackUrl === '/') {
+        if (userRole === 'admin') {
+          redirectPath = '/admin/dashboard';
+        } else if (userRole === 'manager') {
+          redirectPath = `/dashboard/${(session.user as any).id}`;
+        } else {
+          redirectPath = `/user/${(session.user as any).id}`;
+        }
+      }
+      
+      router.replace(redirectPath);
+    }
+  }, [status, session, router, callbackUrl]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
+  // Show loading if already authenticated and redirecting
+  if (status === 'authenticated') {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-gray-600">Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
+
  const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
+  
+  if (loading || status === 'loading') return; // Prevent double submission
+  
   setLoading(true);
   setError('');
 
@@ -36,20 +94,21 @@ export default function LoginPage() {
 
     if (result?.error) {
       setError('Invalid email or password');
+      setLoading(false);
       return;
     }
 
-    // Get the session which includes the user's role
-    const session = await getSession();
-    if (session?.user) {
-      // Redirect based on user role
-      const redirectPath = session.user.role === 'manager' ? `/dashboard/${session.user.id}` : '/';
-      router.push(redirectPath);
+    if (result?.ok) {
+      // The useEffect hook will handle the redirect once session is updated
+      // Just keep loading state active
+      return;
+    } else {
+      setError('Login failed. Please try again.');
+      setLoading(false);
     }
   } catch (err) {
     console.error('Login error:', err);
     setError('An error occurred during login. Please try again.');
-  } finally {
     setLoading(false);
   }
 };

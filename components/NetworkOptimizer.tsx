@@ -14,6 +14,8 @@ export function NetworkOptimizer() {
   const [isOnline, setIsOnline] = useState(true)
 
   useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+    
     // Network information detection
     const connection = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection
     
@@ -35,6 +37,8 @@ export function NetworkOptimizer() {
   }, [])
 
   useEffect(() => {
+    if (typeof window === 'undefined') return;
+    
     // Online/offline detection
     const handleOnline = () => setIsOnline(true)
     const handleOffline = () => setIsOnline(false)
@@ -49,7 +53,7 @@ export function NetworkOptimizer() {
   }, [])
 
   useEffect(() => {
-    if (!networkInfo) return
+    if (!networkInfo || typeof document === 'undefined') return
 
     // Apply network-based optimizations
     const applyOptimizations = () => {
@@ -90,6 +94,8 @@ export function NetworkOptimizer() {
   }, [networkInfo])
 
   useEffect(() => {
+    if (typeof document === 'undefined') return;
+    
     if (!isOnline) {
       // Offline optimizations
       document.documentElement.classList.add('offline-mode')
@@ -132,6 +138,8 @@ export function useNetworkAwareLoading() {
   const [shouldLoad, setShouldLoad] = useState(true)
 
   useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+    
     const connection = (navigator as any).connection
     if (connection) {
       const isSlowConnection = ['slow-2g', '2g'].includes(connection.effectiveType)
@@ -157,6 +165,8 @@ export function AdaptiveLoader({
   const [shouldRender, setShouldRender] = useState(true)
 
   useEffect(() => {
+    if (typeof navigator === 'undefined') return;
+    
     const connection = (navigator as any).connection
     if (connection) {
       const networkSpeed = connection.effectiveType

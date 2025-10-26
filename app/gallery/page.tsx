@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Navigation } from "@/components/navigation"
+import { ClientOnlyNavigation } from "@/components/ClientOnlyNavigation"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -74,7 +74,7 @@ export default function GalleryPage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <ClientOnlyNavigation />
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary mb-2" />
@@ -89,7 +89,7 @@ export default function GalleryPage() {
   if (error) {
     return (
       <div className="min-h-screen bg-background">
-        <Navigation />
+        <ClientOnlyNavigation />
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <p className="text-red-500 mb-2">{error}</p>
@@ -105,7 +105,7 @@ export default function GalleryPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <ClientOnlyNavigation />
 
       {/* Hero Section */}
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">

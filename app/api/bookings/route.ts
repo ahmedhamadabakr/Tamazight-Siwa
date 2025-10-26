@@ -27,7 +27,6 @@ export async function POST(req: Request) {
     }
 
     const session = await getServerSession(await getAuthOptions()) as any
-    console.log('Session data:', { session: session ? 'exists' : 'null', userId: session?.user?.id })
 
     if (!session?.user?.id) {
       console.error('No valid session or user ID')
@@ -39,9 +38,6 @@ export async function POST(req: Request) {
 
     const data = await req.json()
     const { tourId, numberOfTravelers, specialRequests, totalAmount } = data
-
-    // Validate input
-    console.log('Received booking data:', { tourId, numberOfTravelers, specialRequests, totalAmount })
 
     if (!tourId) {
       return NextResponse.json(
@@ -75,16 +71,12 @@ export async function POST(req: Request) {
     const client = await getMongoClient()
     const db = client.db()
 
-    // Log database connection success
-    console.log('Database connected successfully for booking creation')
-    console.log('Database name:', db.databaseName)
 
     // Test database connection
     try {
       await db.admin().ping()
-      console.log('Database ping successful')
+     
     } catch (pingError) {
-      console.error('Database ping failed:', pingError)
       return NextResponse.json(
         { success: false, message: 'Database connection failed' },
         { status: 503 }
@@ -102,14 +94,11 @@ export async function POST(req: Request) {
       )
     }
 
-    // Get tour details
-    console.log(`Looking up tour with ID: ${tourId}`)
+
     let tour
     try {
       tour = await db.collection('tours').findOne({ _id: new ObjectId(tourId) })
-      console.log('Tour lookup result:', tour ? 'found' : 'not found')
     } catch (tourError) {
-      console.error('Error looking up tour:', tourError)
       return NextResponse.json(
         { success: false, message: 'Error looking up tour' },
         { status: 500 }
@@ -117,14 +106,13 @@ export async function POST(req: Request) {
     }
 
     if (!tour) {
-      console.error(`Tour not found with ID: ${tourId}`)
       return NextResponse.json(
         { success: false, message: 'Tour not found' },
         { status: 404 }
       )
     }
 
-    console.log(`Tour found: ${tour.title}`)
+
 
     // Create booking
     // Validate user ID format
@@ -136,7 +124,7 @@ export async function POST(req: Request) {
       )
     }
 
-    console.log('Creating booking object...')
+
 
     // Create a simple booking object first
     const booking = {
@@ -152,38 +140,14 @@ export async function POST(req: Request) {
       updatedAt: new Date()
     }
 
-    console.log('Booking object created successfully')
-    console.log('User ObjectId valid:', ObjectId.isValid(session.user.id))
-    console.log('Tour ObjectId valid:', ObjectId.isValid(tourId))
-
-    console.log('Attempting to insert booking:', {
-      user: session.user.id,
-      trip: tourId,
-      numberOfTravelers: parseInt(numberOfTravelers),
-      totalAmount: parseFloat(totalAmount),
-      bookingReference
-    })
-
-    console.log('Collection name:', bookingCollectionName)
-    console.log('Database collections:', await db.listCollections().toArray())
+g('Database collections:', await db.listCollections().toArray())
 
     let result
     try {
-      console.log('About to insert booking:', JSON.stringify(booking, null, 2))
-      result = await db.collection('bookings').insertOne(booking, { 
+           result = await db.collection('bookings').insertOne(booking, { 
         bypassDocumentValidation: true 
       })
-      console.log(`Booking inserted successfully with ID: ${result.insertedId}`)
-    } catch (insertError) {
-      console.error('Error inserting booking:', insertError)
-      console.error('Insert error details:', {
-        name: insertError instanceof Error ? insertError.name : 'Unknown',
-        message: insertError instanceof Error ? insertError.message : 'Unknown error',
-        code: (insertError as any)?.code,
-        codeName: (insertError as any)?.codeName,
-        stack: insertError instanceof Error ? insertError.stack : undefined
-      })
-
+       } catch (insertError) {
       // Try to provide more specific error message
       if (insertError instanceof Error) {
         if (insertError.message.includes('validation')) {
@@ -207,7 +171,6 @@ export async function POST(req: Request) {
     }
 
     // Get user details for email
-    console.log(`Looking up user with ID: ${session.user.id}`)
     const user = await db.collection('users').findOne({ _id: new ObjectId(session.user.id) })
 
     // Send confirmation email

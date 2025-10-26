@@ -30,7 +30,7 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    console.log('Session status:', status, 'Session data:', session)
+    
 
     if (status === 'loading') {
       toast.error('Checking authentication...')
@@ -74,7 +74,6 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
       totalAmount: price * travelers
     }
     
-    console.log('Sending booking data:', bookingData)
     
     try {
       const response = await fetch('/api/bookings', {
@@ -86,7 +85,6 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
       })
 
       const data = await response.json()
-      console.log('Booking response:', { status: response.status, data })
 
       if (!response.ok) {
         console.error('Booking failed:', data)
@@ -152,7 +150,6 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
             variant="outline"
             className="w-full"
             onClick={async () => {
-              console.log('Testing API connection...')
               try {
                 const response = await fetch('/api/test-booking', {
                   method: 'POST',
@@ -160,10 +157,8 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
                   body: JSON.stringify({ test: 'data', tourId, travelers })
                 })
                 const data = await response.json()
-                console.log('Test API response:', data)
                 toast.success('API Test: ' + (data.success ? 'Success' : 'Failed'))
               } catch (error) {
-                console.error('Test API error:', error)
                 toast.error('API Test Failed')
               }
             }}

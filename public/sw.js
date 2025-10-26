@@ -7,8 +7,7 @@ const DYNAMIC_CACHE = 'dynamic-v1'
 const CRITICAL_RESOURCES = [
   '/',
   '/manifest.json',
-  '/siwa-oasis-sunset-salt-lakes-reflection.jpg',
-  '/fonts/cairo-variable.woff2'
+  '/siwa-oasis-sunset-salt-lakes-reflection.jpg'
 ]
 
 // Resources to cache on first visit

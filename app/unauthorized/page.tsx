@@ -13,7 +13,6 @@ export default function UnauthorizedPage() {
 
   const getRoleDisplayName = (role: string) => {
     switch (role) {
-      case 'admin': return 'Administrator';
       case 'manager': return 'Manager';
       case 'user': return 'User';
       default: return 'Unknown';

@@ -179,7 +179,7 @@ export async function getAuthOptions(): Promise<NextAuthOptions> {
     ],
     session: {
       strategy: "jwt",
-      maxAge: 15 * 60, // 15 minutes for access token
+      maxAge: 24 * 60 * 60, // 24 hours for session token
     },
     callbacks: {
       async jwt({ token, user }: { token: JWT; user?: any }): Promise<JWT> {
@@ -188,13 +188,43 @@ export async function getAuthOptions(): Promise<NextAuthOptions> {
           token.image = user.image
           token.refreshToken = user.refreshToken
 
-          // Generate short-lived access token
+          // Generate access token with longer expiry
           token.accessToken = generateAccessToken({
             userId: user.id,
             email: user.email,
             role: user.role
           })
+          
+          // Set token expiry time
+          token.exp = Math.floor(Date.now() / 1000) + (24 * 60 * 60) // 24 hours
         }
+        
+        // Check if token is expired and refresh if needed
+        const now = Math.floor(Date.now() / 1000)
+        if (token.exp && typeof token.exp === 'number' && token.exp < now) {
+          try {
+            // Try to refresh the token using refresh token
+            if (token.refreshToken) {
+              const user = await database.findUserByRefreshToken(token.refreshToken as string)
+              if (user && user.isActive) {
+                // Generate new access token
+                token.accessToken = generateAccessToken({
+                  userId: user._id!.toString(),
+                  email: user.email,
+                  role: user.role
+                })
+                token.exp = Math.floor(Date.now() / 1000) + (24 * 60 * 60)
+              } else {
+                // Invalid refresh token, force logout
+                return {} as JWT
+              }
+            }
+          } catch (error) {
+            console.error('Token refresh error:', error)
+            return {} as JWT
+          }
+        }
+        
         return token
       },
       async session({ session, token }: { session: Session; token: JWT }): Promise<Session> {
@@ -206,6 +236,17 @@ export async function getAuthOptions(): Promise<NextAuthOptions> {
           session.accessToken = token.accessToken as string
         }
         return session
+      },
+      async signIn({ user, account, profile }: { user: any; account: any; profile?: any }) {
+        // Allow sign in
+        return true
+      },
+      async redirect({ url, baseUrl }: { url: string; baseUrl: string }) {
+        // Allows relative callback URLs
+        if (url.startsWith("/")) return `${baseUrl}${url}`
+        // Allows callback URLs on the same origin
+        else if (new URL(url).origin === baseUrl) return url
+        return baseUrl
       },
     },
     cookies: {

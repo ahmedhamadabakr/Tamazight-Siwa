@@ -1,6 +1,7 @@
 'use client'
 
 import { SessionProvider } from 'next-auth/react'
+import { AuthErrorBoundary } from './AuthErrorBoundary'
 
 export function AuthProvider({
   children
@@ -8,12 +9,15 @@ export function AuthProvider({
   children: React.ReactNode
 }) {
   return (
-    <SessionProvider 
-      refetchInterval={5 * 60} // Refetch session every 5 minutes
-      refetchOnWindowFocus={true} // Refetch when window gets focus
-      refetchWhenOffline={false} // Don't refetch when offline
-    >
-      {children}
-    </SessionProvider>
+    <AuthErrorBoundary>
+      <SessionProvider 
+        refetchInterval={0} // Disable automatic refetch to prevent conflicts
+        refetchOnWindowFocus={false} // Disable refetch on focus to prevent conflicts
+        refetchWhenOffline={false} // Don't refetch when offline
+        basePath="/api/auth" // Ensure correct auth path
+      >
+        {children}
+      </SessionProvider>
+    </AuthErrorBoundary>
   )
 }

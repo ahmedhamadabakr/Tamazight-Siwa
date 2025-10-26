@@ -98,7 +98,7 @@ export function MemoryOptimizer() {
     const scheduleGC = () => {
       if (typeof window !== 'undefined' && window.gc && typeof window.gc === 'function') {
         const gcInterval = setInterval(() => {
-          if (document.hidden && window.gc) {
+          if (typeof document !== 'undefined' && document.hidden && window.gc) {
             window.gc()
           }
         }, 60000) // Every minute when tab is hidden
@@ -125,6 +125,8 @@ export function MemoryOptimizer() {
   }, [])
 
   const triggerMemoryCleanup = useCallback(() => {
+    if (typeof document === 'undefined' || typeof window === 'undefined') return;
+    
     // Remove cached images that are not visible
     const images = document.querySelectorAll('img')
     images.forEach(img => {
@@ -137,7 +139,7 @@ export function MemoryOptimizer() {
     })
 
     // Clear unused caches
-    if ('caches' in window) {
+    if (typeof window !== 'undefined' && 'caches' in window) {
       caches.keys().then(cacheNames => {
         cacheNames.forEach(cacheName => {
           if (cacheName.includes('old-') || cacheName.includes('temp-')) {
@@ -148,7 +150,7 @@ export function MemoryOptimizer() {
     }
 
     // Force garbage collection if available
-    if (window.gc && typeof window.gc === 'function') {
+    if (typeof window !== 'undefined' && window.gc && typeof window.gc === 'function') {
       window.gc()
     }
   }, [])

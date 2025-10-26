@@ -183,17 +183,6 @@ export async function GET(
       }
     ]).toArray()
 
-    console.log('Match condition:', matchCondition)
-    console.log('Found booking:', booking.length > 0 ? 'Yes' : 'No')
-    
-    if (booking.length > 0) {
-      console.log('Booking details:', {
-        _id: booking[0]._id,
-        hasUser: !!booking[0].user,
-        hasTour: !!booking[0].tour,
-        status: booking[0].status
-      })
-    }
 
     if (!booking || booking.length === 0) {
       return NextResponse.json(

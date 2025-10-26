@@ -40,6 +40,8 @@ export function ImageGalleryFallback({ images, title, className = "" }: ImageGal
 
     // Add keyboard event listeners
     useEffect(() => {
+        if (typeof document === 'undefined') return;
+        
         const handleKeyDownWrapper = (e: KeyboardEvent) => handleKeyDown(e)
 
         if (isOpen) {
@@ -55,16 +57,6 @@ export function ImageGalleryFallback({ images, title, className = "" }: ImageGal
             document.body.style.overflow = 'unset'
         }
     }, [isOpen])
-
-    // Debug logging
-    console.log('ImageGalleryFallback received:', {
-        images,
-        imagesLength: images?.length,
-        imagesType: typeof images,
-        isArray: Array.isArray(images),
-        title,
-        imageErrors
-    })
 
     if (!images || images.length === 0) {
         return (

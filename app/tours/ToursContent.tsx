@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import React from "react"
-import { Navigation } from "@/components/navigation"
+import { ClientOnlyNavigation } from "@/components/ClientOnlyNavigation"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -44,7 +44,7 @@ export default function ToursContent() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Navigation />
+      <ClientOnlyNavigation />
 
       {/* Tours Grid */}
       <section className="py-20 px-4">

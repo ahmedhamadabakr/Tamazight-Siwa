@@ -34,6 +34,9 @@ export default function RegisterPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (loading) return; // Prevent double submission
+    
     setLoading(true);
     setError('');
     setSuccess('');
@@ -69,12 +72,13 @@ export default function RegisterPage() {
 
         const redirectUrl = `/verify-code?email=${encodeURIComponent(formData.email)}`;
         router.push(redirectUrl);
+        // Don't set loading to false here as we're redirecting
       } else {
         setError(data.error || 'Failed to send verification code');
+        setLoading(false);
       }
     } catch (error) {
       setError('Network error. Please try again.');
-    } finally {
       setLoading(false);
     }
   };

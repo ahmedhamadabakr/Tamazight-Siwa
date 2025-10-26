@@ -31,7 +31,7 @@ export function PerformanceMonitor() {
             metrics.LCP = entry.startTime
             break
           case 'first-input':
-            metrics.FID = entry.processingStart - entry.startTime
+            metrics.FID = (entry as any).processingStart - entry.startTime
             break
           case 'layout-shift':
             if (!(entry as any).hadRecentInput) {
@@ -57,12 +57,11 @@ export function PerformanceMonitor() {
     // Report metrics after page load
     const reportMetrics = () => {
       if (Object.keys(metrics).length > 0) {
-        console.log('Performance Metrics:', metrics)
-        
+     
         // Send to analytics (if needed)
-        if (window.gtag) {
+        if ((window as any).gtag) {
           Object.entries(metrics).forEach(([key, value]) => {
-            window.gtag('event', 'web_vitals', {
+            (window as any).gtag('event', 'web_vitals', {
               event_category: 'Performance',
               event_label: key,
               value: Math.round(value),
@@ -89,7 +88,7 @@ export function ResourceHints() {
   return (
     <>
       {/* Preload critical resources */}
-      <link rel="preload" href="/fonts/cairo-variable.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+
       
       {/* Prefetch likely next pages */}
       <link rel="prefetch" href="/tours" />

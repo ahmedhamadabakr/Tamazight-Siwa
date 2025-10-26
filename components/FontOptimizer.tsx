@@ -5,12 +5,7 @@ import { memo, useState, useEffect } from 'react'
 export const FontOptimizer = memo(() => {
   return (
     <>
-      {/* Preload critical fonts from Google Fonts */}
-      <link
-        rel="preload"
-        href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap"
-        as="style"
-      />
+      {/* Load Google Fonts directly without preload to avoid warnings */}
       
       {/* Font display optimization - using Google Fonts */}
       <link

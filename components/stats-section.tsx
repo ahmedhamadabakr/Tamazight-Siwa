@@ -54,8 +54,10 @@ export function StatsSection() {
       { threshold: 0.3 }
     )
 
-    const element = document.getElementById('stats-section')
-    if (element) observer.observe(element)
+    if (typeof document !== 'undefined') {
+      const element = document.getElementById('stats-section')
+      if (element) observer.observe(element)
+    }
 
     return () => observer.disconnect()
   }, [])

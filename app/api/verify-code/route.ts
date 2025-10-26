@@ -28,18 +28,10 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-
-    console.log('Verification attempt:', {
-      email,
-      name: name ? 'provided' : 'missing',
-      password: password ? 'provided' : 'missing'
-    });
-
     // Find verification code (case insensitive)
     const verificationCode = await database.findVerificationCode(code);
 
     if (!verificationCode) {
-      console.log('No matching verification code found');
       return NextResponse.json(
         { error: 'Invalid or expired verification code' },
         { status: 400 }
@@ -48,22 +40,12 @@ export async function POST(req: Request) {
 
     // Check if the email matches (case insensitive)
     if (verificationCode.email.toLowerCase() !== email.toLowerCase()) {
-      console.log('Email does not match verification code');
+
       return NextResponse.json(
         { error: 'Invalid email for this verification code' },
         { status: 400 }
       );
     }
-
-    // Debug log
-    console.log('Matching verification code:', {
-      code: verificationCode.code,
-      email: verificationCode.email,
-      expires: verificationCode.expires,
-      used: verificationCode.used,
-      now: new Date().toISOString(),
-      isExpired: verificationCode ? new Date() > new Date(verificationCode.expires) : 'N/A'
-    });
 
     // Check if code exists
     if (!verificationCode) {
