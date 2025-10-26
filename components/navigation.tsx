@@ -166,7 +166,7 @@ const NavigationComponent = memo(function Navigation() {
             {/* Auth Section */}
             {mounted && status === "authenticated" && displayUser && !isSigningOut ? (
               <div className="flex items-center space-x-4 ml-4">
-                <Link href={profileLink}>
+                <Link href={profileLink} aria-label="View profile">
                   <div className="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-200 cursor-pointer">
                     <div className="relative">
                       {displayUser.image ? (
@@ -194,6 +194,7 @@ const NavigationComponent = memo(function Navigation() {
                   onClick={handleSignOut}
                   disabled={isSigningOut}
                   className="text-gray-600 hover:text-red-600 hover:bg-red-50 transition-all disabled:opacity-50"
+                  aria-label="Sign out"
                 >
                   <LogOut className="h-4 w-4" />
                 </Button>
@@ -224,6 +225,7 @@ const NavigationComponent = memo(function Navigation() {
               size="icon"
               onClick={() => setIsOpen((prev) => !prev)}
               className="text-gray-700 hover:bg-gray-100"
+              aria-label={isOpen ? "Close menu" : "Open menu"}
             >
               {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
@@ -288,6 +290,7 @@ const NavigationComponent = memo(function Navigation() {
                       href="/admin/settings"
                       onClick={() => setIsOpen(false)}
                       className="flex items-center p-3 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-100"
+                      aria-label="System Settings"
                     >
                       <Shield className="w-5 h-5 text-emerald-600 mr-3" />
                       <span className="font-medium text-gray-900">System Settings</span>
@@ -298,6 +301,7 @@ const NavigationComponent = memo(function Navigation() {
                     href={profileLink}
                     onClick={() => setIsOpen(false)}
                     className="flex items-center p-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-100"
+                    aria-label="My Profile"
                   >
                     <User className="w-5 h-5 text-gray-600 mr-3" />
                     <span className="font-medium text-gray-900">My Profile</span>
@@ -307,6 +311,7 @@ const NavigationComponent = memo(function Navigation() {
                     onClick={handleSignOut}
                     disabled={isSigningOut}
                     className="flex w-full items-center p-3 rounded-xl bg-red-50 hover:bg-red-100 border border-red-100 text-red-600 disabled:opacity-50"
+                    aria-label={isSigningOut ? "Signing out" : "Sign out"}
                   >
                     <LogOut className="w-5 h-5 mr-3" />
                     <span>{isSigningOut ? "Signing Out..." : "Sign Out"}</span>

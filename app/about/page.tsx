@@ -79,7 +79,7 @@ export default function AboutContent() {
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20" />
         <Image
-          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=600&fit=crop"
+          src="/siwa-oasis-photography-golden-hour-palm-trees.jpg"
           alt="Siwa Oasis landscape with palm trees and desert"
           fill
           className="object-cover"
@@ -149,7 +149,7 @@ export default function AboutContent() {
           >
             {" "}
             <Image
-              src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=600&h=500&fit=crop"
+              src="/siwa-oasis-traditional-berber-architecture-at-suns.jpg"
               alt="Traditional Siwa mud-brick architecture"
               width={600}
               height={500}

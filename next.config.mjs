@@ -80,8 +80,22 @@ const nextConfig = {
     minimumCacheTTL: 86400,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
-    dangerouslyAllowSVG: true,
-    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
+    dangerouslyAllowSVG: false,
+    // More comprehensive CSP for the entire application (can be customized further)
+    contentSecurityPolicy: `
+     default-src 'self';
+     script-src 'self' 'unsafe-eval' 'unsafe-inline' https://vercel.live https://*.vercel-insights.com;
+     style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+     img-src 'self' data: https://images.unsplash.com https://res.cloudinary.com;
+     font-src 'self' https://fonts.gstatic.com;
+     connect-src 'self' https://vercel.live https://*.vercel-insights.com;
+     media-src 'self';
+     object-src 'none';
+     base-uri 'self';
+     form-action 'self';
+     frame-ancestors 'none';
+     upgrade-insecure-requests;
+   `,
     remotePatterns: [
       {
         protocol: 'https',

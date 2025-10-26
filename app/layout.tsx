@@ -151,6 +151,7 @@ export default function RootLayout({
         <link rel="canonical" href="https://siwa-with-us.com" />
         <link rel="alternate" hrefLang="en" href="https://siwa-with-us.com/en" />
         <link rel="alternate" hrefLang="ar" href="https://siwa-with-us.com/ar" />
+        <link rel='alternate' href='https://tamazight-siwa.vercel.app/' hreflang='en' />
         <link rel="alternate" hrefLang="x-default" href="https://siwa-with-us.com" />
 
         {/* Resource Hints */}
@@ -160,7 +161,9 @@ export default function RootLayout({
         <ErrorBoundary>
           <Suspense fallback={<Loading />}>
             <AuthProvider>
-              {children}
+              <main role="main" className="flex-grow">
+                {children}
+              </main>
             </AuthProvider>
           </Suspense>
         </ErrorBoundary>

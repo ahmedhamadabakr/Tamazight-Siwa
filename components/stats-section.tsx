@@ -104,9 +104,11 @@ export function StatsSection() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           {stats.map((stat, index) => (
-            <div
+            <article
               key={index}
               className="group relative bg-white/50 backdrop-blur-sm rounded-3xl p-8 text-center hover:bg-white/70 transition-all duration-500 hover:scale-105 hover:shadow-2xl border border-white/20"
+              role="region"
+              aria-label={`${stat.label} stat`}
             >
               {/* Background decoration */}
               <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
@@ -131,7 +133,7 @@ export function StatsSection() {
 
               {/* Hover effect line */}
               <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-0 h-1 bg-gradient-to-r from-primary via-secondary to-accent rounded-full group-hover:w-3/4 transition-all duration-500"></div>
-            </div>
+            </article>
           ))}
         </div>
 
