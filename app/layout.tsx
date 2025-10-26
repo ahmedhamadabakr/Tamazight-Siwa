@@ -39,25 +39,25 @@ export default function RootLayout({
         {/* Preconnect for critical resources */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        
+        {/* Remove modulepreload to avoid unused resource warnings */}
 
-        {/* Optimized font loading with variable font */}
+        {/* Optimized font loading with specific weights */}
         <link
-          href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap"
-          rel="preload"
-          as="style"
+          href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
+          rel="stylesheet"
+          suppressHydrationWarning
         />
-        <noscript>
-          <link
-            href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap"
-            rel="stylesheet"
-          />
-        </noscript>
 
         {/* Critical CSS for above-the-fold content */}
         <style dangerouslySetInnerHTML={{
           __html: `
-            body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;background:#f8f5f0;color:#3d2914}
+            body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;background:#f8f5f0;color:#3d2914;font-display:swap}
             .hero-section{height:100vh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
+            h1{font-size:2.5rem;font-weight:700;line-height:1.2;margin:0 0 1.5rem 0}
+            @media(min-width:768px){h1{font-size:3.75rem}}
+            @media(min-width:1024px){h1{font-size:4.5rem}}
+            .gpu-accelerated{transform:translateZ(0);will-change:transform}
             .loading-skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:loading 1.5s infinite}
             @keyframes loading{0%{background-position:-200% 0}100%{background-position:200% 0}}
           `
@@ -107,7 +107,7 @@ export default function RootLayout({
         <meta name="business:contact_data:phone_number" content="+20-xxx-xxx-xxxx" />
 
         {/* Preload critical resources */}
-        <link rel="preload" href="/siwa-oasis-sunset-salt-lakes-reflection.jpg" as="image" />
+        <link rel="preload" href="/siwa-oasis-sunset-salt-lakes-reflection.jpg" as="image" fetchPriority="high" />
 
         {/* Canonical and alternate languages */}
         <link rel="canonical" href="https://siwa-with-us.com" />
@@ -118,7 +118,7 @@ export default function RootLayout({
         {/* Resource Hints */}
         <ResourceHints />
       </head>
-      <body className="font-cairo antialiased">
+      <body className="font-cairo antialiased" suppressHydrationWarning>
         <ErrorBoundary>
           <Suspense fallback={<Loading />}>
             <AuthProvider>

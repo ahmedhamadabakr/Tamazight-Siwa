@@ -11,28 +11,28 @@ interface HeroContentProps {
 // Memoized hero content to prevent unnecessary re-renders
 export const HeroContent = memo(({ showVideo, onToggleVideo }: HeroContentProps) => {
   return (
-    <div className="relative z-10 text-center text-white max-w-5xl mx-auto px-4 animate-fade-in-up gpu-accelerated">
-      <div className="mb-6">
-        <span className="inline-block bg-primary/20 backdrop-blur-sm border border-primary/30 rounded-full px-6 py-2 text-sm font-medium mb-4">
+    <div className="relative z-10 text-center text-white max-w-5xl mx-auto px-4 gpu-accelerated">
+      <div className="mb-4">
+        <span className="inline-block bg-primary/20 backdrop-blur-sm border border-primary/30 rounded-full px-4 py-2 text-sm font-medium mb-4">
           ✨ Discover the Magic of Egyptian Desert
         </span>
       </div>
-      
-      <h1 className="text-5xl md:text-8xl font-bold mb-6 text-balance leading-tight">
-        <span className="bg-gradient-to-r from-white via-yellow-200 to-primary bg-clip-text text-transparent gpu-accelerated">
+
+      <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold mb-4 leading-tight gpu-accelerated">
+        <span className="bg-gradient-to-r from-white via-yellow-200 to-primary bg-clip-text text-transparent">
           Siwa
         </span>
         <br />
-        <span className="text-4xl md:text-6xl gpu-accelerated">With Us</span>
+        <span className="text-3xl md:text-5xl lg:text-6xl">With Us</span>
       </h1>
-      
+
       <p className="text-xl md:text-2xl mb-8 text-pretty opacity-90 max-w-3xl mx-auto leading-relaxed">
         Discover the magic of Siwa Oasis through authentic eco-tourism and cultural heritage experiences
       </p>
-      
+
       <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
-        <Button 
-          size="lg" 
+        <Button
+          size="lg"
           className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-4 text-lg rounded-full shadow-2xl hover:shadow-primary/25 transition-all duration-300 hover:scale-105 gpu-accelerated"
           aria-label="Book your Siwa Oasis trip now"
         >

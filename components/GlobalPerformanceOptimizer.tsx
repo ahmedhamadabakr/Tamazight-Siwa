@@ -7,23 +7,9 @@ export function GlobalPerformanceOptimizer() {
   const [isVisible, setIsVisible] = useState(false)
 
   useEffect(() => {
-    // Critical resource preloading
+    // Critical resource preloading is handled in layout.tsx to avoid hydration issues
     const preloadCriticalResources = () => {
-      if (typeof window === 'undefined' || typeof document === 'undefined') return;
-      
-      const criticalImages = [
-        '/siwa-oasis-sunset-salt-lakes-reflection.jpg',
-        '/logo.png',
-        '/favicon.ico'
-      ]
-
-      criticalImages.forEach(src => {
-        const link = document.createElement('link')
-        link.rel = 'preload'
-        link.as = 'image'
-        link.href = src
-        document.head.appendChild(link)
-      })
+      // Resources are preloaded in layout.tsx
     }
 
 
@@ -151,6 +137,7 @@ export function CriticalCSS() {
         padding: 0;
         background-color: oklch(0.98 0.01 85);
         color: oklch(0.25 0.02 45);
+        font-display: swap;
       }
       
       .hero-section {
@@ -164,6 +151,30 @@ export function CriticalCSS() {
       
       .hero-gradient {
         background: linear-gradient(135deg, oklch(0.35 0.05 30) 0%, oklch(0.55 0.12 65) 100%);
+      }
+      
+      /* Optimize hero text for LCP */
+      h1 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+        margin: 0 0 1rem 0;
+        contain: layout style paint;
+      }
+      
+      @media (min-width: 768px) {
+        h1 { font-size: 3.75rem; }
+      }
+      
+      @media (min-width: 1024px) {
+        h1 { font-size: 4.5rem; }
+      }
+      
+      /* GPU acceleration */
+      .gpu-accelerated {
+        transform: translateZ(0);
+        will-change: transform;
+        backface-visibility: hidden;
       }
       
       /* Prevent layout shift */

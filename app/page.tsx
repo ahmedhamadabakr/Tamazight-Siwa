@@ -8,13 +8,8 @@ import { ServicesSection } from "@/components/services-section"
 import { Footer } from "@/components/footer"
 import { ResourceHints } from "@/components/PerformanceMonitor"
 import { GlobalPerformanceOptimizer, CriticalCSS } from "@/components/GlobalPerformanceOptimizer"
-import { FontOptimizer } from "@/components/FontOptimizer"
-import { AnimationOptimizer } from "@/components/AnimationOptimizer"
-import { MemoryOptimizer } from "@/components/MemoryOptimizer"
-import { NetworkOptimizer } from "@/components/NetworkOptimizer"
 import { HomePageSEO } from "@/components/PageSEO"
 import { LocalSEO } from "@/components/LocalSEO"
-import { SEOPerformanceOptimizer } from "@/components/SEOPerformanceOptimizer"
 import dynamic from "next/dynamic"
 
 // Import components normally to avoid dynamic import issues
@@ -28,17 +23,10 @@ export default function HomePage() {
       <HomePageSEO />
       <LocalSEO />
       
-      {/* Critical optimizations */}
+      {/* Essential optimizations only */}
       <CriticalCSS />
-      <FontOptimizer />
       <ResourceHints />
-      
-      {/* Performance optimizers */}
       <GlobalPerformanceOptimizer />
-      <AnimationOptimizer />
-      <MemoryOptimizer />
-      <NetworkOptimizer />
-      <SEOPerformanceOptimizer />
       
       <main className="min-h-screen">
         <ClientOnlyNavigation />

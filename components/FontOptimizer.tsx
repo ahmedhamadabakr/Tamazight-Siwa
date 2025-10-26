@@ -5,13 +5,7 @@ import { memo, useState, useEffect } from 'react'
 export const FontOptimizer = memo(() => {
   return (
     <>
-      {/* Load Google Fonts directly without preload to avoid warnings */}
-      
-      {/* Font display optimization - using Google Fonts */}
-      <link
-        href="https://fonts.googleapis.com/css2?family=Cairo:wght@200..900&display=swap"
-        rel="stylesheet"
-      />
+      {/* Font loading is handled in layout.tsx to avoid hydration issues */}
       
       {/* Fallback font loading */}
       <style jsx>{`
