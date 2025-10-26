@@ -84,7 +84,7 @@ export default function RootLayout({
         {/* Theme and viewport */}
         <meta name="theme-color" content="#D4A574" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-        <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
+        <meta name="format-detection" content="telephone=+201552624123, date=no, email=tamazight.siwa@gmail.com, address=siwa oasis" />
 
         {/* Additional SEO Meta Tags */}
         <meta name="geo.region" content="EG-MT" />
@@ -118,11 +118,11 @@ export default function RootLayout({
         <meta name="business:contact_data:locality" content="Siwa" />
         <meta name="business:contact_data:region" content="Matrouh Governorate" />
         <meta name="business:contact_data:country_name" content="Egypt" />
-        <meta name="business:contact_data:phone_number" content="+20-xxx-xxx-xxxx" />
+        <meta name="business:contact_data:phone_number" content="+201552624123" />
 
         {/* Preload critical resources */}
         <link rel="preload" href="/siwa-oasis-sunset-salt-lakes-reflection.jpg" as="image" fetchPriority="high" type="image/jpeg" />
-        <link rel="prefetch" href="/logo.png" as="image" />
+        <link rel="prefetch" href="/placeholder-logo.png" as="image" />
 
         {/* Canonical and alternate languages */}
         <link rel="canonical" href="https://siwa-with-us.com" />

@@ -149,6 +149,7 @@ export function TestimonialsSection() {
                         variant="outline"
                         size="icon"
                         className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm border-white/20 hover:bg-white/90 rounded-full w-12 h-12"
+                        aria-label="Previous testimonial"
                         onClick={prevTestimonial}
                         onMouseEnter={() => setIsAutoPlaying(false)}
                         onMouseLeave={() => setIsAutoPlaying(true)}
@@ -160,6 +161,7 @@ export function TestimonialsSection() {
                         variant="outline"
                         size="icon"
                         className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 backdrop-blur-sm border-white/20 hover:bg-white/90 rounded-full w-12 h-12"
+                        aria-label="Next testimonial"
                         onClick={nextTestimonial}
                         onMouseEnter={() => setIsAutoPlaying(false)}
                         onMouseLeave={() => setIsAutoPlaying(true)}
@@ -174,10 +176,12 @@ export function TestimonialsSection() {
                         <button
                             key={index}
                             onClick={() => goToSlide(index)}
-                            className={`w-3 h-3 rounded-full transition-all duration-300 ${index === currentIndex
+                            className={`w-4 h-4 p-2 rounded-full transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary ${index === currentIndex
                                 ? 'bg-primary w-8'
                                 : 'bg-primary/30 hover:bg-primary/50'
                                 }`}
+                            aria-label={`Go to slide ${index + 1}`}
+                            aria-current={index === currentIndex ? 'true' : undefined}
                         />
                     ))}
                 </div>

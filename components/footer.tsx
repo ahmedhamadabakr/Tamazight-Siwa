@@ -19,13 +19,13 @@ export function Footer() {
               pristine desert paradise.
             </p>
             <div className="flex space-x-4">
-              <a href="#" className="text-background/60 hover:text-primary transition-colors">
+              <a href="#" aria-label="Follow us on Facebook" className="text-background/60 hover:text-primary transition-colors">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="#" className="text-background/60 hover:text-primary transition-colors">
+              <a href="#" aria-label="Follow us on Instagram" className="text-background/60 hover:text-primary transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="#" className="text-background/60 hover:text-primary transition-colors">
+              <a href="#" aria-label="Follow us on X (Twitter)" className="text-background/60 hover:text-primary transition-colors">
                 <Twitter className="w-5 h-5" />
               </a>
             </div>

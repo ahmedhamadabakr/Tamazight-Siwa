@@ -1,30 +1,60 @@
 "use client"
 
-import dynamic from "next/dynamic"
-import type React from "react"
-import type { MotionProps } from "framer-motion"
+import React from "react"
 
-type DivProps = React.HTMLAttributes<HTMLDivElement> & MotionProps
-type H1Props = React.HTMLAttributes<HTMLHeadingElement> & MotionProps
-type PProps = React.HTMLAttributes<HTMLParagraphElement> & MotionProps
+type AnyProps = Record<string, any>
 
-export const MotionDiv = dynamic(async () => {
-  const { motion } = await import("framer-motion")
-  return function MotionDivInner(props: DivProps) {
-    return <motion.div {...props} />
+function stripMotionProps<P extends AnyProps>(props: P): P {
+  const {
+    initial,
+    animate,
+    exit,
+    whileInView,
+    whileHover,
+    whileTap,
+    transition,
+    viewport,
+    variants,
+    layout,
+    layoutId,
+    drag,
+    dragConstraints,
+    dragElastic,
+    dragMomentum,
+    ...rest
+  } = props as AnyProps
+  return rest as P
+}
+
+function createMotionFallback<T extends keyof JSX.IntrinsicElements>(tag: T) {
+  return function MotionFallback(props: AnyProps) {
+    const [MotionTag, setMotionTag] = React.useState<React.ComponentType<AnyProps> | null>(null)
+
+    React.useEffect(() => {
+      let mounted = true
+      ;(async () => {
+        try {
+          const { motion } = await import("framer-motion")
+          if (mounted) {
+            const comp = (motion as AnyProps)[tag]
+            setMotionTag(() => comp)
+          }
+        } catch {
+          // ignore
+        }
+      })()
+      return () => { mounted = false }
+    }, [])
+
+    if (MotionTag) {
+      return <MotionTag {...props} />
+    }
+    // Server and first client paint: render plain element without motion-only props
+    const PlainTag = tag as any
+    return <PlainTag {...stripMotionProps(props)} />
   }
-}, { ssr: false }) as unknown as (props: DivProps) => JSX.Element
+}
 
-export const MotionH1 = dynamic(async () => {
-  const { motion } = await import("framer-motion")
-  return function MotionH1Inner(props: H1Props) {
-    return <motion.h1 {...props} />
-  }
-}, { ssr: false }) as unknown as (props: H1Props) => JSX.Element
-
-export const MotionP = dynamic(async () => {
-  const { motion } = await import("framer-motion")
-  return function MotionPInner(props: PProps) {
-    return <motion.p {...props} />
-  }
-}, { ssr: false }) as unknown as (props: PProps) => JSX.Element
+export const MotionDiv = createMotionFallback("div")
+export const MotionH1 = createMotionFallback("h1")
+export const MotionP = createMotionFallback("p")

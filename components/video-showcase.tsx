@@ -53,6 +53,7 @@ export function VideoShowcase() {
             >
               <source src="/Siwa/WhatsApp Video 2025-10-11 at 14.15.44_a55f796c.mp4" type="video/mp4" />
               <source src="/Siwa/WhatsApp Video 2025-10-11 at 14.16.53_71a463c0.mp4" type="video/mp4" />
+              <track kind="captions" src="/captions-en.vtt" srcLang="en" label="English captions" default />
             </video>
 
             {/* Video Controls Overlay */}
@@ -62,6 +63,7 @@ export function VideoShowcase() {
                   size="lg"
                   onClick={togglePlay}
                   className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white rounded-full w-16 h-16 p-0"
+                  aria-label={isPlaying ? "Pause video" : "Play video"}
                 >
                   {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6 ml-1" />}
                 </Button>
@@ -69,6 +71,7 @@ export function VideoShowcase() {
                   size="sm"
                   onClick={toggleMute}
                   className="bg-white/20 hover:bg-white/30 backdrop-blur-sm border border-white/30 text-white rounded-full w-12 h-12 p-0"
+                  aria-label={isMuted ? "Unmute video" : "Mute video"}
                 >
                   {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                 </Button>

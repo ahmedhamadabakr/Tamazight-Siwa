@@ -42,7 +42,7 @@ const fetchTours = async () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <div className="inline-block bg-accent/10 rounded-full px-6 py-2 mb-4">
-            <span className="text-accent font-medium">🌟 Featured Experiences</span>
+            <span className="text-primary font-medium">🌟 Featured Experiences</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6 text-balance">
             Discover Siwa's Magic
@@ -74,7 +74,7 @@ const fetchTours = async () => {
                 {/* Hover Overlay with Title */}
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                   <div className="text-white text-center p-4">
-                    <h4 className="font-bold text-lg mb-2">{tour.title}</h4>
+                    <h3 className="font-bold text-lg mb-2">{tour.title}</h3>
                     <p className="text-sm opacity-90">Click to view details</p>
                   </div>
                 </div>
@@ -99,8 +99,8 @@ const fetchTours = async () => {
                   </div>
                 </div>
                 
-                <Link href={`/tours/${tour.slug || tour.id}`} className="w-full mt-auto">
-                  <Button variant="outline" className="w-full hover:bg-primary hover:text-white transition-colors">
+                <Link href={`/tours/${tour.slug || tour.id}`} className="w-full mt-auto" aria-label={`Discover more about ${tour.title}`}>
+                  <Button variant="outline" className="w-full hover:bg-primary hover:text-white transition-colors" aria-label={`Discover more about ${tour.title}`}>
                     Discover More
                   </Button>
                 </Link>
