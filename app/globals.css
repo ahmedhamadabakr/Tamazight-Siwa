@@ -242,3 +242,300 @@ html {
   overflow: hidden;
   line-clamp: 3;
 }
+/* Performance-optimized animations for hero section */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.8s ease-out forwards;
+  opacity: 0;
+}
+
+/* Optimized backdrop blur for better performance */
+.backdrop-blur-optimized {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+/* Hardware acceleration for smooth animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-in-up,
+  .animate-bounce,
+  .animate-pulse,
+  .animate-float {
+    animation: none;
+  }
+  
+  .transition-all,
+  .transition-opacity,
+  .transition-transform {
+    transition: none;
+  }
+}
+
+/* Optimized loading states */
+.loading-skeleton {
+  background: linear-gradient(90deg, 
+    oklch(0.92 0.02 75) 25%, 
+    oklch(0.88 0.02 70) 50%, 
+    oklch(0.92 0.02 75) 75%
+  );
+  background-size: 200% 100%;
+  animation: loading-shimmer 1.5s infinite;
+}
+
+@keyframes loading-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}/* A
+dvanced performance optimizations */
+
+/* Container queries for better responsive design */
+@container (min-width: 768px) {
+  .container-responsive {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+}
+
+/* Optimized scrolling */
+.smooth-scroll {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Network-aware optimizations */
+.reduce-animations * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+.offline-mode {
+  filter: grayscale(0.3);
+}
+
+.offline-mode .non-essential {
+  display: none;
+}
+
+/* Content visibility optimization */
+.content-visibility-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
+
+/* Intersection observer optimizations */
+.lazy-section {
+  opacity: 0;
+  transform: translateY(50px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.lazy-section.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Critical resource hints */
+.preload-hint::before {
+  content: '';
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  background: url('/siwa-oasis-sunset-salt-lakes-reflection.jpg') no-repeat -9999px -9999px;
+}
+
+/* Memory-efficient animations */
+@keyframes efficient-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.efficient-animation {
+  animation: efficient-fade 0.3s ease-out;
+  will-change: opacity;
+}
+
+.efficient-animation.complete {
+  will-change: auto;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .hero-gradient {
+    background: linear-gradient(135deg, #000 0%, #333 100%);
+  }
+  
+  .text-primary {
+    color: #000 !important;
+  }
+}
+
+/* Forced colors mode support */
+@media (forced-colors: active) {
+  .hero-gradient {
+    background: Canvas;
+    color: CanvasText;
+    border: 1px solid CanvasText;
+  }
+}
+
+/* Print optimizations */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  .hero-section {
+    height: auto !important;
+    page-break-inside: avoid;
+  }
+  
+  * {
+    background: transparent !important;
+    color: black !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+}
+
+/* Focus management for accessibility */
+.focus-visible:focus-visible {
+  outline: 2px solid #d4a574;
+  outline-offset: 2px;
+}
+
+/* Skip to content link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #d4a574;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 10000;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Loading states for better UX */
+.skeleton-loader {
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Optimized backdrop filters */
+.backdrop-blur-performance {
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+@supports not (backdrop-filter: blur()) {
+  .backdrop-blur-performance {
+    background: rgba(255, 255, 255, 0.9);
+  }
+}
+
+/* Battery-aware optimizations */
+@media (prefers-reduced-data: reduce) {
+  .data-heavy {
+    display: none;
+  }
+  
+  video {
+    display: none;
+  }
+  
+  .background-image {
+    background-image: none !important;
+    background-color: #f3f4f6;
+  }
+}
+
+/* Optimized transforms for better performance */
+.transform-gpu {
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+.transform-gpu:hover {
+  transform: translateZ(0) translateY(-2px);
+}
+
+/* Efficient grid layouts */
+.performance-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+  gap: clamp(1rem, 4vw, 2rem);
+}
+
+/* Optimized text rendering */
+.optimized-text {
+  text-rendering: optimizeSpeed;
+  font-smooth: never;
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: auto;
+}
+
+/* Critical path CSS for hero section */
+.hero-critical {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: linear-gradient(135deg, #8b4513 0%, #d4a574 100%);
+}
+
+.hero-critical .hero-content {
+  text-align: center;
+  color: white;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+  z-index: 10;
+  position: relative;
+}
+
+.hero-critical h1 {
+  font-size: clamp(2rem, 8vw, 6rem);
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  line-height: 1.1;
+}
+
+.hero-critical p {
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  max-width: 48rem;
+  margin-left: auto;
+  margin-right: auto;
+}

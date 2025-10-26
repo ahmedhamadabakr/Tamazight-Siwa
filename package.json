@@ -50,6 +50,7 @@
     "cloudinary": "^2.7.0",
     "clsx": "^2.1.1",
     "cmdk": "1.0.4",
+    "critters": "^0.0.23",
     "express-rate-limit": "^8.1.0",
     "framer-motion": "^10.18.0",
     "geist": "latest",

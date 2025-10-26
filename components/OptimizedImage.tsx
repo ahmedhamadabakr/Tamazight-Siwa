@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 interface OptimizedImageProps {
   src: string
@@ -36,6 +36,43 @@ export function OptimizedImage({
 }: OptimizedImageProps) {
   const [isLoading, setIsLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+  const [shouldLoad, setShouldLoad] = useState(priority)
+  const imgRef = useRef<HTMLDivElement>(null)
+
+  // Intersection Observer for lazy loading
+  useEffect(() => {
+    if (priority || shouldLoad) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setShouldLoad(true)
+          observer.disconnect()
+        }
+      },
+      {
+        rootMargin: '50px',
+        threshold: 0.1
+      }
+    )
+
+    if (imgRef.current) {
+      observer.observe(imgRef.current)
+    }
+
+    return () => observer.disconnect()
+  }, [priority, shouldLoad])
+
+  // Connection-aware quality adjustment
+  useEffect(() => {
+    const connection = (navigator as any).connection
+    if (connection && connection.effectiveType) {
+      const isSlowConnection = ['slow-2g', '2g'].includes(connection.effectiveType)
+      if (isSlowConnection && quality > 60) {
+        quality = 50 // Reduce quality for slow connections
+      }
+    }
+  }, [])
 
   const handleLoad = () => {
     setIsLoading(false)
@@ -50,27 +87,39 @@ export function OptimizedImage({
 
   // Generate blur placeholder for better UX
   const generateBlurDataURL = (w: number, h: number) => {
-    return `data:image/svg+xml;base64,${Buffer.from(
-      `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">
-        <defs>
-          <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#f3f4f6;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#e5e7eb;stop-opacity:1" />
-          </linearGradient>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#grad)"/>
-      </svg>`
-    ).toString('base64')}`
+    const svg = `<svg width="${w}" height="${h}" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#f3f4f6;stop-opacity:1" />
+          <stop offset="100%" style="stop-color:#e5e7eb;stop-opacity:1" />
+        </linearGradient>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#grad)"/>
+    </svg>`
+    
+    // Use btoa for client-side base64 encoding
+    return `data:image/svg+xml;base64,${btoa(svg)}`
   }
 
   if (hasError) {
     return (
-      <div 
+      <div
+        ref={imgRef}
         className={`bg-gray-200 flex items-center justify-center ${className}`}
         style={{ width, height }}
       >
         <span className="text-gray-500 text-sm">Image not available</span>
       </div>
+    )
+  }
+
+  if (!shouldLoad) {
+    return (
+      <div
+        ref={imgRef}
+        className={`loading-skeleton ${className}`}
+        style={{ width, height }}
+      />
     )
   }
 
@@ -121,7 +170,7 @@ export function CloudinaryImage({
   transformations?: string
 }) {
   const cloudinaryUrl = `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dp5bk64xn'}/image/upload/${transformations}/${publicId}`
-  
+
   return (
     <OptimizedImage
       src={cloudinaryUrl}

@@ -23,8 +23,11 @@ const nextConfig = {
       '@radix-ui/react-dropdown-menu',
       '@radix-ui/react-navigation-menu'
     ],
-    webVitalsAttribution: ['CLS', 'LCP'],
+    webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'TTFB'],
     serverComponentsExternalPackages: ['mongodb', 'bcryptjs'],
+    optimizeCss: true,
+    scrollRestoration: true,
+    largePageDataBytes: 128 * 1000, // 128KB
   },
   
   // Production optimizations
@@ -77,6 +80,8 @@ const nextConfig = {
     minimumCacheTTL: 86400,
     deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
     imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
       {
         protocol: 'https',
@@ -88,6 +93,8 @@ const nextConfig = {
         pathname: '/dp5bk64xn/**',
       },
     ],
+    loader: 'default',
+    loaderFile: './lib/imageLoader.js',
   },
   
   // Output optimization - removed standalone for development

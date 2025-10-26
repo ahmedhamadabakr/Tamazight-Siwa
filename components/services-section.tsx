@@ -1,4 +1,5 @@
 "use client"
+"use client"
 import { Card, CardContent } from "@/components/ui/card"
 import { Hotel, Car, Utensils, Compass, Wifi, Shield, Clock, Heart } from "lucide-react"
 import { useState } from "react"
