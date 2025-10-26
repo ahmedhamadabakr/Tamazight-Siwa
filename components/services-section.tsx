@@ -3,6 +3,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Hotel, Car, Utensils, Compass, Wifi, Shield, Clock, Heart } from "lucide-react"
 import { useState } from "react"
+import Image from "next/image"
 
 const services = [
   {
@@ -63,10 +64,14 @@ export function ServicesSection() {
             >
               {/* Background Image */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity duration-500">
-                <img 
-                  src={service.image} 
-                  alt={service.title}
-                  className="w-full h-full object-cover"
+                <Image
+                  src={service.image}
+                  alt=""
+                  fill
+                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
+                  className="object-cover"
+                  quality={70}
+                  aria-hidden
                 />
               </div>
 

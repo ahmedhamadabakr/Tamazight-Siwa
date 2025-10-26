@@ -6,6 +6,7 @@ import { useSession, signOut } from "next-auth/react";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, User, LogOut, Settings, Shield } from "lucide-react";
+import Image from "next/image";
 
 type UserRole = "user" | "manager" | "admin";
 
@@ -170,7 +171,7 @@ const NavigationComponent = memo(function Navigation() {
                   <div className="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-200 cursor-pointer">
                     <div className="relative">
                       {displayUser.image ? (
-                        <img
+                        <Image
                           src={displayUser.image}
                           alt={displayUser.name || "User"}
                           className="h-9 w-9 rounded-full object-cover ring-2 ring-primary/20 hover:ring-primary/30 transition-all"
@@ -254,7 +255,7 @@ const NavigationComponent = memo(function Navigation() {
                 <div className="px-4 py-3 border-t border-gray-200">
                   <div className="flex items-center space-x-3">
                     {displayUser.image ? (
-                      <img
+                      <Image
                         src={displayUser.image}
                         alt={displayUser.name || "User"}
                         className="w-12 h-12 rounded-full object-cover"

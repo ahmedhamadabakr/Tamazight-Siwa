@@ -42,6 +42,7 @@ export default function RootLayout({
 
         {/* Preconnect for critical resources */}
         <link rel="preconnect" href="https://vercel.live" />
+        <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="preconnect" href="https://images.unsplash.com" />
 
         {/* Optimize JavaScript loading */}

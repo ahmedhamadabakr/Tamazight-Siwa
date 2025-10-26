@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User } from "lucide-react";
 import { NavigationSkeleton } from "./NavigationSkeleton";
+import Image from "next/image";
 
 // Lazy load heavy components
 const DropdownMenu = lazy(() => import("@/components/ui/dropdown-menu").then(mod => ({ default: mod.DropdownMenu })));
@@ -87,7 +88,7 @@ export function OptimizedNavigation() {
                     <DropdownMenuTrigger asChild>
                       <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0">
                         {user.image ? (
-                          <img
+                          <Image
                             src={user.image}
                             alt={user.name || 'User'}
                             className="h-10 w-10 rounded-full object-cover"
@@ -200,7 +201,7 @@ export function OptimizedNavigation() {
                 <div className="flex items-center px-4 mb-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center overflow-hidden mr-3">
                     {user.image ? (
-                      <img
+                      <Image
                         src={user.image}
                         alt={user.name || 'User'}
                         className="w-full h-full object-cover"

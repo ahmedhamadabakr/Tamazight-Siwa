@@ -12,6 +12,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Input } from '@/components/ui/input'
+import Image from 'next/image'
 
 interface AdminHeaderProps {
   user: any
@@ -96,7 +97,7 @@ export function AdminHeader({ user }: AdminHeaderProps) {
               <Button variant="ghost" className="flex items-center space-x-2 px-3">
                 <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
                   {user?.image ? (
-                    <img
+                    <Image
                       src={user.image}
                       alt={user.name || 'Admin'}
                       className="w-8 h-8 rounded-full object-cover"

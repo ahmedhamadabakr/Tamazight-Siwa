@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogOut } from "lucide-react";
+import Image from "next/image";
 
 type UserRole = 'user' | 'manager' | 'admin';
 
@@ -160,7 +161,7 @@ export const FastNavigation = memo(function FastNavigation() {
                     onClick={toggleDropdown}
                   >
                     {user.image ? (
-                      <img
+                      <Image
                         src={user.image}
                         alt={user.name || 'User'}
                         className="h-10 w-10 rounded-full object-cover"
@@ -283,7 +284,7 @@ export const FastNavigation = memo(function FastNavigation() {
                 <div className="flex items-center px-4 mb-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center overflow-hidden mr-3">
                     {user.image ? (
-                      <img
+                      <Image
                         src={user.image}
                         alt={user.name || 'User'}
                         className="w-full h-full object-cover"

@@ -4,6 +4,7 @@ import { MapPin, Clock, Users } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { useEffect, useState } from "react"
+import Image from "next/image"
 
 interface Tour {
   id: string;
@@ -56,11 +57,14 @@ const fetchTours = async () => {
           {firstFourItems.map((tour, index) => (
             <Card key={tour.id} className="group overflow-hidden hover:shadow-xl transition-all duration-300 h-full">
               <div className="relative overflow-hidden h-48">
-                <img
+                <Image
                   src={tour.images[0] || "/placeholder.svg"}
                   alt={tour.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  loading="lazy"
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-500"
+                  sizes="(min-width: 1024px) 25vw, (min-width: 768px) 50vw, 100vw"
+                  quality={75}
+                  priority={false}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                 

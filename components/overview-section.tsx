@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
+import Image from "next/image"
 import { Leaf, Users, Award, Heart } from "lucide-react"
 
 const highlights = [
@@ -64,11 +65,17 @@ export function OverviewSection() {
 
           {/* Right Content */}
           <div className="space-y-8">
-            <img
-              src="/siwa-oasis-natural-springs-with-turquoise-water-an.jpg"
-              alt="Siwa Oasis Natural Springs"
-              className="w-full h-64 object-cover rounded-lg shadow-lg"
-            />
+            <div className="relative w-full h-64 rounded-lg shadow-lg overflow-hidden">
+              <Image
+                src="/siwa-oasis-natural-springs-with-turquoise-water-an.jpg"
+                alt="Siwa Oasis Natural Springs"
+                fill
+                className="object-cover"
+                sizes="(min-width: 1024px) 50vw, 100vw"
+                quality={70}
+                priority={false}
+              />
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {values.map((value, index) => (

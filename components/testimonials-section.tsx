@@ -3,6 +3,7 @@ import { useState, useEffect } from "react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 const testimonials = [
     {
@@ -121,9 +122,11 @@ export function TestimonialsSection() {
                                     {/* User Info */}
                                     <div className="flex items-center justify-center gap-4">
                                         <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-primary/20">
-                                            <img
+                                            <Image
                                                 src={testimonials[currentIndex].image}
                                                 alt={testimonials[currentIndex].name}
+                                                width={64}
+                                                height={64}
                                                 className="w-full h-full object-cover"
                                             />
                                         </div>

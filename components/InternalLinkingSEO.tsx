@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { memo } from 'react'
 
 interface SEOLinkProps {
@@ -75,7 +76,7 @@ export const RelatedContentSEO = memo(({
           <article key={index} className="related-item bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
             {item.image && (
               <div className="related-image">
-                <img 
+                <Image 
                   src={item.image} 
                   alt={item.title}
                   className="w-full h-48 object-cover"

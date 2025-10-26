@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Star, ThumbsUp, Shield, Filter, ChevronDown, Calendar, User } from 'lucide-react'
 import { Review } from '@/models/Review'
 import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
 interface ReviewsListProps {
   tourId: string
@@ -209,7 +210,7 @@ export function ReviewsList({
               <div className="flex items-start gap-3">
                 <div className="flex-shrink-0">
                   {review.userImage ? (
-                    <img
+                    <Image
                       src={review.userImage}
                       alt={review.userName}
                       className="w-10 h-10 rounded-full"
@@ -267,7 +268,7 @@ export function ReviewsList({
               <div className="mb-4">
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
                   {review.images.map((image, index) => (
-                    <img
+                    <Image
                       key={index}
                       src={image}
                       alt={`Review photo ${index + 1}`}

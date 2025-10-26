@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Star, Upload, X, Send } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import Image from 'next/image'
 
 interface ReviewFormProps {
   tourId: string
@@ -205,7 +206,7 @@ export function ReviewForm({ tourId, onSubmit, onCancel, isSubmitting }: ReviewF
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
               {images.map((image, index) => (
                 <div key={index} className="relative group">
-                  <img
+                  <Image
                     src={image}
                     alt={`Photo ${index + 1}`}
                     className="w-full h-24 object-cover rounded-md border"

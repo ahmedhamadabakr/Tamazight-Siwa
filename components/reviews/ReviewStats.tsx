@@ -2,6 +2,7 @@
 
 import { Star, Users, Shield } from 'lucide-react'
 import { ReviewStats as ReviewStatsType } from '@/models/Review'
+import Image from 'next/image'
 
 interface ReviewStatsProps {
   stats: ReviewStatsType
@@ -98,7 +99,7 @@ export function ReviewStats({ stats }: ReviewStatsProps) {
               <div key={review._id} className="flex items-start gap-3 p-3 bg-gray-50 rounded-md">
                 <div className="flex-shrink-0">
                   {review.userImage ? (
-                    <img
+                    <Image
                       src={review.userImage}
                       alt={review.userName}
                       className="w-8 h-8 rounded-full"
