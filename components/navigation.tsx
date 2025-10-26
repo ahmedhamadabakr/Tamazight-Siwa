@@ -225,10 +225,13 @@ const NavigationComponent = memo(function Navigation() {
               size="icon"
               onClick={() => setIsOpen((prev) => !prev)}
               className="text-gray-700 hover:bg-gray-100"
+              aria-label={isOpen ? "Close navigation menu" : "Open navigation menu"}
             >
               {isOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+              <span className="sr-only">{isOpen ? "Close menu" : "Open menu"}</span>
             </Button>
           </div>
+
         </div>
 
         {/* Mobile Menu */}

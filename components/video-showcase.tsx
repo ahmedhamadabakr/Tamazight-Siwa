@@ -63,11 +63,11 @@ export function VideoShowcase() {
               preload="none"
               poster="/siwa-oasis-photography-golden-hour-palm-trees.jpg"
             >
+              <track kind="captions" src="/captions-en.vtt" srcLang="en" label="English captions" default />
               {sourcesLoaded && (
                 <>
                   <source src="/Siwa/WhatsApp Video 2025-10-11 at 14.15.44_a55f796c.mp4" type="video/mp4" />
                   <source src="/Siwa/WhatsApp Video 2025-10-11 at 14.16.53_71a463c0.mp4" type="video/mp4" />
-                  <track kind="captions" src="/captions-en.vtt" srcLang="en" label="English captions" default />
                 </>
               )}
             </video>

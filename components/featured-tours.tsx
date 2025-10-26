@@ -43,7 +43,7 @@ const fetchTours = async () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-16">
           <div className="inline-block bg-accent/10 rounded-full px-6 py-2 mb-4">
-            <span className="text-primary font-medium">🌟 Featured Experiences</span>
+            <span className="text-foreground font-medium">🌟 Featured Experiences</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6 text-balance">
             Discover Siwa's Magic
