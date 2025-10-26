@@ -36,6 +36,7 @@ export default function TourDetailsPage() {
   interface Tour {
     id: string;
     title: string;
+    slug?: string;
     description: string;
     duration: string;
     groupSize: string;
@@ -93,6 +94,65 @@ export default function TourDetailsPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+              {
+                "@type": "ListItem",
+                "position": 1,
+                "name": "Home",
+                "item": "https://siwa-with-us.com/"
+              },
+              {
+                "@type": "ListItem",
+                "position": 2,
+                "name": "Tours",
+                "item": "https://siwa-with-us.com/tours"
+              },
+              {
+                "@type": "ListItem",
+                "position": 3,
+                "name": tour.title,
+                "item": `https://siwa-with-us.com/tours/${tour.slug || (slug as string)}`
+              }
+            ]
+          })
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "TouristTrip",
+            "name": tour.title,
+            "description": tour.description,
+            "touristType": tour.category,
+            "image": tour.images,
+            "itinerary": tour.highlights,
+            "offers": {
+              "@type": "Offer",
+              "price": tour.price,
+              "priceCurrency": "EGP",
+              "url": `https://siwa-with-us.com/tours/${tour.slug || (slug as string)}`,
+              "availability": "http://schema.org/InStock"
+            },
+            "provider": {
+              "@type": "Organization",
+              "name": "Tamazight Siwa",
+              "url": "https://siwa-with-us.com"
+            },
+            "areaServed": {
+              "@type": "Place",
+              "name": tour.location
+            }
+          })
+        }}
+      />
       {/* Breadcrumbs */}
       <div className="max-w-5xl mx-auto px-4 pt-4">
         <TourBreadcrumbs 

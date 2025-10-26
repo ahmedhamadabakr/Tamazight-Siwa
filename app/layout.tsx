@@ -127,9 +127,64 @@ export default function RootLayout({
 
         {/* Canonical and alternate languages */}
         <link rel="canonical" href="https://siwa-with-us.com" />
-        <link rel="alternate" hrefLang="en" href="https://siwa-with-us.com/en" />
-        <link rel="alternate" hrefLang="ar" href="https://siwa-with-us.com/ar" />
         <link rel="alternate" hrefLang="x-default" href="https://siwa-with-us.com" />
+
+        {/* JSON-LD Structured Data */}
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "name": "Tamazight Siwa",
+          "url": "https://siwa-with-us.com",
+          "logo": "https://siwa-with-us.com/placeholder-logo.png",
+          "sameAs": [
+            "https://www.facebook.com/SiwaWithUs",
+            "https://www.instagram.com/",
+            "https://x.com/"
+          ],
+          "contactPoint": [{
+            "@type": "ContactPoint",
+            "telephone": "+201552624123",
+            "contactType": "customer service",
+            "areaServed": "EG",
+            "availableLanguage": ["en", "ar"]
+          }]
+        }) }} />
+
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "name": "Tamazight Siwa",
+          "url": "https://siwa-with-us.com",
+          "potentialAction": {
+            "@type": "SearchAction",
+            "target": "https://siwa-with-us.com/search?q={search_term_string}",
+            "query-input": "required name=search_term_string"
+          }
+        }) }} />
+
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "LocalBusiness",
+          "name": "Tamazight Siwa",
+          "image": [
+            "https://siwa-with-us.com/siwa-oasis-sunset-salt-lakes-reflection.jpg"
+          ],
+          "address": {
+            "@type": "PostalAddress",
+            "streetAddress": "Siwa Oasis",
+            "addressLocality": "Siwa",
+            "addressRegion": "Matrouh Governorate",
+            "addressCountry": "EG"
+          },
+          "telephone": "+201552624123",
+          "url": "https://siwa-with-us.com",
+          "priceRange": "$$",
+          "geo": {
+            "@type": "GeoCoordinates",
+            "latitude": 29.205,
+            "longitude": 25.519
+          }
+        }) }} />
 
         {/* Resource Hints */}
         <ResourceHints />
