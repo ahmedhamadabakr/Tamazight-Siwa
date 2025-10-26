@@ -1,12 +1,12 @@
-"use client";
-
+import type React from "react";
+export const dynamic = "force-static";
 import { ClientOnlyNavigation } from "@/components/ClientOnlyNavigation";
 import { Footer } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, Heart, Leaf, Award, MapPin, Clock } from "lucide-react";
 import Image from "next/image";
-import { motion } from "framer-motion";
+import { MotionDiv, MotionH1, MotionP } from "@/components/Motion";
 
 // ♻️ Reusable Value Card
 function ValueCard({
@@ -19,7 +19,7 @@ function ValueCard({
   description: string;
 }) {
   return (
-    <motion.div
+    <MotionDiv
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
@@ -34,7 +34,7 @@ function ValueCard({
           <p className="text-muted-foreground">{description}</p>
         </CardContent>
       </Card>
-    </motion.div>
+    </MotionDiv>
   );
 }
 
@@ -51,7 +51,7 @@ function TeamCard({
   bio: string;
 }) {
   return (
-    <motion.div
+    <MotionDiv
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.6 }}
@@ -67,7 +67,7 @@ function TeamCard({
           <p className="text-muted-foreground">{bio}</p>
         </CardContent>
       </Card>
-    </motion.div>
+    </MotionDiv>
   );
 }
 
@@ -79,24 +79,25 @@ export default function AboutContent() {
       <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20" />
         <Image
-          src="https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=600&fit=crop"
+          src="/siwa-oasis-sunset-salt-lakes-reflection.jpg"
           alt="Siwa Oasis landscape with palm trees and desert"
           fill
           className="object-cover"
           priority
-          placeholder="blur"
-          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
+          fetchPriority="high"
+          sizes="100vw"
+          placeholder="empty"
         />
         <div className="relative z-10 text-center text-white max-w-4xl mx-auto px-4">
-          <motion.h1
+          <MotionH1
             className="text-4xl md:text-6xl font-bold mb-6 text-balance"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
             About Tamazight Siwa
-          </motion.h1>
-          <motion.p
+          </MotionH1>
+          <MotionP
             className="text-xl md:text-2xl text-balance"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -104,14 +105,14 @@ export default function AboutContent() {
           >
             Preserving the authentic spirit of Siwa Oasis through sustainable
             tourism
-          </motion.p>
+          </MotionP>
         </div>
       </section>
       <section className="py-20 px-4">
         {" "}
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
           {" "}
-          <motion.div
+          <MotionDiv
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.7 }}
@@ -141,8 +142,8 @@ export default function AboutContent() {
               {" "}
               Learn More About Siwa{" "}
             </Button>{" "}
-          </motion.div>{" "}
-          <motion.div
+          </MotionDiv>{" "}
+          <MotionDiv
             className="relative"
             initial={{ opacity: 0, x: 40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -155,11 +156,12 @@ export default function AboutContent() {
               alt="Traditional Siwa mud-brick architecture"
               width={600}
               height={500}
+              sizes="(min-width: 768px) 600px, 90vw"
               placeholder="blur"
               blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
               className="rounded-lg shadow-lg"
             />{" "}
-          </motion.div>{" "}
+          </MotionDiv>{" "}
         </div>{" "}
       </section>{" "}
       {/* Values */}{" "}

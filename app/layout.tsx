@@ -4,6 +4,8 @@ import type { Metadata } from "next"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
+import { Cairo } from "next/font/google"
+
 import "./globals.css"
 import Loading from "./loading"
 import { AuthProvider } from "@/components/auth-provider"
@@ -22,25 +24,26 @@ export const metadata: Metadata = generateAdvancedMetadata({
   alternateLocales: ["ar_EG"]
 })
 
+const cairo = Cairo({ subsets: ["latin"], weight: ["400", "600", "700"], display: "swap" })
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+  const enableAnalytics = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === 'true'
   return (
     <html lang="en" dir="ltr" className="scroll-smooth">
       <head>
         {/* DNS Prefetch for external domains */}
-        <link rel="dns-prefetch" href="//fonts.googleapis.com" />
-        <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="dns-prefetch" href="//res.cloudinary.com" />
+        <link rel="dns-prefetch" href="//images.unsplash.com" />
         <link rel="dns-prefetch" href="//vercel.live" />
 
         {/* Preconnect for critical resources */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://vercel.live" />
-        
+        <link rel="preconnect" href="https://images.unsplash.com" />
+
         {/* Optimize JavaScript loading */}
         <script dangerouslySetInnerHTML={{
           __html: `
@@ -55,32 +58,6 @@ export default function RootLayout({
             }
           `
         }} />
-
-        {/* Optimized font loading with specific weights */}
-        <link
-          href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
-          rel="preload"
-          as="style"
-          suppressHydrationWarning
-        />
-        <script dangerouslySetInnerHTML={{
-          __html: `
-            // Load font stylesheet after preload
-            const fontLink = document.querySelector('link[href*="Cairo"]');
-            if (fontLink) {
-              fontLink.onload = function() {
-                this.onload = null;
-                this.rel = 'stylesheet';
-              };
-            }
-          `
-        }} />
-        <noscript>
-          <link
-            href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
-            rel="stylesheet"
-          />
-        </noscript>
 
         {/* Critical CSS for above-the-fold content */}
         <style dangerouslySetInnerHTML={{
@@ -156,7 +133,7 @@ export default function RootLayout({
         {/* Resource Hints */}
         <ResourceHints />
       </head>
-      <body className="font-cairo antialiased" suppressHydrationWarning>
+      <body className={`${cairo.className} font-cairo antialiased`} suppressHydrationWarning>
         <ErrorBoundary>
           <Suspense fallback={<Loading />}>
             <AuthProvider>
@@ -166,11 +143,11 @@ export default function RootLayout({
         </ErrorBoundary>
 
         {/* Performance Monitoring */}
-        <PerformanceMonitor />
+        {enableAnalytics && <PerformanceMonitor />}
 
         {/* Analytics - loaded after interactive */}
-        <Analytics />
-        <SpeedInsights />
+        {enableAnalytics && <Analytics />}
+        {enableAnalytics && <SpeedInsights />}
       </body>
     </html>
   )

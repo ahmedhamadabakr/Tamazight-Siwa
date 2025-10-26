@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Plus, Search, Filter, Eye, EyeOff, Edit, Trash2, Image as ImageIcon } from 'lucide-react'
 import { CloudinaryImage } from '@/components/CloudinaryImage'
 import GalleryForm from './gallery-form'
+import Image from 'next/image'
 
 interface GalleryImage {
   _id: string
@@ -293,12 +294,12 @@ export default function GalleryManager() {
           {filteredImages.map((image) => (
             <div key={image._id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
               <div className="relative h-48 rounded-t-lg overflow-hidden">
-                <CloudinaryImage
+                <Image
                   src={image.imageUrl}
                   alt={image.title}
                   fill
                   quality={75}
-                  transformation="w_300,h_200,c_fill,q_75,f_auto"
+                
                 />
                 <div className="absolute top-2 right-2">
                   <span className={`px-2 py-1 text-xs rounded-full ${

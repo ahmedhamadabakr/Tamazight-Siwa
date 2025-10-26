@@ -13,7 +13,7 @@ import {
   Trash2
 } from 'lucide-react'
 import { Review } from '@/models/Review'
-import { CloudinaryImage } from '@/components/CloudinaryImage'
+import Image from 'next/image'
 
 interface ReviewsManagerProps {
   className?: string
@@ -327,138 +327,138 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
         </div>
       ) : (
         <div className="space-y-4">
-          {reviews.map((review) => (
-            <div key={review._id} className="bg-white rounded-lg shadow p-6">
-              {/* Review Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3 space-x-reverse">
-                  {review.userImage ? (
-                    <CloudinaryImage
-                      src={review.userImage}
-                      alt={review.userName}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                      transformation="w_40,h_40,c_fill,q_80,f_auto"
-                    />
-                  ) : (
-                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                      <span className="text-gray-600 font-medium">
-                        {review.userName.charAt(0).toUpperCase()}
-                      </span>
+          {reviews.map((review) => {
+            return (
+              <div key={review._id} className="bg-white rounded-lg shadow p-6">
+                {/* Review Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center space-x-3 space-x-reverse">
+                    {review.userImage ? (
+                      <Image
+                        src={review.userImage}
+                        alt={review.userName}
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+                        <span className="text-gray-600 font-medium">
+                          {review.userName.charAt(0).toUpperCase()}
+                        </span>
+                      </div>
+                    )}
+
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-medium text-gray-900">{review.userName}</h4>
+                        {review.verified && (
+                          <div className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
+                            <Shield className="h-3 w-3" />
+                            <span>Verified</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 text-sm text-gray-500">
+                        <span>{new Date(review.createdAt).toLocaleDateString('en-US')}</span>
+                      </div>
                     </div>
-                  )}
-                  
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-medium text-gray-900">{review.userName}</h4>
-                      {review.verified && (
-                        <div className="flex items-center gap-1 bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-                          <Shield className="h-3 w-3" />
-                          <span>Verified</span>
-                        </div>
-                      )}
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-500">
-                      <span>{new Date(review.createdAt).toLocaleDateString('en-US')}</span>
-                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 ${getStatusColor(review.status)}`}>
+                      {getStatusIcon(review.status)}
+                      {getStatusText(review.status)}
+                    </span>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 ${getStatusColor(review.status)}`}>
-                    {getStatusIcon(review.status)}
-                    {getStatusText(review.status)}
-                  </span>
-                </div>
-              </div>
-
-              {/* Rating and Title */}
-              <div className="mb-3">
-                <div className="flex items-center gap-2 mb-2">
-                  <div className="flex items-center">
-                    {renderStars(review.rating)}
-                  </div>
-                  <span className="text-sm text-gray-600">({review.rating}/5)</span>
-                </div>
-                <h3 className="font-semibold text-gray-900">{review.title}</h3>
-              </div>
-
-              {/* Comment */}
-              <p className="text-gray-700 mb-4">{review.comment}</p>
-
-              {/* Review Images */}
-              {review.images && review.images.length > 0 && (
-                <div className="grid grid-cols-3 gap-2 mb-4">
-                  {review.images.slice(0, 3).map((image, index) => (
-                    <CloudinaryImage
-                      key={index}
-                      src={image}
-                      alt={`Review image ${index + 1}`}
-                      width={100}
-                      height={80}
-                      className="rounded"
-                      transformation="w_100,h_80,c_fill,q_80,f_auto"
-                    />
-                  ))}
-                </div>
-              )}
-
-              {/* Admin Response */}
-              {review.adminResponse && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                {/* Rating and Title */}
+                <div className="mb-3">
                   <div className="flex items-center gap-2 mb-2">
-                    <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white text-xs font-bold">A</span>
+                    <div className="flex items-center">
+                      {renderStars(review.rating)}
                     </div>
-                    <span className="font-medium text-blue-900">Admin Response</span>
+                    <span className="text-sm text-gray-600">({review.rating}/5)</span>
                   </div>
-                  <p className="text-blue-800">{review.adminResponse.message}</p>
+                  <h3 className="font-semibold text-gray-900">{review.title}</h3>
                 </div>
-              )}
 
-              {/* Actions */}
-              <div className="flex gap-2 pt-4 border-t">
-                {review.status === 'pending' && (
-                  <>
-                    <button
-                      onClick={() => updateReviewStatus(review._id!, 'approved')}
-                      className="bg-green-600 text-white px-3 py-1 text-sm rounded hover:bg-green-700 flex items-center gap-1"
-                    >
-                      <CheckCircle className="h-3 w-3" />
-                      Approve
-                    </button>
-                    <button
-                      onClick={() => updateReviewStatus(review._id!, 'rejected')}
-                      className="bg-red-600 text-white px-3 py-1 text-sm rounded hover:bg-red-700 flex items-center gap-1"
-                    >
-                      <XCircle className="h-3 w-3" />
-                      Reject
-                    </button>
-                  </>
+                {/* Comment */}
+                <p className="text-gray-700 mb-4">{review.comment}</p>
+
+                {/* Review Images */}
+                {review.images && review.images.length > 0 && (
+                  <div className="grid grid-cols-3 gap-2 mb-4">
+                    {review.images.slice(0, 3).map((image, index) => (
+                      <Image
+                        key={index}
+                        src={image}
+                        alt={`Review image ${index + 1}`}
+                        width={100}
+                        height={80}
+                        className="rounded"
+                        />
+                    ))}
+                  </div>
                 )}
-                
-                <button
-                  onClick={() => {
-                    setSelectedReview(review)
-                    setShowResponseModal(true)
-                  }}
-                  className="bg-blue-600 text-white px-3 py-1 text-sm rounded hover:bg-blue-700 flex items-center gap-1"
-                >
-                  <Reply className="h-3 w-3" />
-                  Reply
-                </button>
-                
-                <button
-                  onClick={() => deleteReview(review._id!)}
-                  className="bg-red-600 text-white px-3 py-1 text-sm rounded hover:bg-red-700 flex items-center gap-1"
-                >
-                  <Trash2 className="h-3 w-3" />
-                  Delete
-                </button>
+
+                {/* Admin Response */}
+                {review.adminResponse && (
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span className="text-white text-xs font-bold">A</span>
+                      </div>
+                      <span className="font-medium text-blue-900">Admin Response</span>
+                    </div>
+                    <p className="text-blue-800">{review.adminResponse.message}</p>
+                  </div>
+                )}
+
+                {/* Actions */}
+                <div className="flex gap-2 pt-4 border-t">
+                  {review.status === 'pending' && (
+                    <>
+                      <button
+                        onClick={() => updateReviewStatus(review._id!, 'approved')}
+                        className="bg-green-600 text-white px-3 py-1 text-sm rounded hover:bg-green-700 flex items-center gap-1"
+                      >
+                        <CheckCircle className="h-3 w-3" />
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => updateReviewStatus(review._id!, 'rejected')}
+                        className="bg-red-600 text-white px-3 py-1 text-sm rounded hover:bg-red-700 flex items-center gap-1"
+                      >
+                        <XCircle className="h-3 w-3" />
+                        Reject
+                      </button>
+                    </>
+                  )}
+
+                  <button
+                    onClick={() => {
+                      setSelectedReview(review)
+                      setShowResponseModal(true)
+                    } }
+                    className="bg-blue-600 text-white px-3 py-1 text-sm rounded hover:bg-blue-700 flex items-center gap-1"
+                  >
+                    <Reply className="h-3 w-3" />
+                    Reply
+                  </button>
+
+                  <button
+                    onClick={() => deleteReview(review._id!)}
+                    className="bg-red-600 text-white px-3 py-1 text-sm rounded hover:bg-red-700 flex items-center gap-1"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    Delete
+                  </button>
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       )}
 

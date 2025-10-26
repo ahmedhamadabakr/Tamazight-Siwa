@@ -1,14 +1,10 @@
-"use client"
-
-import { useState, useEffect } from "react"
+ 
 import { ClientOnlyNavigation } from "@/components/ClientOnlyNavigation"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Camera, Heart, Share2, Download, MapPin, Images, Users, Loader2 } from "lucide-react"
+import { Camera, MapPin, Images, Users } from "lucide-react"
 import Image from "next/image"
-import { CloudinaryImage } from "@/components/CloudinaryImage"
-import { motion } from "framer-motion"
+import { GalleryClient } from "@/components/gallery/GalleryClient"
 
 interface GalleryImage {
   _id: string
@@ -31,59 +27,21 @@ const categories = [
   { key: "Other", label: "Other" }
 ]
 
-export default function GalleryPage() {
-  const [images, setImages] = useState<GalleryImage[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [activeCategory, setActiveCategory] = useState("all")
-  const [lightbox, setLightbox] = useState<{ src: string; title: string } | null>(null)
-
-  useEffect(() => {
-    fetchImages()
-  }, [])
-
-  const fetchImages = async () => {
-    try {
-      setLoading(true)
-      setError(null)
-
-      const params = new URLSearchParams()
-      params.append('public', 'true') // This tells the API to only return active images for public viewing
-
-      const response = await fetch(`/api/gallery?${params.toString()}`)
-      const data = await response.json()
-
-      if (data.success) {
-        setImages(data.data || [])
-      } else {
-        setError(data.message || 'Failed to load images')
-      }
-    } catch (error) {
-    
-      setError('Failed to connect to the server')
-    } finally {
-      setLoading(false)
+export default async function GalleryPage() {
+  let images: GalleryImage[] = []
+  let error: string | null = null
+  try {
+    const params = new URLSearchParams()
+    params.append('public', 'true')
+    const response = await fetch(`/api/gallery?${params.toString()}` as any, { next: { revalidate: 60 } })
+    const data = await response.json()
+    if (data.success) {
+      images = data.data || []
+    } else {
+      error = data.message || 'Failed to load images'
     }
-  }
-
-  const filteredImages =
-    activeCategory === "all"
-      ? images
-      : images.filter((img) => img.category === activeCategory)
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <ClientOnlyNavigation />
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <Loader2 className="mx-auto h-8 w-8 animate-spin text-primary mb-2" />
-            <p className="text-muted-foreground">Loading gallery...</p>
-          </div>
-        </div>
-        <Footer />
-      </div>
-    )
+  } catch (e) {
+    error = 'Failed to connect to the server'
   }
 
   if (error) {
@@ -93,9 +51,6 @@ export default function GalleryPage() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <p className="text-red-500 mb-2">{error}</p>
-            <Button onClick={fetchImages} variant="outline">
-              Retry
-            </Button>
           </div>
         </div>
         <Footer />
@@ -114,20 +69,17 @@ export default function GalleryPage() {
           alt="Siwa Oasis Gallery"
           fill
           priority
+          fetchPriority="high"
+          sizes="100vw"
           className="object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-          className="relative z-10 text-center text-white max-w-3xl mx-auto px-4"
-        >
+        <div className="relative z-10 text-center text-white max-w-3xl mx-auto px-4">
           <h1 className="text-4xl md:text-6xl font-bold mb-6">Siwa Gallery</h1>
           <p className="text-lg md:text-2xl opacity-90">
             Discover the beauty of Siwa Oasis through our collection
           </p>
-        </motion.div>
+        </div>
       </section>
 
       {/* Stats Section */}
@@ -158,81 +110,8 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Filter Section */}
-      <section className="py-8 px-4">
-        <div className="max-w-6xl mx-auto overflow-x-auto">
-          <div className="flex gap-3 justify-center min-w-max">
-            {categories.map((category) => (
-              <Button
-                key={category.key}
-                variant={activeCategory === category.key ? "default" : "outline"}
-                size="sm"
-                onClick={() => setActiveCategory(category.key)}
-                className="rounded-full"
-              >
-                {category.label}
-              </Button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Gallery Grid */}
-      <section className="py-12 px-4">
-        <div className="max-w-7xl mx-auto">
-          {filteredImages.length === 0 ? (
-            <div className="text-center py-12">
-              <Images className="mx-auto h-12 w-12 text-muted-foreground mb-4" />
-              <h3 className="text-lg font-medium text-muted-foreground mb-2">
-                No images found in this category
-              </h3>
-              <p className="text-muted-foreground">
-                Try another category or come back later to see more images
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredImages.map((image, index) => (
-                <motion.div
-                  key={image._id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, delay: index * 0.1 }}
-                  className="group relative overflow-hidden rounded-xl shadow-md hover:shadow-2xl cursor-pointer"
-                  onClick={() => setLightbox({ src: image.imageUrl, title: image.title })}
-                >
-                  <div className="relative w-full h-64 rounded-xl overflow-hidden">
-                    <CloudinaryImage
-                      src={image.imageUrl}
-                      alt={image.title}
-                      fill
-                      className="group-hover:scale-110 transition-transform duration-500 w-full h-full object-cover"
-                      quality={100}
-                      transformation="w_400,h_300,c_fill,q_100,f_auto"
-                    />
-
-                    {/* Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
-
-                    {/* Badge */}
-                    <div className="absolute top-4 left-4">
-                      <Badge className="bg-white/90 text-black">{image.category}</Badge>
-                    </div>
-
-                    {/* Info */}
-                    <div className="absolute bottom-0 left-0 right-0 p-4 text-white translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                      <h3 className="font-bold text-lg">{image.title}</h3>
-                      <p className="text-sm opacity-80">
-                        {image.description || 'No description available'}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-        </div>
-      </section>
+      {/* Filters + Grid + Lightbox (Client) */}
+      <GalleryClient images={images} />
 
       {/* CTA Section */}
       <section className="relative py-20 text-center text-white">
@@ -240,6 +119,7 @@ export default function GalleryPage() {
           src="/great-sand-sea-dunes-golden-hour.jpg"
           alt="Photography Tours"
           fill
+          sizes="100vw"
           className="object-cover"
         />
         <div className="absolute inset-0 bg-black/70" />
@@ -279,6 +159,7 @@ export default function GalleryPage() {
                   src='/cleopatra-bath-natural-spring-siwa.jpg'
                   alt={`Instagram Post ${i}`}
                   fill
+                  sizes="(min-width: 768px) 16.6vw, (min-width: 640px) 33vw, 50vw"
                   className="object-cover hover:scale-110 transition-transform duration-500"
                 />
               </div>
@@ -294,26 +175,7 @@ export default function GalleryPage() {
         </div>
       </section>
 
-      {/* Lightbox */}
-      {lightbox && (
-        <div
-          className="fixed inset-0 bg-black/90 flex items-center justify-center z-50"
-          onClick={() => setLightbox(null)}
-        >
-          <div className="relative max-w-4xl w-full px-4">
-            <CloudinaryImage
-              src={lightbox.src}
-              alt={lightbox.title}
-              width={1200}
-              height={800}
-              className="rounded-lg mx-auto"
-              quality={95}
-              transformation="w_1200,h_800,c_limit,q_95,f_auto"
-            />
-            <p className="text-center text-white mt-4 text-lg">{lightbox.title}</p>
-          </div>
-        </div>
-      )}
+      {/* Lightbox moved to client component */}
 
       <Footer />
     </div>
