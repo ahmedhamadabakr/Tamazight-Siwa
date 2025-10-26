@@ -87,11 +87,7 @@ export function PerformanceMonitor() {
 export function ResourceHints() {
   return (
     <>
-      {/* Preload critical resources */}
-
-      
       {/* Prefetch likely next pages */}
-      <link rel="prefetch" href="/tours" />
       <link rel="prefetch" href="/gallery" />
       <link rel="prefetch" href="/contact" />
       

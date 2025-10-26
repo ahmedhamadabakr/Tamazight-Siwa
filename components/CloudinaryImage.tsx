@@ -65,7 +65,7 @@ export function CloudinaryImage({
         transformations.push(customTransformation)
       } else {
         // Default optimizations
-        transformations.push(`q_${quality}`)
+        transformations.push(`q_auto:best`)
         transformations.push('f_auto')
         
         if (width && height) {
@@ -172,7 +172,7 @@ export function useCloudinaryUrl(
     if (transformation) {
       transformations.push(transformation)
     } else {
-      transformations.push(`q_${quality}`)
+      transformations.push(`q_auto:best`)
       transformations.push(`f_${format}`)
       
       if (width && height) {

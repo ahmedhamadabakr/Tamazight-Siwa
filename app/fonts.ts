@@ -8,14 +8,3 @@ export const cairo = Cairo({
   fallback: ['system-ui', 'arial'],
   adjustFontFallback: true,
 })
-
-// Font optimization utility
-export const fontOptimization = {
-  preloadFonts: [
-    {
-      href: 'https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap',
-      as: 'style',
-      onload: "this.onload=null;this.rel='stylesheet'",
-    },
-  ],
-}
