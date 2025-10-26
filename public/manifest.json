@@ -1,23 +1,27 @@
 {
-  "name": "Siwa Tours - Discover Egyptian Desert Magic",
-  "short_name": "Siwa Tours",
+  "name": "Siwa With Us - Authentic Desert Experiences",
+  "short_name": "Siwa With Us",
   "description": "Discover the magic of Siwa Oasis through authentic eco-tourism and cultural heritage experiences",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f8f5f0",
-  "theme_color": "#d4a574",
+  "theme_color": "#D4A574",
   "orientation": "portrait-primary",
-  "categories": ["travel", "tourism", "lifestyle"],
-  "lang": "en",
-  "dir": "ltr",
   "icons": [
     {
-      "src": "/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml"
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
     }
   ],
-
-
-  "prefer_related_applications": false
+  "categories": ["travel", "tourism", "lifestyle"],
+  "lang": "en",
+  "dir": "ltr"
 }

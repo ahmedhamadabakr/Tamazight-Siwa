@@ -26,11 +26,11 @@ export const HeroContent = memo(({ showVideo, onToggleVideo }: HeroContentProps)
         <span className="text-3xl md:text-5xl lg:text-6xl">With Us</span>
       </h1>
 
-      <p className="text-xl md:text-2xl mb-8 text-pretty opacity-90 max-w-3xl mx-auto leading-relaxed">
+      <p className="text-lg md:text-xl mb-6 opacity-90 max-w-2xl mx-auto leading-relaxed">
         Discover the magic of Siwa Oasis through authentic eco-tourism and cultural heritage experiences
       </p>
 
-      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
         <Button
           size="lg"
           className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-4 text-lg rounded-full shadow-2xl hover:shadow-primary/25 transition-all duration-300 hover:scale-105 gpu-accelerated"

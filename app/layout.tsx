@@ -34,32 +34,69 @@ export default function RootLayout({
         <link rel="dns-prefetch" href="//fonts.googleapis.com" />
         <link rel="dns-prefetch" href="//fonts.gstatic.com" />
         <link rel="dns-prefetch" href="//res.cloudinary.com" />
-        <link rel="dns-prefetch" href="//images.unsplash.com" />
+        <link rel="dns-prefetch" href="//vercel.live" />
 
         {/* Preconnect for critical resources */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://vercel.live" />
         
-        {/* Remove modulepreload to avoid unused resource warnings */}
+        {/* Optimize JavaScript loading */}
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            // Preload critical resources
+            if ('requestIdleCallback' in window) {
+              requestIdleCallback(() => {
+                const link = document.createElement('link');
+                link.rel = 'prefetch';
+                link.href = '/tours';
+                document.head.appendChild(link);
+              });
+            }
+          `
+        }} />
 
         {/* Optimized font loading with specific weights */}
         <link
           href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
-          rel="stylesheet"
+          rel="preload"
+          as="style"
           suppressHydrationWarning
         />
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            // Load font stylesheet after preload
+            const fontLink = document.querySelector('link[href*="Cairo"]');
+            if (fontLink) {
+              fontLink.onload = function() {
+                this.onload = null;
+                this.rel = 'stylesheet';
+              };
+            }
+          `
+        }} />
+        <noscript>
+          <link
+            href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
+            rel="stylesheet"
+          />
+        </noscript>
 
         {/* Critical CSS for above-the-fold content */}
         <style dangerouslySetInnerHTML={{
           __html: `
-            body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;background:#f8f5f0;color:#3d2914;font-display:swap}
-            .hero-section{height:100vh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden}
-            h1{font-size:2.5rem;font-weight:700;line-height:1.2;margin:0 0 1.5rem 0}
+            *{box-sizing:border-box}
+            body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;background:#f8f5f0;color:#3d2914;font-display:swap;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
+            .hero-section{height:100vh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;contain:layout style paint}
+            h1{font-size:2.5rem;font-weight:700;line-height:1.1;margin:0 0 1rem 0;contain:layout style paint;text-rendering:optimizeSpeed}
             @media(min-width:768px){h1{font-size:3.75rem}}
             @media(min-width:1024px){h1{font-size:4.5rem}}
-            .gpu-accelerated{transform:translateZ(0);will-change:transform}
+            .gpu-accelerated{transform:translateZ(0);will-change:transform;backface-visibility:hidden}
+            img{max-width:100%;height:auto;display:block}
             .loading-skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:loading 1.5s infinite}
             @keyframes loading{0%{background-position:-200% 0}100%{background-position:200% 0}}
+            .animate-fade-in-up{animation:fadeInUp 0.6s ease-out forwards}
+            @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
           `
         }} />
 
@@ -69,7 +106,7 @@ export default function RootLayout({
 
         {/* Theme and viewport */}
         <meta name="theme-color" content="#D4A574" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5, user-scalable=yes" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="format-detection" content="telephone=no, date=no, email=no, address=no" />
 
         {/* Additional SEO Meta Tags */}
@@ -107,7 +144,8 @@ export default function RootLayout({
         <meta name="business:contact_data:phone_number" content="+20-xxx-xxx-xxxx" />
 
         {/* Preload critical resources */}
-        <link rel="preload" href="/siwa-oasis-sunset-salt-lakes-reflection.jpg" as="image" fetchPriority="high" />
+        <link rel="preload" href="/siwa-oasis-sunset-salt-lakes-reflection.jpg" as="image" fetchPriority="high" type="image/jpeg" />
+        <link rel="prefetch" href="/logo.png" as="image" />
 
         {/* Canonical and alternate languages */}
         <link rel="canonical" href="https://siwa-with-us.com" />

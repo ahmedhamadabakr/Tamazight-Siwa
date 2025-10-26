@@ -31,7 +31,10 @@ export function GlobalPerformanceOptimizer() {
             }
           })
         },
-        { rootMargin: '50px' }
+        { 
+          rootMargin: '100px',
+          threshold: 0.1
+        }
       )
 
       // Observe all lazy images
@@ -46,7 +49,13 @@ export function GlobalPerformanceOptimizer() {
       
       if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
         try {
-          await navigator.serviceWorker.register('/sw.js')
+          // Register service worker after page load
+          window.addEventListener('load', async () => {
+            await navigator.serviceWorker.register('/sw.js', {
+              scope: '/',
+              updateViaCache: 'none'
+            })
+          })
         } catch (error) {
           console.warn('Service Worker registration failed:', error)
         }
@@ -181,6 +190,14 @@ export function CriticalCSS() {
       img {
         max-width: 100%;
         height: auto;
+        aspect-ratio: attr(width) / attr(height);
+      }
+      
+      /* Reserve space for hero image */
+      .hero-section img {
+        width: 100%;
+        height: 100vh;
+        object-fit: cover;
       }
       
       /* Loading states */
