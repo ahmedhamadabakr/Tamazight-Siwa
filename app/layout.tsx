@@ -24,7 +24,7 @@ export const metadata: Metadata = generateAdvancedMetadata({
   alternateLocales: ["ar_EG"]
 })
 
-const cairo = Cairo({ subsets: ["latin"], weight: ["400", "600", "700"], display: "swap" })
+const cairo = Cairo({ subsets: ["latin"], weight: ["400", "700"], display: "swap" })
 
 export default function RootLayout({
   children,
@@ -122,7 +122,6 @@ export default function RootLayout({
         <meta name="business:contact_data:phone_number" content="+201552624123" />
 
         {/* Preload critical resources */}
-        <link rel="preload" href="/siwa-oasis-sunset-salt-lakes-reflection.jpg" as="image" fetchPriority="high" type="image/jpeg" />
         <link rel="prefetch" href="/placeholder-logo.png" as="image" />
 
         {/* Canonical and alternate languages */}

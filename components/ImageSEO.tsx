@@ -1,5 +1,5 @@
 import { memo } from 'react'
-import { OptimizedImage } from './OptimizedImage'
+import Image from 'next/image'
 
 interface ImageSEOProps {
   src: string
@@ -58,7 +58,7 @@ export const ImageSEO = memo(({
 
   return (
     <figure className={`image-seo-container ${className || ''}`}>
-      <OptimizedImage
+      <Image
         src={src}
         alt={alt}
         title={title}

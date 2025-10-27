@@ -3,18 +3,17 @@ import { HeroSection } from "@/components/hero-section"
 import { FeaturedTours } from "@/components/featured-tours"
 import { StatsSection } from "@/components/stats-section"
 import { OverviewSection } from "@/components/overview-section"
-import { TestimonialsSection } from "@/components/testimonials-section"
-import { ServicesSection } from "@/components/services-section"
+import dynamic from "next/dynamic"
+// Defer below-the-fold components to improve FCP
+const VideoShowcaseLazy = dynamic(() => import("@/components/video-showcase").then(m => ({ default: m.VideoShowcase })), { ssr: false })
+const GalleryPreviewLazy = dynamic(() => import("@/components/gallery-preview").then(m => ({ default: m.GalleryPreview })), { ssr: false })
+const TestimonialsSectionLazy = dynamic(() => import("@/components/testimonials-section").then(m => ({ default: m.TestimonialsSection })), { ssr: false })
+const ServicesSectionLazy = dynamic(() => import("@/components/services-section").then(m => ({ default: m.ServicesSection })), { ssr: false })
 import { Footer } from "@/components/footer"
 import { ResourceHints } from "@/components/PerformanceMonitor"
 import { GlobalPerformanceOptimizer, CriticalCSS } from "@/components/GlobalPerformanceOptimizer"
 import { HomePageSEO } from "@/components/PageSEO"
 import { LocalSEO } from "@/components/LocalSEO"
-import dynamic from "next/dynamic"
-
-// Import components normally to avoid dynamic import issues
-import { VideoShowcase } from "@/components/video-showcase"
-import { GalleryPreview } from "@/components/gallery-preview"
 
 export default function HomePage() {
   return (
@@ -34,10 +33,10 @@ export default function HomePage() {
         <FeaturedTours />
         <StatsSection />
         <OverviewSection />
-        <VideoShowcase />
-        <GalleryPreview />
-        <TestimonialsSection />
-        <ServicesSection />
+        <VideoShowcaseLazy />
+        <GalleryPreviewLazy />
+        <TestimonialsSectionLazy />
+        <ServicesSectionLazy />
         <Footer />
       </main>
     </>
