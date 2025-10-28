@@ -132,7 +132,7 @@ const NavigationComponent = memo(function Navigation() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-18">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3 group">
+          <Link href="/" prefetch={false} className="flex items-center space-x-3 group">
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center text-white font-bold shadow-lg group-hover:shadow-xl transition-all">
               TS
             </div>
@@ -151,6 +151,7 @@ const NavigationComponent = memo(function Navigation() {
                 <Link
                   key={item.name}
                   href={item.href}
+                  prefetch={false}
                   className={`relative px-4 py-2 font-medium rounded-lg transition-all ${isActive(item.href)
                     ? "text-primary bg-primary/10 shadow-sm"
                     : "text-gray-700 hover:text-primary hover:bg-gray-50"
@@ -167,7 +168,7 @@ const NavigationComponent = memo(function Navigation() {
             {/* Auth Section */}
             {mounted && status === "authenticated" && displayUser && !isSigningOut ? (
               <div className="flex items-center space-x-4 ml-4">
-                <Link href={profileLink}>
+                <Link href={profileLink} prefetch={false}>
                   <div className="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-200 cursor-pointer">
                     <div className="relative">
                       {displayUser.image ? (
@@ -201,12 +202,12 @@ const NavigationComponent = memo(function Navigation() {
               </div>
             ) : mounted && status === "unauthenticated" ? (
               <div className="flex items-center space-x-3 ml-4">
-                <Link href="/login">
+                <Link href="/login" prefetch={false}>
                   <Button variant="ghost" className="text-gray-700 hover:text-primary hover:bg-gray-50">
                     Sign in
                   </Button>
                 </Link>
-                <Link href="/register">
+                <Link href="/register" prefetch={false}>
                   <Button className="bg-primary hover:bg-primary/90 text-white">Sign up</Button>
                 </Link>
               </div>

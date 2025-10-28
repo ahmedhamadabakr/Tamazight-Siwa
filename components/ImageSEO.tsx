@@ -96,8 +96,8 @@ export const GallerySEO = memo(({
     caption?: string
     width?: number
     height?: number
-  }>
-  title: string
+  }>,
+  title: string,
   description: string
 }) => {
   const gallerySchema = {
