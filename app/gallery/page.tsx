@@ -6,6 +6,7 @@ import { Camera, MapPin, Images, Users } from "lucide-react"
 import Image from "next/image"
 import { GalleryClient } from "@/components/gallery/GalleryClient"
 import dbConnect from '@/lib/mongodb'
+import { Suspense } from "react"
 
 interface GalleryImage {
   _id: string
@@ -63,47 +64,20 @@ async function getGalleryImages(): Promise<{ images: GalleryImage[], error: stri
   }
 }
 
-export default async function GalleryPage() {
+async function ImagesData() {
   const { images, error } = await getGalleryImages()
-
   if (error) {
     return (
-      <div className="min-h-screen bg-background">
-        <ClientOnlyNavigation />
-        <div className="flex items-center justify-center h-64">
-          <div className="text-center">
-            <p className="text-red-500 mb-2">{error}</p>
-          </div>
+      <section className="py-12">
+        <div className="max-w-6xl mx-auto px-4">
+          <p className="text-center text-red-500">{error}</p>
         </div>
-        <Footer />
-      </div>
+      </section>
     )
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <ClientOnlyNavigation />
-
-      {/* Hero Section */}
-      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
-        <Image
-          src="/siwa-oasis-sunset-salt-lakes-reflection.jpg"
-          alt="Siwa Oasis Gallery"
-          fill
-          priority
-          fetchPriority="high"
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
-        <div className="relative z-10 text-center text-white max-w-3xl mx-auto px-4">
-          <h1 className="text-4xl md:text-6xl font-bold mb-6">Siwa Gallery</h1>
-          <p className="text-lg md:text-2xl opacity-90">
-            Discover the beauty of Siwa Oasis through our collection
-          </p>
-        </div>
-      </section>
-
+    <>
       {/* Stats Section */}
       <section className="py-12 bg-muted/30">
         <div className="max-w-6xl mx-auto px-4">
@@ -134,6 +108,72 @@ export default async function GalleryPage() {
 
       {/* Filters + Grid + Lightbox (Client) */}
       <GalleryClient images={images} />
+    </>
+  )
+}
+
+function LoadingSection() {
+  return (
+    <section className="py-12 bg-muted/30">
+      <div className="max-w-6xl mx-auto px-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center animate-pulse">
+          <div>
+            <div className="mx-auto w-8 h-8 bg-muted rounded mb-2" />
+            <div className="h-6 w-16 bg-muted rounded mx-auto" />
+            <div className="h-3 w-20 bg-muted rounded mx-auto mt-2" />
+          </div>
+          <div>
+            <div className="mx-auto w-8 h-8 bg-muted rounded mb-2" />
+            <div className="h-6 w-16 bg-muted rounded mx-auto" />
+            <div className="h-3 w-20 bg-muted rounded mx-auto mt-2" />
+          </div>
+          <div>
+            <div className="mx-auto w-8 h-8 bg-muted rounded mb-2" />
+            <div className="h-6 w-16 bg-muted rounded mx-auto" />
+            <div className="h-3 w-20 bg-muted rounded mx-auto mt-2" />
+          </div>
+          <div>
+            <div className="mx-auto w-8 h-8 bg-muted rounded mb-2" />
+            <div className="h-6 w-16 bg-muted rounded mx-auto" />
+            <div className="h-3 w-20 bg-muted rounded mx-auto mt-2" />
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+export default function GalleryPage() {
+  return (
+    <div className="min-h-screen bg-background">
+      <ClientOnlyNavigation />
+
+      {/* Hero Section */}
+      <section className="relative h-[60vh] flex items-center justify-center overflow-hidden">
+        <Image
+          src="/siwa-oasis-sunset-salt-lakes-reflection.jpg"
+          alt="Siwa Oasis Gallery"
+          fill
+          priority
+          fetchPriority="high"
+          sizes="100vw"
+          className="object-cover"
+          quality={60}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/70 to-black/30" />
+        <div className="relative z-10 text-center text-white max-w-3xl mx-auto px-4">
+          <h1 className="text-4xl md:text-6xl font-bold mb-6">Siwa Gallery</h1>
+          <p className="text-lg md:text-2xl opacity-90">
+            Discover the beauty of Siwa Oasis through our collection
+          </p>
+        </div>
+      </section>
+
+      <Suspense fallback={<LoadingSection />}>
+        {/* Stats + Gallery stream in without blocking hero */}
+        {/* Filters + Grid + Lightbox (Client) */}
+        <ImagesData />
+      </Suspense>
 
       {/* CTA Section */}
   
