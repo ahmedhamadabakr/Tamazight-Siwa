@@ -1,10 +1,11 @@
- 
+
 import { ClientOnlyNavigation } from "@/components/ClientOnlyNavigation"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
 import { Camera, MapPin, Images, Users } from "lucide-react"
 import Image from "next/image"
 import { GalleryClient } from "@/components/gallery/GalleryClient"
+import dbConnect from '@/lib/mongodb'
 
 interface GalleryImage {
   _id: string
@@ -27,22 +28,43 @@ const categories = [
   { key: "Other", label: "Other" }
 ]
 
-export default async function GalleryPage() {
-  let images: GalleryImage[] = []
-  let error: string | null = null
+async function getGalleryImages(): Promise<{ images: GalleryImage[], error: string | null }> {
   try {
-    const params = new URLSearchParams()
-    params.append('public', 'true')
-    const response = await fetch(`/api/gallery?${params.toString()}` as any, { next: { revalidate: 60 } })
-    const data = await response.json()
-    if (data.success) {
-      images = data.data || []
-    } else {
-      error = data.message || 'Failed to load images'
-    }
+    const db = await dbConnect()
+    const collection = db.collection('gallery')
+
+    const query = { isActive: true }
+    const images = await collection
+      .find(query)
+      .sort({ createdAt: -1 })
+      .toArray()
+
+    // Convert MongoDB documents to plain objects
+    const serializedImages = images.map(img => ({
+      _id: img._id?.toString() || '',
+      title: img.title || '',
+      description: img.description || '',
+      imageUrl: img.imageUrl || '',
+      category: img.category || 'Other',
+      isActive: img.isActive !== false,
+      createdAt: img.createdAt?.toISOString() || new Date().toISOString(),
+      updatedAt: img.updatedAt?.toISOString() || new Date().toISOString()
+    }))
+
+    return { images: serializedImages, error: null }
   } catch (e) {
-    error = 'Failed to connect to the server'
+    console.error('Error fetching gallery images:', e)
+    // Return empty array instead of error during build time
+    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build'
+    return {
+      images: [],
+      error: isBuildTime ? null : 'Failed to connect to the server'
+    }
   }
+}
+
+export default async function GalleryPage() {
+  const { images, error } = await getGalleryImages()
 
   if (error) {
     return (
@@ -114,35 +136,7 @@ export default async function GalleryPage() {
       <GalleryClient images={images} />
 
       {/* CTA Section */}
-      <section className="relative py-20 text-center text-white">
-        <Image
-          src="/great-sand-sea-dunes-golden-hour.jpg"
-          alt="Photography Tours"
-          fill
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="absolute inset-0 bg-black/70" />
-        <div className="relative z-10 max-w-4xl mx-auto px-4">
-          <Camera className="w-16 h-16 mx-auto mb-6 opacity-90" />
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">Capture your memories</h2>
-          <p className="text-lg md:text-xl mb-8 opacity-90">
-            Join our photography tours and learn how to capture the beauty of Siwa like professionals
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Button size="lg" variant="secondary" className="bg-white text-black hover:bg-white/90">
-              Photography Tours
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="border-white text-black hover:bg-white hover:text-black-900"
-            >
-              Special Sessions
-            </Button>
-          </div>
-        </div>
-      </section>
+  
 
       {/* Instagram Feed */}
       <section className="py-20 px-4">

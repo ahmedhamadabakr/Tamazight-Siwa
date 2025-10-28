@@ -99,8 +99,8 @@ export default function LoginPage() {
     }
 
     if (result?.ok) {
-      // The useEffect hook will handle the redirect once session is updated
-      // Just keep loading state active
+      // Redirect immediately for better UX instead of waiting for session hydration
+      router.replace(callbackUrl);
       return;
     } else {
       setError('Login failed. Please try again.');

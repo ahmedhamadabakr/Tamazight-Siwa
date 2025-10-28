@@ -18,12 +18,25 @@ if (!cached) {
 }
 
 async function dbConnect(): Promise<Db> {
-  // Check if we're in build time and throw a specific error
+  // Check if we're in build time and return a mock connection
   const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
-    process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === undefined;
+    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV && !process.env.MONGODB_URI);
 
   if (isBuildTime) {
-    throw new Error('Database connection not available during build time');
+    // Return a mock database for build time
+    return {
+      collection: () => ({
+        find: () => ({
+          sort: () => ({
+            toArray: () => Promise.resolve([])
+          })
+        }),
+        findOne: () => Promise.resolve(null),
+        insertOne: () => Promise.resolve({ insertedId: null }),
+        updateOne: () => Promise.resolve({ modifiedCount: 0 }),
+        deleteOne: () => Promise.resolve({ deletedCount: 0 })
+      })
+    } as any;
   }
 
   if (cached.conn) {
@@ -57,12 +70,13 @@ let mongoClient: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
 async function getMongoClient(): Promise<MongoClient> {
-  // Check if we're in build time and throw a specific error
+  // Check if we're in build time and return a mock client
   const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
-    process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === undefined;
+    (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV && !process.env.MONGODB_URI);
 
   if (isBuildTime) {
-    throw new Error('Database connection not available during build time');
+    // Return a mock client for build time
+    return {} as MongoClient;
   }
 
   if (!mongoClient) {

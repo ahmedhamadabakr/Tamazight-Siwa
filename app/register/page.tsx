@@ -9,39 +9,41 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, UserPlus } from 'lucide-react';
+import Select from 'react-select';
+import {countriesByContinent} from '@/data/countries';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
     phone: '',
+    country: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const [success, setSuccess] = useState('');
   const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
+  };
+
+  const handleCountryChange = (selected: any) => {
+    setFormData({ ...formData, country: selected?.label || '' });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (loading) return; // Prevent double submission
-    
+    if (loading) return;
     setLoading(true);
     setError('');
-    setSuccess('');
 
-    // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match');
       setLoading(false);
@@ -51,34 +53,26 @@ export default function RegisterPage() {
     try {
       const response = await fetch('/api/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.fullName,
           email: formData.email,
+          phone: formData.phone,
+          country: formData.country,
           password: formData.password,
         }),
       });
 
       const data = await response.json();
-
       if (data.success) {
-        localStorage.setItem('registrationData', JSON.stringify({
-          name: formData.fullName,
-          email: formData.email,
-          password: formData.password,
-        }));
-
-        const redirectUrl = `/verify-code?email=${encodeURIComponent(formData.email)}`;
-        router.push(redirectUrl);
-        // Don't set loading to false here as we're redirecting
+        router.push(`/verify-code?email=${encodeURIComponent(formData.email)}`);
       } else {
-        setError(data.error || 'Failed to send verification code');
-        setLoading(false);
+        const serverMessage = typeof data.error === 'string' ? data.error : data.error?.message;
+        setError(serverMessage || 'Failed to register');
       }
     } catch (error) {
       setError('Network error. Please try again.');
+    } finally {
       setLoading(false);
     }
   };
@@ -86,7 +80,6 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-4 py-12">
       <div className="max-w-md w-full space-y-8">
-        {/* Logo + Title */}
         <div className="text-center">
           <Link href="/" className="flex items-center justify-center gap-2 mb-6">
             <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-md">
@@ -104,33 +97,23 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {/* Register Card */}
         <Card className="shadow-lg border border-gray-200">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-800">
               <UserPlus className="w-5 h-5 text-primary" />
               Join us today
             </CardTitle>
-            <CardDescription>
-              Create your account and start exploring our unique travel experiences
-            </CardDescription>
+            <CardDescription>Create your account and start exploring</CardDescription>
           </CardHeader>
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
                 <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
+                  <AlertDescription>{typeof error === 'string' ? error : JSON.stringify(error)}</AlertDescription>
                 </Alert>
               )}
 
-              {success && (
-                <Alert>
-                  <AlertDescription className="text-green-600">{success}</AlertDescription>
-                </Alert>
-              )}
-
-              {/* Full name */}
               <div>
                 <Label htmlFor="fullName">Full Name</Label>
                 <Input
@@ -145,7 +128,6 @@ export default function RegisterPage() {
                 />
               </div>
 
-              {/* Email */}
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -160,7 +142,6 @@ export default function RegisterPage() {
                 />
               </div>
 
-              {/* Phone */}
               <div>
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
@@ -175,7 +156,17 @@ export default function RegisterPage() {
                 />
               </div>
 
-              {/* Password */}
+              {/* Country Selector */}
+              <div>
+                <Label>Country</Label>
+                <Select
+                  options={countriesByContinent}
+                  onChange={handleCountryChange}
+                  placeholder="Select your country"
+                  className="mt-1"
+                />
+              </div>
+
               <div>
                 <Label htmlFor="password">Password</Label>
                 <div className="relative mt-1">
@@ -194,17 +185,12 @@ export default function RegisterPage() {
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
                   >
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-1">
-                  Password must be at least 6 characters
-                </p>
               </div>
 
-              {/* Confirm Password */}
               <div>
                 <Label htmlFor="confirmPassword">Confirm Password</Label>
                 <div className="relative mt-1">
@@ -223,35 +209,16 @@ export default function RegisterPage() {
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                     className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                    aria-label={showConfirmPassword ? 'Hide confirm password' : 'Show confirm password'}
                   >
                     {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
               </div>
 
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full font-semibold text-base"
-                disabled={loading}
-              >
+              <Button type="submit" className="w-full font-semibold text-base" disabled={loading}>
                 {loading ? 'Creating account...' : 'Create Account'}
               </Button>
             </form>
-
-            <div className="mt-6 text-center text-sm text-gray-600">
-              <p>
-                By clicking “Create Account”, you agree to our{' '}
-                <Link href="/terms" className="text-primary hover:underline">
-                  Terms of Service
-                </Link>{' '}
-                and{' '}
-                <Link href="/privacy" className="text-primary hover:underline">
-                  Privacy Policy
-                </Link>.
-              </p>
-            </div>
           </CardContent>
         </Card>
       </div>

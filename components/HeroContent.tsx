@@ -2,6 +2,7 @@
 import { Button } from "@/components/ui/button"
 import { Play } from "lucide-react"
 import { memo } from "react"
+import Link from "next/link"
 
 interface HeroContentProps {
   showVideo: boolean
@@ -31,13 +32,13 @@ export const HeroContent = memo(({ showVideo, onToggleVideo }: HeroContentProps)
       </p>
 
       <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
-        <Button
-          size="lg"
-          className="bg-primary hover:bg-primary/90 text-primary-foreground px-10 py-4 text-lg rounded-full shadow-2xl hover:shadow-primary/25 transition-all duration-300 hover:scale-105 gpu-accelerated"
+        <Link
+          href="/tours"
+          className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-2 text-lg rounded-full shadow-2xl hover:shadow-primary/25 transition-all duration-300 hover:scale-105 gpu-accelerated"
           aria-label="Book your Siwa Oasis trip now"
         >
           Book Your Trip Now
-        </Button>
+        </Link>
         <Button
           size="lg"
           variant="outline"
@@ -53,15 +54,15 @@ export const HeroContent = memo(({ showVideo, onToggleVideo }: HeroContentProps)
       {/* Stats */}
       <div className="flex flex-wrap justify-center gap-8 text-sm">
         <div className="text-center">
-          <div className="text-2xl font-bold text-primary">500+</div>
+          <div className="text-2xl font-bold ">500+</div>
           <div className="opacity-80">Happy Visitors</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-primary">15+</div>
+          <div className="text-2xl font-bold ">15+</div>
           <div className="opacity-80">Unique Experiences</div>
         </div>
         <div className="text-center">
-          <div className="text-2xl font-bold text-primary">4.9</div>
+          <div className="text-2xl font-bold ">4.9</div>
           <div className="opacity-80">Excellent Rating</div>
         </div>
       </div>

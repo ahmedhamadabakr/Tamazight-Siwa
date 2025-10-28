@@ -10,6 +10,8 @@ import { Phone, Mail, MapPin, Clock, MessageCircle, Send } from "lucide-react"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from "@/components/ui/accordion"
+import { ContactSection } from "@/components/contact-section"
+import Link from "next/link"
 
 export default function ContactPage() {
   return (
@@ -51,50 +53,7 @@ export default function ContactPage() {
               Tell us about your dream Siwa experience and we&apos;ll create the perfect itinerary for you.
             </p>
 
-            <Card className="border-0 shadow-lg">
-              <CardContent className="p-8">
-                <form className="space-y-6">
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input id="firstName" placeholder="Your first name" className="mt-2" />
-                    </div>
-                    <div>
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input id="lastName" placeholder="Your last name" className="mt-2" />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email Address</Label>
-                    <Input id="email" type="email" placeholder="your@email.com" className="mt-2" />
-                  </div>
-                  <div>
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input id="phone" type="tel" placeholder="+20 123 456 789" className="mt-2" />
-                  </div>
-                  <div>
-                    <Label htmlFor="travelDates">Preferred Travel Dates</Label>
-                    <Input id="travelDates" placeholder="e.g., March 15-22, 2024" className="mt-2" />
-                  </div>
-                  <div>
-                    <Label htmlFor="groupSize">Group Size</Label>
-                    <Input id="groupSize" placeholder="Number of travelers" className="mt-2" />
-                  </div>
-                  <div>
-                    <Label htmlFor="interests">Interests & Preferences</Label>
-                    <Textarea
-                      id="interests"
-                      placeholder="Tell us about your interests, preferred activities, etc."
-                      className="mt-2 min-h-[120px]"
-                    />
-                  </div>
-                  <Button size="lg" className="w-full bg-primary hover:scale-105 transition-transform">
-                    <Send className="w-4 h-4 mr-2" />
-                    Send Message
-                  </Button>
-                </form>
-              </CardContent>
-            </Card>
+          <ContactSection />
           </motion.div>
 
           {/* Contact Info */}
@@ -106,7 +65,7 @@ export default function ContactPage() {
 
             <div className="space-y-6">
               {[
-                { icon: Phone, title: "Phone & WhatsApp", details: ["+20 123 456 789", "+20 987 654 321"] },
+                { icon: Phone, title: "Phone & WhatsApp", details: ["+20 155 262 4123"], },
                 { icon: Mail, title: "Email", details: ["info@tamazightsiwa.com", "bookings@tamazightsiwa.com"] },
                 { icon: MapPin, title: "Location", details: ["Shali Village, Siwa Oasis", "Matrouh, Egypt"] },
                 { icon: Clock, title: "Office Hours", details: ["Daily: 8:00 AM - 10:00 PM", "Emergency: 24/7"] },
@@ -166,17 +125,44 @@ export default function ContactPage() {
 
           <div className="grid md:grid-cols-3 gap-8 mb-12">
             {[
-              { name: "WhatsApp", color: "bg-green-500", icon: <MessageCircle className="w-8 h-8 text-white" /> },
-              { name: "Instagram", color: "bg-gradient-to-r from-pink-500 to-purple-500", icon: <span className="text-white font-bold text-xl">IG</span> },
-              { name: "Facebook", color: "bg-blue-600", icon: <span className="text-white font-bold text-xl">FB</span> },
-            ].map((s, i) => (
-              <Card key={i} className="border-0 shadow-lg hover:scale-105 transition-transform cursor-pointer">
-                <CardContent className="p-8 text-center">
-                  <div className={`w-16 h-16 ${s.color} rounded-full flex items-center justify-center mx-auto mb-4`}>
-                    {s.icon}
+              { 
+                name: "WhatsApp", 
+                color: "bg-green-500", 
+                icon: <MessageCircle className="w-8 h-8 text-white" />,
+                url: "https://wa.me/+201552624123"
+              },
+              { 
+                name: "Instagram", 
+                color: "bg-gradient-to-r from-pink-500 to-purple-500", 
+                icon: <span className="text-white font-bold text-xl">IG</span>,
+                url: "https://instagram.com/YOUR_INSTAGRAM"
+              },
+              { 
+                name: "Facebook", 
+                color: "bg-blue-600", 
+                icon: <span className="text-white font-bold text-xl">FB</span>,
+                url: "https://facebook.com/YOUR_FACEBOOK_PAGE"
+              },
+            ].map((social, index) => (
+              <Card key={social.name} className="group border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
+                <CardContent className="p-8 text-center h-full flex flex-col">
+                  <div className={`w-16 h-16 ${social.color} rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform`}>
+                    {social.icon}
                   </div>
-                  <h3 className="font-semibold text-lg mb-2">{s.name}</h3>
-                  <Button variant="outline" className="w-full bg-transparent">Connect</Button>
+                  <h3 className="font-semibold text-lg mb-4">{social.name}</h3>
+                  <Link
+                    href={social.url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="mt-auto inline-block w-full"
+                  >
+                    <Button 
+                      variant="outline" 
+                      className="w-full bg-transparent hover:bg-foreground/5 transition-colors"
+                    >
+                      Connect on {social.name}
+                    </Button>
+                  </Link>
                 </CardContent>
               </Card>
             ))}
@@ -194,9 +180,12 @@ export default function ContactPage() {
             <div className="relative z-10">
               <h3 className="text-2xl font-bold mb-4">Ready to Book Your Adventure?</h3>
               <p className="text-lg opacity-90 mb-6">Don&apos;t wait – Siwa&apos;s magic is calling your name!</p>
-              <Button size="lg" variant="secondary" className="bg-background text-foreground hover:scale-105 transition-transform">
+              <Link 
+                href="/tours"
+                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 hover:scale-105 transition-transform"
+              >
                 Start Planning Now
-              </Button>
+              </Link>
             </div>
           </div>
         </div>

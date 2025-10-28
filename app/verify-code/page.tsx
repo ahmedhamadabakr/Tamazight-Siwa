@@ -2,147 +2,123 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { FaCheckCircle, FaTimesCircle, FaSpinner, FaArrowLeft } from 'react-icons/fa';
+import { motion } from 'framer-motion';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Card, CardHeader, CardTitle, CardContent, CardFooter, CardDescription } from '@/components/ui/card';
+import { Loader2, CheckCircle, XCircle, ArrowLeft, Mail } from 'lucide-react';
 
 type VerificationStatus = 'entering' | 'verifying' | 'success' | 'error';
 
-export default function VerifyEmail() {
+export default function VerifyEmailPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<VerificationStatus>('entering');
   const [email, setEmail] = useState('');
   const [code, setCode] = useState('');
-  const [name, setName] = useState('');
-  const [password, setPassword] = useState('');
-  const [message, setMessage] = useState('Enter the verification code sent to your email');
+  const [message, setMessage] = useState('Enter the 6-digit verification code sent to your email');
   const [isLoading, setIsLoading] = useState(false);
+  const [countdown, setCountdown] = useState(300); // 5 minutes in seconds
+  const [canResend, setCanResend] = useState(true);
+  const [resendMessage, setResendMessage] = useState('');
+
+  // Format countdown to MM:SS
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     const urlEmail = searchParams.get('email');
-    const storedData = localStorage.getItem('registrationData');
-    let registrationData = { email: '', name: '', password: '' };
-
-    if (storedData) {
-      try {
-        registrationData = JSON.parse(storedData);
-      } catch (e) {
-        console.error('Error parsing registration data from localStorage:', e);
-      }
-    }
-
-    // Prioritize URL email if available, otherwise use stored email
-    const finalEmail = urlEmail || registrationData.email;
-    setEmail(finalEmail);
-    setName(registrationData.name);
-    setPassword(registrationData.password);
-    
-    if (!finalEmail) {
+    if (!urlEmail) {
       setStatus('error');
       setMessage('Email not found. Please register again.');
-    } else if (!registrationData.name || !registrationData.password) {
-      // This case handles if email is in URL but name/password are missing from localStorage
-      setStatus('error');
-      setMessage('Email not found. Please register again.');
+      return;
     }
+    setEmail(urlEmail);
   }, [searchParams]);
+
+  // Handle countdown timer
+  useEffect(() => {
+    if (countdown > 0 && status === 'entering') {
+      const timer = setTimeout(() => setCountdown(countdown - 1), 1000);
+      return () => clearTimeout(timer);
+    } else if (countdown === 0) {
+      setCanResend(true);
+    }
+  }, [countdown, status]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!code) {
-      setMessage('Enter the verification code sent to your email');
-      setStatus('error');
-      return;
-    }
-
-    if (!email) {
-      setMessage('Email not found. Please register again.');
+    if (!code || code.length !== 6) {
+      setMessage('Please enter a valid 6-digit code');
       setStatus('error');
       return;
     }
 
     setIsLoading(true);
     setStatus('verifying');
-    setMessage('Verifying the code...');
+    setMessage('Verifying your code...');
 
     try {
       const response = await fetch('/api/verify-code', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          code,
-          name,
-          password,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, code }),
       });
 
       const data = await response.json();
 
-      if (data.success) {
-        setStatus('success');
-        setMessage('Account created successfully! Redirecting to login page...');
-
-        // Clear stored data
-        localStorage.removeItem('registrationData');
-
-        // Redirect to login page after 3 seconds
-        setTimeout(() => {
-          router.push('/login');
-        }, 3000);
-      } else {
-        setStatus('error');
-        setMessage(data.error || '  Invalid verification code');
+      if (!response.ok) {
+        throw new Error(data.error || 'Verification failed');
       }
+
+      setStatus('success');
+      setMessage('Email verified successfully! Redirecting to login...');
+      setTimeout(() => {
+        router.push('/login');
+      }, 2000);
     } catch (error) {
-      console.error('Verification error:', error);
       setStatus('error');
-      setMessage('An error occurred while verifying the code');
+      setMessage(error instanceof Error ? error.message : 'An error occurred. Please try again.');
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleResendCode = async () => {
-    if (!email || !name || !password) {
-      setMessage('Please return to the registration page and enter the data again');
+    if (!email) {
+      setMessage('Email not found');
       setStatus('error');
       return;
     }
 
     setIsLoading(true);
-    setStatus('verifying');
-    setMessage('Sending new verification code...');
+    setResendMessage('Sending new code...');
 
     try {
-      const response = await fetch('/api/register', {
+      const response = await fetch('/api/resend-verification', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          password,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
       });
 
       const data = await response.json();
 
-      if (data.success) {
-        setStatus('entering');
-        setMessage('New verification code sent to your email');
-        setCode(''); // Clear the code field
-      } else {
-        setStatus('error');
-        setMessage(data.error || 'Failed to send new verification code');
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to resend code');
       }
+
+      setCanResend(false);
+      setCountdown(300); // Reset countdown to 5 minutes
+      setResendMessage('New verification code sent!');
+      setStatus('entering');
+      setCode('');
+      setMessage('Enter the new 6-digit code sent to your email');
     } catch (error) {
-      console.error('Resend error:', error);
-      setStatus('error');
-      setMessage('An error occurred while sending the new verification code');
+      setResendMessage(error instanceof Error ? error.message : 'Failed to resend code');
     } finally {
       setIsLoading(false);
     }
@@ -151,11 +127,11 @@ export default function VerifyEmail() {
   const getStatusIcon = () => {
     switch (status) {
       case 'verifying':
-        return <FaSpinner className="animate-spin text-blue-500 text-3xl mb-4" />;
+        return <Loader2 className="animate-spin text-blue-500 w-8 h-8 mb-4" />;
       case 'success':
-        return <FaCheckCircle className="text-green-500 text-3xl mb-4" />;
+        return <CheckCircle className="text-green-500 w-8 h-8 mb-4" />;
       case 'error':
-        return <FaTimesCircle className="text-red-500 text-3xl mb-4" />;
+        return <XCircle className="text-red-500 w-8 h-8 mb-4" />;
       default:
         return null;
     }
@@ -200,15 +176,18 @@ export default function VerifyEmail() {
               </button>
             </div>
 
-            <div className="text-center">
+            <div className="text-center space-y-2">
               <button
                 type="button"
                 onClick={handleResendCode}
-                disabled={isLoading}
+                disabled={isLoading || !canResend}
                 className="text-sm text-blue-600 hover:text-blue-500 disabled:opacity-50"
               >
-                Resend code
+                Resend code { !canResend && `in ${formatTime(countdown)}` }
               </button>
+              {resendMessage && (
+                <div className="text-xs text-gray-500">{resendMessage}</div>
+              )}
             </div>
 
             <div className="text-center">
@@ -217,7 +196,7 @@ export default function VerifyEmail() {
                 onClick={() => router.push('/register')}
                 className="text-sm text-gray-600 hover:text-gray-500 flex items-center justify-center gap-2"
               >
-                <FaArrowLeft className="text-sm" />
+                <ArrowLeft className="w-4 h-4" />
                 Return to registration page
               </button>
             </div>

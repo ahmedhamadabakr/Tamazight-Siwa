@@ -56,95 +56,104 @@ export async function getAuthOptions(): Promise<NextAuthOptions> {
               '127.0.0.1'
             const ip = Array.isArray(clientIP) ? clientIP[0] : clientIP.toString().split(',')[0]
 
-            // Check rate limiting for IP
-            const ipRateLimit = await rateLimitService.checkLoginAttempts(ip)
+            // Check rate limiting for IP and email in parallel
+            const [ipRateLimit, emailRateLimit] = await Promise.all([
+              rateLimitService.checkLoginAttempts(ip),
+              rateLimitService.checkLoginAttempts(credentials.email)
+            ])
             if (!ipRateLimit.allowed) {
-              await database.logSecurityEvent({
+              // fire-and-forget logging
+              void database.logSecurityEvent({
                 eventType: 'RATE_LIMIT_EXCEEDED',
                 ipAddress: ip,
                 details: { identifier: ip, type: 'ip' }
-              })
+              }).catch(() => {})
               return null
             }
-
-            // Check rate limiting for email
-            const emailRateLimit = await rateLimitService.checkLoginAttempts(credentials.email)
             if (!emailRateLimit.allowed) {
-              await database.logSecurityEvent({
+              void database.logSecurityEvent({
                 eventType: 'RATE_LIMIT_EXCEEDED',
                 ipAddress: ip,
                 details: { identifier: credentials.email, type: 'email' }
-              })
+              }).catch(() => {})
               return null
             }
 
             // Find user by email
             const user = await database.findUserByEmail(credentials.email)
             if (!user) {
-              await rateLimitService.recordLoginAttempt(ip, false)
-              await rateLimitService.recordLoginAttempt(credentials.email, false)
-              await database.logSecurityEvent({
-                eventType: 'LOGIN_FAILED',
-                ipAddress: ip,
-                details: { reason: 'user_not_found', email: credentials.email }
-              })
+              await Promise.allSettled([
+                rateLimitService.recordLoginAttempt(ip, false),
+                rateLimitService.recordLoginAttempt(credentials.email, false),
+                database.logSecurityEvent({
+                  eventType: 'LOGIN_FAILED',
+                  ipAddress: ip,
+                  details: { reason: 'user_not_found', email: credentials.email }
+                })
+              ])
               return null
             }
 
             // Check if account is locked
             if (user.lockoutUntil && user.lockoutUntil > new Date()) {
-              await database.logSecurityEvent({
+              void database.logSecurityEvent({
                 userId: user._id,
                 eventType: 'ACCOUNT_LOCKED',
                 ipAddress: ip,
                 details: { lockoutUntil: user.lockoutUntil }
-              })
+              }).catch(() => {})
               return null
             }
 
             // Verify password
             const isPasswordValid = await comparePassword(credentials.password, user.password)
             if (!isPasswordValid) {
-              await rateLimitService.recordLoginAttempt(ip, false)
-              await rateLimitService.recordLoginAttempt(credentials.email, false)
-              await database.incrementLoginAttempts(credentials.email)
+              await Promise.allSettled([
+                rateLimitService.recordLoginAttempt(ip, false),
+                rateLimitService.recordLoginAttempt(credentials.email, false),
+                database.incrementLoginAttempts(credentials.email)
+              ])
 
               // Check if account should be locked
               if (await rateLimitService.shouldLockAccount(credentials.email)) {
-                await database.lockAccount(credentials.email, SECURITY_CONFIG.LOGIN_LOCKOUT_DURATION)
-                await database.logSecurityEvent({
-                  userId: user._id,
-                  eventType: 'ACCOUNT_LOCKED',
-                  ipAddress: ip,
-                  details: { reason: 'max_attempts_exceeded' }
-                })
+                await Promise.allSettled([
+                  database.lockAccount(credentials.email, SECURITY_CONFIG.LOGIN_LOCKOUT_DURATION),
+                  database.logSecurityEvent({
+                    userId: user._id,
+                    eventType: 'ACCOUNT_LOCKED',
+                    ipAddress: ip,
+                    details: { reason: 'max_attempts_exceeded' }
+                  })
+                ])
               }
 
-              await database.logSecurityEvent({
+              void database.logSecurityEvent({
                 userId: user._id,
                 eventType: 'LOGIN_FAILED',
                 ipAddress: ip,
                 details: { reason: 'invalid_password' }
-              })
+              }).catch(() => {})
               return null
             }
 
             // Check if user account is active
             if (!user.isActive) {
-              await database.logSecurityEvent({
+              void database.logSecurityEvent({
                 userId: user._id,
                 eventType: 'LOGIN_FAILED',
                 ipAddress: ip,
                 details: { reason: 'account_inactive' }
-              })
+              }).catch(() => {})
               return null
             }
 
             // Successful login - reset rate limits and login attempts
-            await rateLimitService.recordLoginAttempt(ip, true)
-            await rateLimitService.recordLoginAttempt(credentials.email, true)
-            await database.resetLoginAttempts(credentials.email)
-            await database.updateLastLogin(user._id!, ip)
+            await Promise.allSettled([
+              rateLimitService.recordLoginAttempt(ip, true),
+              rateLimitService.recordLoginAttempt(credentials.email, true),
+              database.resetLoginAttempts(credentials.email),
+              database.updateLastLogin(user._id!, ip)
+            ])
 
             // Generate and store refresh token
             const rememberMe = credentials.rememberMe === 'true'
@@ -152,14 +161,15 @@ export async function getAuthOptions(): Promise<NextAuthOptions> {
             refreshTokenData.ipAddress = ip
             refreshTokenData.deviceInfo = req?.headers?.['user-agent'] || 'Unknown'
 
-            await database.addRefreshToken(user._id!, refreshTokenData)
-
-            await database.logSecurityEvent({
-              userId: user._id,
-              eventType: 'LOGIN_SUCCESS',
-              ipAddress: ip,
-              details: { rememberMe }
-            })
+            await Promise.allSettled([
+              database.addRefreshToken(user._id!, refreshTokenData),
+              database.logSecurityEvent({
+                userId: user._id,
+                eventType: 'LOGIN_SUCCESS',
+                ipAddress: ip,
+                details: { rememberMe }
+              })
+            ])
 
             return {
               id: user._id!.toString(),

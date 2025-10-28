@@ -36,9 +36,12 @@ export async function POST(request: NextRequest) {
     }
 
     const { email, password, rememberMe } = validatedData;
-
-    // Check rate limiting for IP
-    const ipRateLimit = await rateLimitService.checkLoginAttempts(clientIP);
+    
+    // Check rate limiting for IP and email in parallel
+    const [ipRateLimit, emailRateLimit] = await Promise.all([
+      rateLimitService.checkLoginAttempts(clientIP),
+      rateLimitService.checkLoginAttempts(email),
+    ]);
     if (!ipRateLimit.allowed) {
       await database.logSecurityEvent({
         eventType: 'RATE_LIMIT_EXCEEDED',
@@ -63,15 +66,13 @@ export async function POST(request: NextRequest) {
         }
       );
     }
-
-    // Check rate limiting for email
-    const emailRateLimit = await rateLimitService.checkLoginAttempts(email);
     if (!emailRateLimit.allowed) {
-      await database.logSecurityEvent({
+      // Fire-and-forget logging
+      void database.logSecurityEvent({
         eventType: 'RATE_LIMIT_EXCEEDED',
         ipAddress: clientIP,
         details: { identifier: email, type: 'email', retryAfter: emailRateLimit.retryAfter }
-      });
+      }).catch(() => {});
 
       return NextResponse.json(
         { 
@@ -94,14 +95,17 @@ export async function POST(request: NextRequest) {
     // Find user by email
     const user = await database.findUserByEmail(email);
     if (!user) {
-      await rateLimitService.recordLoginAttempt(clientIP, false);
-      await rateLimitService.recordLoginAttempt(email, false);
-      await database.logSecurityEvent({
-        eventType: 'LOGIN_FAILED',
-        ipAddress: clientIP,
-        userAgent,
-        details: { reason: 'user_not_found', email }
-      });
+      // Record attempts in parallel; do not block on logging
+      await Promise.allSettled([
+        rateLimitService.recordLoginAttempt(clientIP, false),
+        rateLimitService.recordLoginAttempt(email, false),
+        database.logSecurityEvent({
+          eventType: 'LOGIN_FAILED',
+          ipAddress: clientIP,
+          userAgent,
+          details: { reason: 'user_not_found', email }
+        })
+      ]);
 
       return NextResponse.json(
         { 
@@ -118,13 +122,13 @@ export async function POST(request: NextRequest) {
     // Check if account is locked
     if (user.lockoutUntil && user.lockoutUntil > new Date()) {
       const lockoutRemaining = Math.ceil((user.lockoutUntil.getTime() - Date.now()) / 1000);
-      await database.logSecurityEvent({
+      void database.logSecurityEvent({
         userId: user._id,
         eventType: 'ACCOUNT_LOCKED',
         ipAddress: clientIP,
         userAgent,
         details: { lockoutUntil: user.lockoutUntil, remainingSeconds: lockoutRemaining }
-      });
+      }).catch(() => {});
 
       return NextResponse.json(
         { 
@@ -147,29 +151,33 @@ export async function POST(request: NextRequest) {
     // Verify password
     const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
-      await rateLimitService.recordLoginAttempt(clientIP, false);
-      await rateLimitService.recordLoginAttempt(email, false);
-      await database.incrementLoginAttempts(email);
+      await Promise.allSettled([
+        rateLimitService.recordLoginAttempt(clientIP, false),
+        rateLimitService.recordLoginAttempt(email, false),
+        database.incrementLoginAttempts(email),
+      ]);
       
       // Check if account should be locked
       if (await rateLimitService.shouldLockAccount(email)) {
-        await database.lockAccount(email, SECURITY_CONFIG.LOGIN_LOCKOUT_DURATION);
-        await database.logSecurityEvent({
-          userId: user._id,
-          eventType: 'ACCOUNT_LOCKED',
-          ipAddress: clientIP,
-          userAgent,
-          details: { reason: 'max_attempts_exceeded' }
-        });
+        await Promise.allSettled([
+          database.lockAccount(email, SECURITY_CONFIG.LOGIN_LOCKOUT_DURATION),
+          database.logSecurityEvent({
+            userId: user._id,
+            eventType: 'ACCOUNT_LOCKED',
+            ipAddress: clientIP,
+            userAgent,
+            details: { reason: 'max_attempts_exceeded' }
+          })
+        ]);
       }
 
-      await database.logSecurityEvent({
+      void database.logSecurityEvent({
         userId: user._id,
         eventType: 'LOGIN_FAILED',
         ipAddress: clientIP,
         userAgent,
         details: { reason: 'invalid_password' }
-      });
+      }).catch(() => {});
 
       return NextResponse.json(
         { 
@@ -185,13 +193,13 @@ export async function POST(request: NextRequest) {
 
     // Check if user account is active
     if (!user.isActive) {
-      await database.logSecurityEvent({
+      void database.logSecurityEvent({
         userId: user._id,
         eventType: 'LOGIN_FAILED',
         ipAddress: clientIP,
         userAgent,
         details: { reason: 'account_inactive' }
-      });
+      }).catch(() => {});
 
       return NextResponse.json(
         { 
@@ -206,10 +214,12 @@ export async function POST(request: NextRequest) {
     }
 
     // Successful login - reset rate limits and login attempts
-    await rateLimitService.recordLoginAttempt(clientIP, true);
-    await rateLimitService.recordLoginAttempt(email, true);
-    await database.resetLoginAttempts(email);
-    await database.updateLastLogin(user._id!, clientIP);
+    await Promise.allSettled([
+      rateLimitService.recordLoginAttempt(clientIP, true),
+      rateLimitService.recordLoginAttempt(email, true),
+      database.resetLoginAttempts(email),
+      database.updateLastLogin(user._id!, clientIP),
+    ]);
 
     // Generate tokens
     const tokenPair = generateTokenPair(
@@ -217,22 +227,23 @@ export async function POST(request: NextRequest) {
       rememberMe
     );
 
-    // Store refresh token
-    await database.addRefreshToken(user._id!, {
+    // Store refresh token (await but in parallel with logging)
+    const addTokenPromise = database.addRefreshToken(user._id!, {
       token: tokenPair.refreshToken,
       expiresAt: tokenPair.expiresAt,
       deviceInfo: userAgent,
       ipAddress: clientIP,
       createdAt: new Date()
     });
-
-    await database.logSecurityEvent({
+    const logSuccessPromise = database.logSecurityEvent({
       userId: user._id,
       eventType: 'LOGIN_SUCCESS',
       ipAddress: clientIP,
       userAgent,
       details: { rememberMe }
     });
+
+    await Promise.allSettled([addTokenPromise, logSuccessPromise]);
 
     // Prepare user response (without sensitive data)
     const userResponse = {

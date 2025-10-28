@@ -1,39 +1,29 @@
 import { NextResponse } from 'next/server';
 import { database } from '@/lib/models';
-import { hash } from 'bcryptjs';
+import { ObjectId } from 'mongodb';
 
 interface VerificationRequest {
   email: string;
   code: string;
-  name: string;
-  password: string;
-}
-
-interface VerificationCode {
-  code: string;
-  email: string;
-  expires: Date;
-  used: boolean;
-  _id?: string;
 }
 
 export async function POST(req: Request) {
   try {
-    const { email, code, name, password } = await req.json() as VerificationRequest;
+    const { email, code } = await req.json() as VerificationRequest;
 
     // Input validation
-    if (!email || !code || !name || !password) {
+    if (!email || !code) {
       return NextResponse.json(
-        { success: false, error: 'All fields are required' },
+        { success: false, error: 'Email and verification code are required' },
         { status: 400 }
       );
     }
-    // Find verification code (case insensitive)
+    // Find verification code
     const verificationCode = await database.findVerificationCode(code);
 
     if (!verificationCode) {
       return NextResponse.json(
-        { error: 'Invalid or expired verification code' },
+        { success: false, error: 'Invalid or expired verification code' },
         { status: 400 }
       );
     }
@@ -42,19 +32,7 @@ export async function POST(req: Request) {
     if (verificationCode.email.toLowerCase() !== email.toLowerCase()) {
 
       return NextResponse.json(
-        { error: 'Invalid email for this verification code' },
-        { status: 400 }
-      );
-    }
-
-    // Check if code exists
-    if (!verificationCode) {
-      return NextResponse.json(
-        {
-          success: false,
-          error: 'Invalid verification code',
-          debug: 'Could not fetch verification codes'
-        },
+        { success: false, error: 'Invalid email for this verification code' },
         { status: 400 }
       );
     }
@@ -81,25 +59,19 @@ export async function POST(req: Request) {
       );
     }
 
-    // Check if email already exists
-    const existingUser = await database.findUserByEmail(email);
-    if (existingUser) {
+    // Find existing user created during registration
+    const user = await database.findUserByEmail(email);
+    if (!user || !user._id) {
       return NextResponse.json(
-        { success: false, error: 'This email is already in use' },
-        { status: 400 }
+        { success: false, error: 'User not found. Please register again.' },
+        { status: 404 }
       );
     }
 
-    // Hash the password
-    const hashedPassword = await hash(password, 12);
-
-    // Create the user account
-    const user = await database.createUser({
-      name,
-      email,
-      password: hashedPassword,
-      emailVerified: new Date(),
+    // Activate the user and mark email as verified
+    await database.updateUser(user._id as unknown as ObjectId, {
       isActive: true,
+      emailVerified: new Date(),
     });
 
     // Mark verification code as used
@@ -107,12 +79,7 @@ export async function POST(req: Request) {
 
     return NextResponse.json({
       success: true,
-      message: 'Account created successfully! You can now log in.',
-      user: {
-        id: user._id?.toString() || null,
-        name: user.name,
-        email: user.email
-      }
+      message: 'Email verified successfully! You can now log in.'
     });
 
   } catch (error: any) {

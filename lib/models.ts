@@ -17,6 +17,7 @@ export interface IUser {
   fullName?: string;
   email: string;
   password: string;
+  country: string;
   image?: string;
   phone?: string;
   emailVerified?: Date;
@@ -117,7 +118,10 @@ export class Database {
   }
 
   // User operations
-  async createUser(userData: Omit<IUser, '_id' | 'createdAt' | 'updatedAt' | 'role' | 'loginAttempts' | 'refreshTokens'> & { role?: IUser['role'] }): Promise<IUser> {
+  async createUser(userData: Omit<IUser, '_id' | 'createdAt' | 'updatedAt' | 'role' | 'loginAttempts' | 'refreshTokens' | 'country'> & { 
+    role?: IUser['role'];
+    country?: string;
+  }): Promise<IUser> {
     const db = await this.getDb();
     const now = new Date();
     const user: IUser = {
@@ -126,6 +130,7 @@ export class Database {
       createdAt: now,
       updatedAt: now,
       role: userData.role || "user",
+      country: userData.country || "",
       loginAttempts: 0,
       refreshTokens: [],
       isActive: false, // Require email verification by default
