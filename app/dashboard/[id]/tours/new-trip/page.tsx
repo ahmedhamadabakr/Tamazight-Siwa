@@ -179,7 +179,7 @@ export default function NewTrip() {
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-600 block mb-1">Price (SAR)</label>
+                <label className="text-sm font-medium text-gray-600 block mb-1">Price $</label>
                 <input
                   type="number"
                   value={formData.price}

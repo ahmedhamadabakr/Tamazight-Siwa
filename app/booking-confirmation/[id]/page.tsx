@@ -277,7 +277,7 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-600">Price per person</span>
-                  <span className="text-gray-900">{booking.tour.price.toLocaleString()}Dollar</span>
+                  <span className="text-gray-900">{booking.tour.price.toLocaleString()} $</span>
                 </div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-gray-600">Number of travelers</span>
@@ -285,7 +285,7 @@ export default function BookingConfirmation({ params }: BookingConfirmationProps
                 </div>
                 <div className="flex items-center justify-between text-lg font-semibold border-t pt-2">
                   <span className="text-gray-900">Total amount</span>
-                  <span className="text-blue-600">{booking.totalAmount.toLocaleString()} Dollar</span>
+                  <span className="text-blue-600">{booking.totalAmount.toLocaleString()} $</span>
                 </div>
               </div>
             </div>

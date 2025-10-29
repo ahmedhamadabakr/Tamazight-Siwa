@@ -99,9 +99,26 @@ export default function LoginPage() {
     }
 
     if (result?.ok) {
-      // Redirect immediately for better UX instead of waiting for session hydration
-      router.replace(callbackUrl);
-      return;
+      // Determine redirect path based on callbackUrl or user role
+      try {
+        const sess = await getSession();
+        let redirectPath = callbackUrl;
+
+        if (!callbackUrl || callbackUrl === '/') {
+          const role = (sess?.user as any)?.role;
+          const id = (sess?.user as any)?.id;
+          if (role === 'admin') redirectPath = '/admin/dashboard';
+          else if (role === 'manager') redirectPath = `/dashboard/${id}`;
+          else redirectPath = `/user/${id}`;
+        }
+
+        router.replace(redirectPath);
+        return;
+      } catch {
+        // Fallback to callbackUrl if session not yet available
+        router.replace(callbackUrl || '/');
+        return;
+      }
     } else {
       setError('Login failed. Please try again.');
       setLoading(false);

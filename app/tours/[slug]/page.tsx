@@ -214,7 +214,7 @@ export default function TourDetailsPage() {
           </div>
 
           <div className="w-full md:w-72 p-6 border rounded-lg shadow-md bg-card">
-            <div className="text-3xl font-bold text-primary mb-2">{tour.price}</div>
+            <div className="text-3xl font-bold text-primary mb-2">{tour.price} $</div>
             <p className="text-muted-foreground mb-6">per person</p>
             <>
               <Button

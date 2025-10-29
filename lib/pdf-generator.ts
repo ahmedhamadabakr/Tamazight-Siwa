@@ -392,7 +392,7 @@ export function generateBookingHTML(booking: BookingData): string {
             <div class="price-summary">
               <div class="price-row">
                 <span><strong>Price per person:</strong></span>
-                <span><strong>${booking.tour.price.toLocaleString()}Dollars</strong></span>
+                <span><strong>${booking.tour.price.toLocaleString()} $</strong></span>
               </div>
               <div class="price-row">
                 <span><strong>Number of people:</strong></span>
@@ -475,9 +475,9 @@ ${booking.specialRequests}
 
 PRICE SUMMARY
 -------------
-Price per person: ${booking.tour.price.toLocaleString()} SAR
+Price per person: ${booking.tour.price.toLocaleString()} $
 Number of travelers: ${booking.travelers}
-Total Amount: ${booking.totalAmount.toLocaleString()} SAR
+Total Amount: ${booking.totalAmount.toLocaleString()} $
 
 BOOKING STATUS
 --------------

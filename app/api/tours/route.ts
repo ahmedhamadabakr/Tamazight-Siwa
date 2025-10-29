@@ -116,7 +116,10 @@ export async function POST(request: NextRequest) {
       featured = false,
       status = 'active',
       startDate,
-      endDate
+      endDate,
+      difficulty = 'Easy',
+      groupSize = '',
+      highlights = []
     } = body;
 
     // Basic validation
@@ -169,6 +172,9 @@ export async function POST(request: NextRequest) {
       status,
       startDate: new Date(startDate),
       endDate: new Date(endDate),
+      difficulty,
+      groupSize,
+      highlights: Array.isArray(highlights) ? highlights : [highlights].filter(Boolean),
       createdAt: new Date(),
       updatedAt: new Date(),
     };
