@@ -18,27 +18,32 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   
   // Get callback URL from search params
   const callbackUrl = searchParams.get('callbackUrl') || '/';
   const urlError = searchParams.get('error');
 
-  // Set error from URL params
+  // Set error from URL params, then remove error param from URL
   useEffect(() => {
-    if (urlError) {
-      switch (urlError) {
-        case 'authentication_required':
-          setError('Please sign in to access this page');
-          break;
-        case 'middleware_error':
-          setError('Authentication error. Please try again.');
-          break;
-        default:
-          setError('An error occurred. Please try again.');
-      }
+    if (!urlError) return;
+    switch (urlError) {
+      case 'authentication_required':
+        setError('Please sign in to access this page');
+        break;
+      case 'middleware_error':
+        setError('Authentication error. Please try again.');
+        break;
+      default:
+        setError('An error occurred. Please try again.');
     }
-  }, [urlError]);
+    // Clean the URL to avoid sticky banner
+    const params = new URLSearchParams(Array.from(searchParams.entries()));
+    params.delete('error');
+    const qs = params.toString();
+    const clean = qs ? `/login?${qs}` : '/login';
+    router.replace(clean);
+  }, [urlError, searchParams, router]);
 
   // Redirect if already logged in
   useEffect(() => {
@@ -62,6 +67,7 @@ export default function LoginPage() {
   }, [status, session, router, callbackUrl]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (error) setError('');
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
@@ -90,6 +96,7 @@ export default function LoginPage() {
       email: formData.email,
       password: formData.password,
       redirect: false,
+      ...(callbackUrl ? { callbackUrl } : {}),
     });
 
     if (result?.error) {
@@ -99,30 +106,38 @@ export default function LoginPage() {
     }
 
     if (result?.ok) {
-      // Determine redirect path based on callbackUrl or user role
-      try {
-        const sess = await getSession();
-        let redirectPath = callbackUrl;
+      // Small delay to ensure auth cookies are written
+      await new Promise((r) => setTimeout(r, 120));
 
-        if (!callbackUrl || callbackUrl === '/') {
-          const role = (sess?.user as any)?.role;
-          const id = (sess?.user as any)?.id;
-          if (role === 'admin') redirectPath = '/admin/dashboard';
-          else if (role === 'manager') redirectPath = `/dashboard/${id}`;
-          else redirectPath = `/user/${id}`;
-        }
+      // Refresh session immediately
+      const newSession = await update();
 
-        router.replace(redirectPath);
-        return;
-      } catch {
-        // Fallback to callbackUrl if session not yet available
-        router.replace(callbackUrl || '/');
-        return;
+      // Decide redirect based on role and callbackUrl
+      let redirectPath = callbackUrl || '/';
+      const userRole = (newSession?.user as any)?.role;
+      const userId = (newSession?.user as any)?.id;
+
+      if (redirectPath === '/') {
+        if (userRole === 'admin') redirectPath = '/admin/dashboard';
+        else if (userRole === 'manager') redirectPath = `/dashboard/${userId}`;
+        else if (userId) redirectPath = `/user/${userId}`;
       }
-    } else {
-      setError('Login failed. Please try again.');
-      setLoading(false);
+
+      // Navigate and ensure server components refresh
+      router.replace(redirectPath);
+      router.refresh();
+
+      // Fallback: if still not reflected, force a hard navigation
+      setTimeout(() => {
+        if (typeof window !== 'undefined') {
+          window.location.href = redirectPath;
+        }
+      }, 300);
+      return;
     }
+
+    setError('Login failed. Please try again.');
+    setLoading(false);
   } catch (err) {
     console.error('Login error:', err);
     setError('An error occurred during login. Please try again.');

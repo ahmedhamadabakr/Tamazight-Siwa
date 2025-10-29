@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
+import { getServerSession } from 'next-auth/next'
 import { Cairo } from "next/font/google"
 
 import "./globals.css"
@@ -26,12 +27,15 @@ export const metadata: Metadata = generateAdvancedMetadata({
 
 const cairo = Cairo({ subsets: ["latin"], weight: ["400", "700"], display: "swap" })
 
-export default function RootLayout({
+export const dynamic = 'force-dynamic'
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   const enableAnalytics = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === 'true'
+  const session = await getServerSession()
   return (
     <html lang="en" dir="ltr" className="scroll-smooth">
       <head>
@@ -191,7 +195,7 @@ export default function RootLayout({
       <body className={`${cairo.className} font-cairo antialiased`} suppressHydrationWarning>
         <ErrorBoundary>
           <Suspense fallback={<Loading />}>
-            <AuthProvider>
+            <AuthProvider session={session}>
               {children}
             </AuthProvider>
           </Suspense>
