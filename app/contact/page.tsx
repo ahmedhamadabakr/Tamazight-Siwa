@@ -66,8 +66,8 @@ export default function ContactPage() {
             <div className="space-y-6">
               {[
                 { icon: Phone, title: "Phone & WhatsApp", details: ["+20 155 262 4123"], },
-                { icon: Mail, title: "Email", details: ["info@tamazightsiwa.com", "bookings@tamazightsiwa.com"] },
-                { icon: MapPin, title: "Location", details: ["Shali Village, Siwa Oasis", "Matrouh, Egypt"] },
+                { icon: Mail, title: "Email", details: ["tamazight.siwa@gmail.com"], },
+                { icon: MapPin, title: "Location", details: [" Siwa Oasis", "Matrouh, Egypt"] },
                 { icon: Clock, title: "Office Hours", details: ["Daily: 8:00 AM - 10:00 PM", "Emergency: 24/7"] },
               ].map((item, i) => (
                 <Card key={i} className="border-0 shadow-lg hover:shadow-xl transition-all">

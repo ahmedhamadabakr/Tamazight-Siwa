@@ -140,7 +140,7 @@ export async function POST(req: Request) {
       updatedAt: new Date()
     }
 
-g('Database collections:', await db.listCollections().toArray())
+    console.log('Database collections:', await db.listCollections().toArray())
 
     let result
     try {

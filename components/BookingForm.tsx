@@ -67,7 +67,7 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
 
     setIsLoading(true)
     
-    const bookingData = {
+    const bookingPayload = {
       tourId,
       numberOfTravelers: travelers,
       specialRequests,
@@ -81,13 +81,12 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(bookingData),
+        body: JSON.stringify(bookingPayload),
       })
 
       const data = await response.json()
 
       if (!response.ok) {
-        console.error('Booking failed:', data)
         throw new Error(data.message || 'Booking failed')
       }
 
@@ -105,10 +104,12 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
 
       if (onSuccess) {
         onSuccess()
+        toast.success('Booking successful!')
+        router.push(`/booking-confirmation/${data.data._id}`)
       }
 
     } catch (error) {
-      console.error('Booking error:', error)
+
       toast.error('Error', {
         description: error instanceof Error ? error.message : 'An error occurred while processing your request. Please try again.'
       })
@@ -144,28 +145,7 @@ export function BookingForm({ tourId, tourTitle, destination, price, onSuccess }
           />
         </div>
 
-        <div className="pt-2 space-y-2">
-          <Button
-            type="button"
-            variant="outline"
-            className="w-full"
-            onClick={async () => {
-              try {
-                const response = await fetch('/api/test-booking', {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ test: 'data', tourId, travelers })
-                })
-                const data = await response.json()
-                toast.success('API Test: ' + (data.success ? 'Success' : 'Failed'))
-              } catch (error) {
-                toast.error('API Test Failed')
-              }
-            }}
-          >
-            Test Connection
-          </Button>
-          
+        <div className="pt-2 space-y-2">          
           <Button
             type="submit"
             className="w-full"

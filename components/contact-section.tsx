@@ -47,16 +47,18 @@ export function ContactSection() {
         body: JSON.stringify(formData),
       })
 
-      if (res.ok) {
-        toast.success("Message sent successfully!")
+      const data = await res.json()
+      
+      if (res.ok && data.success) {
+        toast.success(data.message || "Message sent successfully!")
         setFormData({ name: "", email: "", subject: "", message: "" })
         setIsSubmitted(true)
       } else {
-        toast.error("Failed to send message. Please try again.")
+        toast.error(data.error || "Failed to send message. Please try again.")
       }
     } catch (error) {
-      console.error(error)
-      toast.error("Server error. Please try later.")
+      console.error("Error:", error)
+      toast.error("An error occurred. Please try again later.")
     } finally {
       setIsSubmitting(false)
     }
