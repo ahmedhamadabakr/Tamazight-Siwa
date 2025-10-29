@@ -287,8 +287,6 @@ const NavigationComponent = memo(function Navigation() {
                     </Link>
                   )}
 
-       
-
                   <button
                     onClick={handleSignOut}
                     disabled={isSigningOut}
@@ -320,7 +318,7 @@ const NavigationComponent = memo(function Navigation() {
 
             <div className="px-4 pt-4 border-t border-gray-200">
               <div className="flex items-center justify-center text-sm text-gray-600 mb-4">
-                <Phone className="w-4 h-4 mr-2" /> +201552624123
+                <Phone className="w-4 h-4 mr-2" />+201552624123
               </div>
               <Button className="w-full bg-primary text-white hover:bg-primary/90">
                 Book Your Trip

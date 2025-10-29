@@ -100,14 +100,27 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setError('Invalid email or password');
+      // Handle specific error types
+      switch (result.error) {
+        case 'CredentialsSignin':
+          setError('Invalid email or password');
+          break;
+        case 'AccessDenied':
+          setError('Account is locked or inactive. Please contact support.');
+          break;
+        case 'Configuration':
+          setError('Authentication service is temporarily unavailable. Please try again later.');
+          break;
+        default:
+          setError('Login failed. Please try again.');
+      }
       setLoading(false);
       return;
     }
 
     if (result?.ok) {
       // Small delay to ensure auth cookies are written
-      await new Promise((r) => setTimeout(r, 120));
+      await new Promise((r) => setTimeout(r, 150));
 
       // Refresh session immediately
       const newSession = await update();
@@ -132,7 +145,7 @@ export default function LoginPage() {
         if (typeof window !== 'undefined') {
           window.location.href = redirectPath;
         }
-      }, 300);
+      }, 400);
       return;
     }
 

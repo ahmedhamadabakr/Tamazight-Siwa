@@ -30,35 +30,15 @@ export async function POST(request: NextRequest) {
     }
 
     const userId = token.sub;
+    const refreshToken = request.cookies.get('refreshToken')?.value;
 
-    if (!userId) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: {
-            code: SecurityErrorCodes.TOKEN_INVALID,
-            message: 'Invalid user session'
-          }
-        },
-        { status: 401 }
-      );
-    }
-
-    // Remove all refresh tokens for this user
-    try {
-      await database.removeAllRefreshTokens(userId as any);
-    } catch (error) {
-      console.error('Error removing all refresh tokens:', error);
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: {
-            code: 'SERVER_ERROR',
-            message: 'Failed to logout from all devices'
-          }
-        },
-        { status: 500 }
-      );
+    // Remove specific refresh token if provided
+    if (refreshToken && userId) {
+      try {
+        await database.removeRefreshToken(userId as any, refreshToken);
+      } catch (error) {
+        console.error('Error removing refresh token:', error);
+      }
     }
 
     // Log security event
@@ -67,13 +47,13 @@ export async function POST(request: NextRequest) {
       eventType: 'LOGIN_SUCCESS', // We'll use this for logout tracking
       ipAddress: clientIP,
       userAgent,
-      details: { action: 'logout', type: 'all_sessions' }
+      details: { action: 'logout', type: 'single_session' }
     });
 
     // Create response and clear cookies
     const response = NextResponse.json({
       success: true,
-      message: 'Logged out from all devices successfully'
+      message: 'Logged out successfully'
     });
 
     // Clear refresh token cookie
@@ -111,7 +91,7 @@ export async function POST(request: NextRequest) {
     return response;
 
   } catch (error) {
-    console.error('Logout all error:', error);
+    console.error('Logout error:', error);
     
     // Log security event for unexpected errors
     try {
@@ -120,7 +100,7 @@ export async function POST(request: NextRequest) {
         eventType: 'LOGIN_FAILED', // Using for error tracking
         ipAddress: clientIP,
         details: { 
-          action: 'logout_all_error', 
+          action: 'logout_error', 
           error: error instanceof Error ? error.message : 'Unknown error' 
         }
       });

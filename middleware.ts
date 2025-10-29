@@ -146,6 +146,17 @@ export async function middleware(request: NextRequest) {
             return NextResponse.redirect(loginUrl);
         }
 
+        // Validate token expiry and refresh if needed
+        const now = Math.floor(Date.now() / 1000);
+        if (token.exp && typeof token.exp === 'number' && token.exp < now) {
+            // Token is expired, redirect to login
+            const loginUrl = new URL('/login', request.url);
+            loginUrl.searchParams.set('callbackUrl', pathname);
+            loginUrl.searchParams.set('error', 'session_expired');
+
+            return NextResponse.redirect(loginUrl);
+        }
+
         // Check if user role has permission
         const userRole = token.role as string || 'user';
         if (!hasPermission(userRole, requiredPermission.allowedRoles)) {

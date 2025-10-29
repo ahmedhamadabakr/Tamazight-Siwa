@@ -1,39 +1,34 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { getAuthOptions } from '@/lib/auth';
+import { getToken } from 'next-auth/jwt';
 import { database } from '@/lib/models';
 import { SecurityErrorCodes } from '@/lib/security';
-import { ObjectId } from 'mongodb';
-
-interface SessionUser {
-  id: string;
-  email: string;
-  name: string;
-  role: string;
-}
 
 export async function GET(request: NextRequest) {
   try {
-    // Get current session
-    const session = await getServerSession(await getAuthOptions());
-    if (!session?.user) {
+    // Get session token from NextAuth
+    const token = await getToken({
+      req: request,
+      secret: process.env.NEXTAUTH_SECRET
+    });
+
+    if (!token || !token.sub) {
       return NextResponse.json(
         { 
           success: false, 
           error: {
             code: SecurityErrorCodes.TOKEN_INVALID,
-            message: 'Not authenticated'
+            message: 'Authentication required'
           }
         },
         { status: 401 }
       );
     }
 
-    const userId = (session.user as SessionUser).id;
-    const userObjectId = new ObjectId(userId);
+    const userId = token.sub;
+    const currentRefreshToken = request.cookies.get('refreshToken')?.value;
 
     // Get user with refresh tokens
-    const user = await database.findUserById(userObjectId);
+    const user = await database.findUserById(userId as any);
     if (!user) {
       return NextResponse.json(
         { 
@@ -51,85 +46,8 @@ export async function GET(request: NextRequest) {
     await database.cleanExpiredRefreshTokens();
 
     // Get updated user data
-    const updatedUser = await database.findUserById(userObjectId);
-    const activeSessions = updatedUser?.refreshTokens || [];
-
-    // Format session data for response
-    const sessions = activeSessions.map((token, index) => ({
-      id: `session_${index}`,
-      deviceInfo: token.deviceInfo || 'Unknown Device',
-      ipAddress: token.ipAddress || 'Unknown IP',
-      createdAt: token.createdAt,
-      expiresAt: token.expiresAt,
-      isCurrentSession: false, // We'll determine this on the client side
-    }));
-
-    return NextResponse.json({
-      success: true,
-      data: {
-        totalSessions: sessions.length,
-        sessions: sessions.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        ),
-      }
-    });
-
-  } catch (error) {
-    console.error('Get sessions error:', error);
-    
-    return NextResponse.json(
-      { 
-        success: false, 
-        error: {
-          code: 'SERVER_ERROR',
-          message: 'An unexpected error occurred while fetching sessions.'
-        }
-      },
-      { status: 500 }
-    );
-  }
-}
-
-// Revoke a specific session
-export async function DELETE(request: NextRequest) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const sessionId = searchParams.get('sessionId');
-
-    if (!sessionId) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: {
-            code: SecurityErrorCodes.INVALID_INPUT,
-            message: 'Session ID is required'
-          }
-        },
-        { status: 400 }
-      );
-    }
-
-    // Get current session
-    const session = await getServerSession(await getAuthOptions());
-    if (!session?.user) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: {
-            code: SecurityErrorCodes.TOKEN_INVALID,
-            message: 'Not authenticated'
-          }
-        },
-        { status: 401 }
-      );
-    }
-
-    const userId = (session.user as SessionUser).id;
-    const userObjectId = new ObjectId(userId);
-
-    // Get user with refresh tokens
-    const user = await database.findUserById(userObjectId);
-    if (!user) {
+    const updatedUser = await database.findUserById(userId as any);
+    if (!updatedUser) {
       return NextResponse.json(
         { 
           success: false, 
@@ -142,65 +60,53 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    // Find the session to revoke
-    const sessionIndex = parseInt(sessionId.replace('session_', ''));
-    const refreshTokens = user.refreshTokens || [];
-    
-    if (sessionIndex < 0 || sessionIndex >= refreshTokens.length) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: {
-            code: SecurityErrorCodes.INVALID_INPUT,
-            message: 'Invalid session ID'
-          }
-        },
-        { status: 400 }
-      );
-    }
+    // Transform refresh tokens to session format
+    const sessions = updatedUser.refreshTokens.map((token, index) => ({
+      id: `${userId}_${index}`,
+      deviceInfo: token.deviceInfo || 'Unknown Device',
+      ipAddress: token.ipAddress || 'Unknown IP',
+      lastActive: token.createdAt,
+      isCurrent: token.token === currentRefreshToken,
+      expiresAt: token.expiresAt,
+    }));
 
-    const tokenToRevoke = refreshTokens[sessionIndex];
-    
-    // Remove the specific refresh token
-    await database.removeRefreshToken(userObjectId, tokenToRevoke.token);
-
-    // Log security event
-    const clientIP = request.headers.get('x-forwarded-for') || 
-                    request.headers.get('x-real-ip') || 
-                    '127.0.0.1';
-    
-    await database.logSecurityEvent({
-      userId,
-      eventType: 'LOGIN_SUCCESS', // Using LOGIN_SUCCESS for session revoke success
-      ipAddress: clientIP,
-      userAgent: request.headers.get('user-agent') || 'Unknown',
-      details: { 
-        action: 'revoke_session', 
-        revokedSession: {
-          deviceInfo: tokenToRevoke.deviceInfo,
-          ipAddress: tokenToRevoke.ipAddress,
-          createdAt: tokenToRevoke.createdAt
-        }
-      }
+    // Sort sessions by last active (current session first, then by date)
+    sessions.sort((a, b) => {
+      if (a.isCurrent) return -1;
+      if (b.isCurrent) return 1;
+      return new Date(b.lastActive).getTime() - new Date(a.lastActive).getTime();
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Session revoked successfully'
+      sessions,
+      totalSessions: sessions.length,
     });
 
   } catch (error) {
-    console.error('Revoke session error:', error);
+    console.error('Sessions fetch error:', error);
     
     return NextResponse.json(
       { 
         success: false, 
         error: {
           code: 'SERVER_ERROR',
-          message: 'An unexpected error occurred while revoking session.'
+          message: 'Failed to fetch sessions'
         }
       },
       { status: 500 }
     );
   }
+}
+
+// Handle OPTIONS request for CORS
+export async function OPTIONS() {
+  return new NextResponse(null, {
+    status: 200,
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    },
+  });
 }
