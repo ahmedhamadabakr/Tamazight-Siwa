@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin } from "lucide-react"
+import { Facebook, Instagram, Mail, Phone, MapPin } from "lucide-react"
 
 export function Footer() {
   return (
@@ -19,15 +19,12 @@ export function Footer() {
               pristine desert paradise.
             </p>
             <div className="flex space-x-4">
-              <a href="#" aria-label="Follow us on Facebook" className="text-background/60 hover:text-primary transition-colors">
+              <Link href="https://www.facebook.com/tamazight.siwa/" aria-label="Follow us on Facebook" className="text-background/60 hover:text-primary transition-colors">
                 <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" aria-label="Follow us on Instagram" className="text-background/60 hover:text-primary transition-colors">
+              </Link>
+              <Link href="https://www.instagram.com/tamazight_siwa/" aria-label="Follow us on Instagram" className="text-background/60 hover:text-primary transition-colors">
                 <Instagram className="w-5 h-5" />
-              </a>
-              <a href="#" aria-label="Follow us on X (Twitter)" className="text-background/60 hover:text-primary transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -75,11 +72,11 @@ export function Footer() {
             <div className="space-y-3">
               <div className="flex items-center space-x-3">
                 <Phone className="w-4 h-4 text-primary" />
-                <span className="text-background/80">+20 123 456 789</span>
+                <span className="text-background/80">+201552624123</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="w-4 h-4 text-primary" />
-                <span className="text-background/80">info@tamazightsiwa.com</span>
+                <span className="text-background/80">tamazightsiwa@gmail.com</span>
               </div>
               <div className="flex items-start space-x-3">
                 <MapPin className="w-4 h-4 text-primary mt-1" />

@@ -271,11 +271,7 @@ const NavigationComponent = memo(function Navigation() {
                     >
                       <Settings className="w-5 h-5 text-blue-600 mr-3" />
                       <span className="font-medium text-gray-900">
-                        {userRole === "admin"
-                          ? "Admin Dashboard"
-                          : userRole === "manager"
-                          ? "Manager Dashboard"
-                          : "My Dashboard"}
+                      Dashboard
                       </span>
                     </Link>
                   )}
