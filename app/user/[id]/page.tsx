@@ -99,41 +99,41 @@ export default function UserDashboard({ params }: UserDashboardProps) {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault()
-  try {
-    // Create a copy of formData without the email field
-    const { email, ...updateData } = formData;
-    
-    const res = await fetch(`/api/users/${params.id}`, {
-      method: 'PUT',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${(session as any)?.accessToken}`
-      },
-      body: JSON.stringify(updateData), // Only send name and phone
-    })
-    
-    const data = await res.json()
-    
-    if (data.success) {
-    setUser(prev => {
-  if (!prev) return null; // Handle the case where prev is null
-  return {
-    ...prev,
-    ...updateData,
-    email: prev.email // email is guaranteed to exist if prev is not null
-  };
-});
-      setEditMode(false)
-      router.refresh()
-      alert('Profile updated successfully ')
-    } else {
-      alert(`Error updating profile : ${data.message || 'Error updating profile'}`)
+    e.preventDefault()
+    try {
+      // Create a copy of formData without the email field
+      const { email, ...updateData } = formData;
+
+      const res = await fetch(`/api/users/${params.id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${(session as any)?.accessToken}`
+        },
+        body: JSON.stringify(updateData), // Only send name and phone
+      })
+
+      const data = await res.json()
+
+      if (data.success) {
+        setUser(prev => {
+          if (!prev) return null; // Handle the case where prev is null
+          return {
+            ...prev,
+            ...updateData,
+            email: prev.email // email is guaranteed to exist if prev is not null
+          };
+        });
+        setEditMode(false)
+        router.refresh()
+        alert('Profile updated successfully ')
+      } else {
+        alert(`Error updating profile : ${data.message || 'Error updating profile'}`)
+      }
+    } catch (err) {
+      alert('Error updating profile. Please try again later.')
     }
-  } catch (err) {
-    alert('Error updating profile. Please try again later.')
   }
-}
 
   const cancelTrip = async (tripId: string) => {
     if (!confirm('Are you sure you want to cancel this trip?')) return
@@ -213,28 +213,26 @@ export default function UserDashboard({ params }: UserDashboardProps) {
             <div className="w-20 h-20 mx-auto bg-blue-100 text-blue-700 rounded-full flex items-center justify-center text-3xl font-semibold mb-3">
               {getInitial()}
             </div>
-            <h3 className="font-semibold text-lg text-gray-800">{user.  name}</h3>
+            <h3 className="font-semibold text-lg text-gray-800">{user.name}</h3>
             <p className="text-gray-500 text-sm">{user.email}</p>
           </div>
 
           <div className="space-y-2">
             <button
               onClick={() => setActiveTab('profile')}
-              className={`flex items-center justify-start gap-2 w-full px-4 py-2 rounded-md text-sm font-medium transition ${
-                activeTab === 'profile'
+              className={`flex items-center justify-start gap-2 w-full px-4 py-2 rounded-md text-sm font-medium transition ${activeTab === 'profile'
                   ? 'bg-blue-100 text-blue-700 font-semibold'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-              }`}
+                }`}
             >
               <User size={18} /> Profile
             </button>
             <button
               onClick={() => setActiveTab('trips')}
-              className={`flex items-center justify-start gap-2 w-full px-4 py-2 rounded-md text-sm font-medium transition ${
-                activeTab === 'trips'
+              className={`flex items-center justify-start gap-2 w-full px-4 py-2 rounded-md text-sm font-medium transition ${activeTab === 'trips'
                   ? 'bg-blue-100 text-blue-700 font-semibold'
                   : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
-              }`}
+                }`}
             >
               <Plane size={18} /> My Trips
             </button>
@@ -255,6 +253,74 @@ export default function UserDashboard({ params }: UserDashboardProps) {
           transition={{ duration: 0.3 }}
           className="flex-1 bg-white rounded-2xl shadow border border-gray-200 p-6"
         >
+
+          {activeTab === 'trips' && (
+            <>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-xl font-semibold text-gray-800">My Trips</h2>
+                <div className="text-sm text-gray-500">
+                  Total Trips: {trips.length}
+                </div>
+              </div>
+
+              {trips.length === 0 ? (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                    <Plane className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 mb-2">No trips found</h3>
+                  <p className="text-gray-500 mb-6">Start your next trip with us and explore amazing destinations</p>
+                  <button
+                    onClick={() => router.push('/tours')}
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
+                  >
+                    Browse available tours
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Stats Summary */}
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-green-600">
+                        {trips.filter(t => t.status === 'confirmed').length}
+                      </div>
+                      <div className="text-sm text-green-700">Confirmed</div>
+                    </div>
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-yellow-600">
+                        {trips.filter(t => t.status === 'pending').length}
+                      </div>
+                      <div className="text-sm text-yellow-700">Pending</div>
+                    </div>
+                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-blue-600">
+                        {trips.filter(t => t.status === 'completed').length}
+                      </div>
+                      <div className="text-sm text-blue-700">Completed</div>
+                    </div>
+                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                      <div className="text-2xl font-bold text-red-600">
+                        {trips.filter(t => t.status === 'cancelled').length}
+                      </div>
+                      <div className="text-sm text-red-700">Cancelled</div>
+                    </div>
+                  </div>
+
+                  {/* Bookings List */}
+                  <div className="space-y-4">
+                    {trips.map((trip) => (
+                      <BookingCard
+                        key={trip._id}
+                        booking={trip}
+                        onCancel={() => fetchUserTrips(userId)}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+            </>
+          )}
           {activeTab === 'profile' && (
             <>
               <div className="flex justify-between items-center mb-6">
@@ -359,73 +425,6 @@ export default function UserDashboard({ params }: UserDashboardProps) {
             </>
           )}
 
-          {activeTab === 'trips' && (
-            <>
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-semibold text-gray-800">My Trips</h2>
-                <div className="text-sm text-gray-500">
-                  Total Trips: {trips.length}
-                </div>
-              </div>
-              
-              {trips.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
-                    <Plane className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 mb-2">No trips found</h3>
-                  <p className="text-gray-500 mb-6">Start your next trip with us and explore amazing destinations</p>
-                  <button
-                    onClick={() => router.push('/tours')}
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium transition-colors"
-                  >
-                    Browse available tours
-                  </button>
-                </div>
-              ) : (
-                <>
-                  {/* Stats Summary */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-                    <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-green-600">
-                        {trips.filter(t => t.status === 'confirmed').length}
-                      </div>
-                      <div className="text-sm text-green-700">Confirmed</div>
-                    </div>
-                    <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-yellow-600">
-                        {trips.filter(t => t.status === 'pending').length}
-                      </div>
-                      <div className="text-sm text-yellow-700">Pending</div>
-                    </div>
-                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-blue-600">
-                        {trips.filter(t => t.status === 'completed').length}
-                      </div>
-                      <div className="text-sm text-blue-700">Completed</div>
-                    </div>
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-red-600">
-                        {trips.filter(t => t.status === 'cancelled').length}
-                      </div>
-                      <div className="text-sm text-red-700">Cancelled</div>
-                    </div>
-                  </div>
-
-                  {/* Bookings List */}
-                  <div className="space-y-4">
-                    {trips.map((trip) => (
-                      <BookingCard
-                        key={trip._id}
-                        booking={trip}
-                        onCancel={() => fetchUserTrips(userId)}
-                      />
-                    ))}
-                  </div>
-                </>
-              )}
-            </>
-          )}
         </motion.div>
       </div>
     </div>

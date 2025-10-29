@@ -26,19 +26,14 @@ const NavigationComponent = memo(function Navigation() {
   const { data: session, status } = useSession();
   const pathname = usePathname();
 
-  // Force re-render when session changes
   const user = session?.user as SessionUser | undefined;
   const userRole = user?.role;
-  
-  // Clear user data immediately when signing out
   const displayUser = isSigningOut ? null : user;
 
-  // ✅ Handle mounting to prevent hydration issues
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // ✅ Memoized navigation items
   const navItems = useMemo(
     () => [
       { name: "Home", href: "/" },
@@ -50,9 +45,8 @@ const NavigationComponent = memo(function Navigation() {
     []
   );
 
-  // ✅ Scroll effect
   useEffect(() => {
-    if (!mounted || typeof window === 'undefined') return;
+    if (!mounted || typeof window === "undefined") return;
 
     const handleScroll = () => setScrolled(window.scrollY > 20);
     handleScroll();
@@ -60,22 +54,20 @@ const NavigationComponent = memo(function Navigation() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [mounted]);
 
-  // ✅ Close mobile menu on route change
   useEffect(() => setIsOpen(false), [pathname]);
 
-  // ✅ Reset signing out state when session changes
   useEffect(() => {
-    if (status === 'unauthenticated' && isSigningOut) {
+    if (status === "unauthenticated" && isSigningOut) {
       setIsSigningOut(false);
     }
   }, [status, isSigningOut]);
 
-  // ✅ Dynamic profile link by role
   const profileLink = useMemo(() => {
     if (!mounted || !displayUser?.id) return "/login";
     if (userRole === "manager") return `/dashboard/${displayUser.id}`;
     if (userRole === "admin") return "/admin/dashboard";
-    return `/user/${displayUser.id}`;
+    if (userRole === "user") return `/user/${displayUser.id}`;
+    return "/login";
   }, [mounted, displayUser, userRole]);
 
   const isActive = useCallback(
@@ -89,43 +81,34 @@ const NavigationComponent = memo(function Navigation() {
   const handleSignOut = useCallback(async () => {
     if (isSigningOut) return;
     setIsSigningOut(true);
-    
+
     try {
-      // Close mobile menu immediately
       setIsOpen(false);
-      
-      // Clear any cached session data
-      if (typeof window !== 'undefined') {
-        // Clear localStorage
-        localStorage.removeItem('nextauth.message');
-        // Clear sessionStorage
+
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("nextauth.message");
         sessionStorage.clear();
       }
-      
-      // Sign out with redirect disabled to handle it manually
-      await signOut({ 
+
+      await signOut({
         redirect: false,
-        callbackUrl: "/" 
+        callbackUrl: "/",
       });
-      
-      // Small delay to ensure signOut completes
-      await new Promise(resolve => setTimeout(resolve, 100));
-      
-      // Force immediate redirect to clear any cached state
-      window.location.href = '/';
-      
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      window.location.href = "/";
     } catch (error) {
       console.error("Sign out error:", error);
-      // Force redirect to home on error
-      window.location.href = '/';
+      window.location.href = "/";
     }
-    // Don't set loading to false since we're redirecting
   }, [isSigningOut]);
 
-  const navClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${scrolled
-    ? "bg-white/98 backdrop-blur-lg border-b border-gray-200/80 shadow-lg"
-    : "bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm"
-    }`;
+  const navClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+    scrolled
+      ? "bg-white/98 backdrop-blur-lg border-b border-gray-200/80 shadow-lg"
+      : "bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm"
+  }`;
 
   return (
     <nav className={navClasses} suppressHydrationWarning>
@@ -152,10 +135,11 @@ const NavigationComponent = memo(function Navigation() {
                   key={item.name}
                   href={item.href}
                   prefetch={false}
-                  className={`relative px-4 py-2 font-medium rounded-lg transition-all ${isActive(item.href)
-                    ? "text-primary bg-primary/10 shadow-sm"
-                    : "text-gray-700 hover:text-primary hover:bg-gray-50"
-                    }`}
+                  className={`relative px-4 py-2 font-medium rounded-lg transition-all ${
+                    isActive(item.href)
+                      ? "text-primary bg-primary/10 shadow-sm"
+                      : "text-gray-700 hover:text-primary hover:bg-gray-50"
+                  }`}
                 >
                   {item.name}
                   {mounted && isActive(item.href) && (
@@ -185,7 +169,9 @@ const NavigationComponent = memo(function Navigation() {
                       <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
                     </div>
                     <div className="hidden lg:block text-left">
-                      <p className="text-sm font-medium text-gray-900">{displayUser.name || "User"}</p>
+                      <p className="text-sm font-medium text-gray-900">
+                        {displayUser.name || "User"}
+                      </p>
                       <p className="text-xs text-gray-500 capitalize">{userRole}</p>
                     </div>
                   </div>
@@ -232,7 +218,6 @@ const NavigationComponent = memo(function Navigation() {
               <span className="sr-only">{isOpen ? "Close menu" : "Open menu"}</span>
             </Button>
           </div>
-
         </div>
 
         {/* Mobile Menu */}
@@ -244,10 +229,11 @@ const NavigationComponent = memo(function Navigation() {
                   key={item.name}
                   href={item.href}
                   onClick={() => setIsOpen(false)}
-                  className={`block px-3 py-2 rounded-md text-base font-medium ${isActive(item.href)
-                    ? "text-primary bg-primary/10"
-                    : "text-gray-700 hover:text-primary hover:bg-gray-50"
-                    }`}
+                  className={`block px-3 py-2 rounded-md text-base font-medium ${
+                    isActive(item.href)
+                      ? "text-primary bg-primary/10"
+                      : "text-gray-700 hover:text-primary hover:bg-gray-50"
+                  }`}
                 >
                   {item.name}
                 </Link>
@@ -277,14 +263,20 @@ const NavigationComponent = memo(function Navigation() {
                 </div>
 
                 <div className="px-2 space-y-2 border-t border-gray-200 pt-3">
-                  {(userRole === "manager" || userRole === "admin") && (
+                  {(userRole === "manager" || userRole === "admin" || userRole === "user") && (
                     <Link
-                      href="/admin/dashboard"
+                      href={profileLink}
                       onClick={() => setIsOpen(false)}
                       className="flex items-center p-3 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-100"
                     >
                       <Settings className="w-5 h-5 text-blue-600 mr-3" />
-                      <span className="font-medium text-gray-900">Dashboard</span>
+                      <span className="font-medium text-gray-900">
+                        {userRole === "admin"
+                          ? "Admin Dashboard"
+                          : userRole === "manager"
+                          ? "Manager Dashboard"
+                          : "My Dashboard"}
+                      </span>
                     </Link>
                   )}
 
@@ -299,14 +291,7 @@ const NavigationComponent = memo(function Navigation() {
                     </Link>
                   )}
 
-                  <Link
-                    href={profileLink}
-                    onClick={() => setIsOpen(false)}
-                    className="flex items-center p-3 rounded-xl bg-gray-50 hover:bg-gray-100 border border-gray-100"
-                  >
-                    <User className="w-5 h-5 text-gray-600 mr-3" />
-                    <span className="font-medium text-gray-900">My Profile</span>
-                  </Link>
+       
 
                   <button
                     onClick={handleSignOut}
@@ -339,7 +324,7 @@ const NavigationComponent = memo(function Navigation() {
 
             <div className="px-4 pt-4 border-t border-gray-200">
               <div className="flex items-center justify-center text-sm text-gray-600 mb-4">
-                <Phone className="w-4 h-4 mr-2" /> +20 123 456 789
+                <Phone className="w-4 h-4 mr-2" /> +201552624123
               </div>
               <Button className="w-full bg-primary text-white hover:bg-primary/90">
                 Book Your Trip

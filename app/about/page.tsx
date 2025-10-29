@@ -306,36 +306,7 @@ export default function AboutContent() {
           </div>
         </div>
       </section>
-      {/* CTA */}
-      <section className="py-20 bg-primary text-primary-foreground">
-        <div className="max-w-4xl mx-auto text-center px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-6">
-            Ready to Experience Siwa?
-          </h2>
-          <p className="text-xl mb-8 opacity-90">
-            Join us for an authentic journey through one of Egypt's most magical destinations
-            Join us for an authentic journey through one of Egypt&apos;s most
-            magical destinations
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-       
-            <Link 
-              href="/tours"
-              className="group relative inline-flex items-center justify-center px-8 py-3.5 overflow-hidden font-medium text-foreground bg-primary hover:bg-primary/90 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 hover:translate-y-[-2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              <span className="relative z-10">Explore Our Tours</span>
-              <span className="absolute inset-0 bg-gradient-to-r from-primary/80 to-accent/80 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-lg"></span>
-            </Link>
-            <Link
-              href="/contact"
-              className="group relative inline-flex items-center justify-center px-8 py-3.5 font-medium text-primary-foreground border-2 border-primary-foreground rounded-lg hover:bg-primary-foreground hover:text-primary transition-all duration-300 hover:translate-y-[-2px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-            >
-              <span className="relative z-10">Meet Our Team</span>
-              <span className="absolute inset-0 bg-primary-foreground/5 group-hover:bg-primary-foreground/10 rounded-md transition-all duration-300"></span>
-            </Link>
-          </div>
-        </div>
-      </section>
+
       <Footer />
     </div>
   );

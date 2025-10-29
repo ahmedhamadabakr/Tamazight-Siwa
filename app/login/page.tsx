@@ -57,7 +57,7 @@ export default function LoginPage() {
           redirectPath = '/admin/dashboard';
         } else if (userRole === 'manager') {
           redirectPath = `/dashboard/${(session.user as any).id}`;
-        } else {
+        } else if (userRole === 'user') {
           redirectPath = `/user/${(session.user as any).id}`;
         }
       }
