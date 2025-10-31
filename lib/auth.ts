@@ -134,12 +134,17 @@ export const authOptions = {
           };
 
         } catch (error) {
-          console.error('Authentication error:', error);
-          console.error('Error details:', {
-            message: error instanceof Error ? error.message : 'Unknown error',
-            stack: error instanceof Error ? error.stack : undefined,
-            credentials: { email: credentials?.email, hasPassword: !!credentials?.password }
-          });
+          const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+          console.error('Authentication error:', errorMessage);
+          
+          // Only log detailed errors in development
+          if (process.env.NODE_ENV === 'development') {
+            console.error('Error details:', {
+              message: errorMessage,
+              stack: error instanceof Error ? error.stack : undefined,
+              credentials: { email: credentials?.email, hasPassword: !!credentials?.password }
+            });
+          }
           throw error;
         }
       }
@@ -152,8 +157,9 @@ export const authOptions = {
   },
 
   session: {
-    strategy: 'jwt',
+    strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
+    updateAge: 24 * 60 * 60, // Update session every 24 hours
   },
 
   jwt: {
@@ -162,27 +168,33 @@ export const authOptions = {
 
   callbacks: {
     async jwt({ token, user, account }: any) {
-      // Initial sign in
+      // Initial sign in - cache user data in token
       if (account && user) {
         return {
           ...token,
           id: user.id,
           role: (user as any).role,
           fullName: (user as any).fullName,
+          email: user.email,
+          name: user.name,
+          image: user.image,
         };
       }
 
-      // Return previous token if the access token has not expired yet
+      // Return cached token data (no DB calls)
       return token;
     },
 
     async session({ session, token }: any) {
+      // Fast session creation from cached token data
       if (token) {
         session.user = {
-          ...session.user,
           id: token.id as string,
+          name: token.name as string,
+          email: token.email as string,
           role: token.role as string,
           fullName: token.fullName as string,
+          image: token.image as string,
         };
       }
       return session;
