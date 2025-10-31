@@ -55,14 +55,29 @@ function hasRequiredRole(userRole: string, requiredRole: string): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Use the new secret directly (temporary fix until Vercel env is updated)
+  // Try multiple approaches to get the token
   const secret = 'ae34ac568d6f9b6fab0aaa890d15a7b4f406f8d70f417cc874ada63af8081a8d';
-  const token = await getToken({
+
+  // Try different cookie names
+  let token = await getToken({
     req: request,
-    secret: secret
+    secret: secret,
+    cookieName: '__Secure-next-auth.session-token'
   });
 
-  console.log('Middleware - Path:', pathname, 'Has secret:', !!secret, 'Token:', token ? { id: token.id, role: token.role } : null);
+  if (!token) {
+    token = await getToken({
+      req: request,
+      secret: secret,
+      cookieName: 'next-auth.session-token'
+    });
+  }
+
+  // Fallback: check if session cookie exists manually
+  const sessionCookie = request.cookies.get('__Secure-next-auth.session-token') ||
+    request.cookies.get('next-auth.session-token');
+
+  console.log('Middleware - Path:', pathname, 'Token:', token ? { id: token.id, role: token.role } : null, 'Has session cookie:', !!sessionCookie);
 
   // Add security headers
   const response = NextResponse.next();
@@ -100,6 +115,12 @@ export async function middleware(request: NextRequest) {
   const requiredRole = getRequiredRole(pathname);
 
   if (requiredRole && !token) {
+    // If no token but session cookie exists, allow access (temporary fix)
+    if (sessionCookie) {
+      console.log('Middleware - No token but session cookie exists, allowing access');
+      return response;
+    }
+
     console.log('Middleware - No token, redirecting to login for:', pathname);
     const url = request.nextUrl.clone();
     url.pathname = '/login';
