@@ -160,12 +160,10 @@ export const authOptions = {
   session: {
     strategy: 'jwt' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
-    updateAge: 24 * 60 * 60, // Update session every 24 hours
   },
 
   jwt: {
     maxAge: 30 * 24 * 60 * 60, // 30 days
-    // Let NextAuth use NEXTAUTH_SECRET automatically
   },
 
   // Remove custom cookie config - let NextAuth handle it automatically
@@ -182,33 +180,22 @@ export const authOptions = {
   // },
 
   callbacks: {
-    async jwt({ token, user, account }: any) {
-      // Initial sign in - cache user data in token
-      if (account && user) {
-        console.log('JWT: Creating token for user:', user.email);
-        return {
-          ...token,
-          id: user.id,
-          role: user.role,
-          fullName: user.fullName,
-        };
+    async jwt({ token, user }: any) {
+      if (user) {
+        console.log('JWT: User signed in:', user.email);
+        token.id = user.id;
+        token.role = user.role;
+        token.fullName = user.fullName;
       }
-
-      // Return existing token
       return token;
     },
 
     async session({ session, token }: any) {
-      if (token) {
-        console.log('Session: Creating session for token:', token.id);
-        session.user = {
-          id: token.id,
-          name: token.name,
-          email: token.email,
-          role: token.role,
-          fullName: token.fullName,
-          image: token.image,
-        };
+      if (token && session.user) {
+        console.log('Session: Adding user data from token');
+        session.user.id = token.id;
+        session.user.role = token.role;
+        session.user.fullName = token.fullName;
       }
       return session;
     },
@@ -244,6 +231,7 @@ export const authOptions = {
     },
   },
 
+  secret: process.env.NEXTAUTH_SECRET,
   debug: true, // Enable debug in production temporarily
   trustHost: true, // Important for Vercel deployments
 };
