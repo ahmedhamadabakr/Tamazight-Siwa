@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { getAuthOptions } from '@/lib/auth'
 import { getMongoClient } from '@/lib/mongodb'
 import { ObjectId } from 'mongodb'
 import { bookingCollectionName } from '@/models/Booking'
@@ -26,15 +24,8 @@ export async function POST(req: Request) {
       }, { status: 503 });
     }
 
-    const session = await getServerSession(await getAuthOptions()) as any
-
-    if (!session?.user?.id) {
-      console.error('No valid session or user ID')
-      return NextResponse.json(
-        { success: false, message: 'Unauthorized' },
-        { status: 401 }
-      )
-    }
+    // Public endpoint: use a default guest user context
+    const session = { user: { id: '000000000000000000000000', email: 'guest@example.com', name: 'Guest' } } as any
 
     const data = await req.json()
     const { tourId, numberOfTravelers, specialRequests, totalAmount } = data
@@ -71,11 +62,9 @@ export async function POST(req: Request) {
     const client = await getMongoClient()
     const db = client.db()
 
-
     // Test database connection
     try {
       await db.admin().ping()
-     
     } catch (pingError) {
       return NextResponse.json(
         { success: false, message: 'Database connection failed' },
@@ -94,7 +83,6 @@ export async function POST(req: Request) {
       )
     }
 
-
     let tour
     try {
       tour = await db.collection('tours').findOne({ _id: new ObjectId(tourId) })
@@ -112,23 +100,15 @@ export async function POST(req: Request) {
       )
     }
 
-
-
     // Create booking
-    // Validate user ID format
-    if (!ObjectId.isValid(session.user.id)) {
-      console.error('Invalid user ID format:', session.user.id)
-      return NextResponse.json(
-        { success: false, message: 'User ID is invalid' },
-        { status: 400 }
-      )
-    }
-
-
+    // For guest bookings, use a fixed ObjectId
+    const userObjectId = ObjectId.isValid(session.user.id)
+      ? new ObjectId(session.user.id)
+      : new ObjectId('000000000000000000000000')
 
     // Create a simple booking object first
     const booking = {
-      user: new ObjectId(session.user.id),
+      user: userObjectId,
       trip: new ObjectId(tourId),
       numberOfTravelers: parseInt(numberOfTravelers),
       specialRequests: specialRequests || '',
@@ -144,10 +124,10 @@ export async function POST(req: Request) {
 
     let result
     try {
-           result = await db.collection('bookings').insertOne(booking, { 
-        bypassDocumentValidation: true 
+      result = await db.collection('bookings').insertOne(booking, {
+        bypassDocumentValidation: true
       })
-       } catch (insertError) {
+    } catch (insertError) {
       // Try to provide more specific error message
       if (insertError instanceof Error) {
         if (insertError.message.includes('validation')) {
@@ -171,7 +151,7 @@ export async function POST(req: Request) {
     }
 
     // Get user details for email
-    const user = await db.collection('users').findOne({ _id: new ObjectId(session.user.id) })
+    const user = await db.collection('users').findOne({ _id: userObjectId })
 
     // Send confirmation email
     try {
