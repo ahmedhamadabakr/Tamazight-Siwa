@@ -170,6 +170,7 @@ export const authOptions = {
     async jwt({ token, user, account }: any) {
       // Initial sign in - cache user data in token
       if (account && user) {
+        console.log('JWT callback - Initial sign in:', { userId: user.id, email: user.email });
         return {
           ...token,
           id: user.id,
@@ -196,15 +197,28 @@ export const authOptions = {
           fullName: token.fullName as string,
           image: token.image as string,
         };
+        console.log('Session callback - User data:', { userId: session.user.id, role: session.user.role });
       }
       return session;
     },
 
     async redirect({ url, baseUrl }: any) {
+      console.log('Redirect callback:', { url, baseUrl });
+      
       // Allows relative callback URLs
-      if (url.startsWith('/')) return `${baseUrl}${url}`;
+      if (url.startsWith('/')) {
+        const redirectUrl = `${baseUrl}${url}`;
+        console.log('Redirecting to:', redirectUrl);
+        return redirectUrl;
+      }
+      
       // Allows callback URLs on the same origin
-      else if (new URL(url).origin === baseUrl) return url;
+      if (new URL(url).origin === baseUrl) {
+        console.log('Same origin redirect:', url);
+        return url;
+      }
+      
+      console.log('Default redirect to baseUrl:', baseUrl);
       return baseUrl;
     }
   },
@@ -223,6 +237,15 @@ export const authOptions = {
 };
 
 // Export function for backward compatibility
+// Validate environment variables
+if (!process.env.NEXTAUTH_SECRET) {
+  throw new Error('NEXTAUTH_SECRET is not defined');
+}
+
+if (!process.env.JWT_SECRET) {
+  throw new Error('JWT_SECRET is not defined');
+}
+
 export async function getAuthOptions() {
   return authOptions;
 }

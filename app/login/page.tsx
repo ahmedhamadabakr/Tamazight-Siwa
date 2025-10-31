@@ -19,7 +19,7 @@ export default function LoginPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { data: session, status, update } = useSession();
-  
+
   // Get callback URL from search params
   const callbackUrl = searchParams.get('callbackUrl') || '/';
   const urlError = searchParams.get('error');
@@ -50,7 +50,7 @@ export default function LoginPage() {
     if (status === 'authenticated' && session?.user) {
       const userRole = (session.user as any).role;
       let redirectPath = callbackUrl;
-      
+
       // Override callback URL based on user role if it's just the home page
       if (callbackUrl === '/' || !callbackUrl) {
         if (userRole === 'admin') {
@@ -63,7 +63,7 @@ export default function LoginPage() {
           redirectPath = '/dashboard';
         }
       }
-      
+
       // Only redirect if we're not already on the target path
       if (window.location.pathname !== redirectPath) {
         router.replace(redirectPath);
@@ -88,56 +88,67 @@ export default function LoginPage() {
     );
   }
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  if (loading || status === 'loading') return; // Prevent double submission
-  
-  setLoading(true);
-  setError('');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-  try {
-    const result = await signIn('credentials', {
-      email: formData.email,
-      password: formData.password,
-      redirect: false,
-      ...(callbackUrl ? { callbackUrl } : {}),
-    });
+    if (loading || status === 'loading') return; // Prevent double submission
 
-    if (result?.error) {
-      // Handle specific error types
-      switch (result.error) {
-        case 'CredentialsSignin':
-          setError('Invalid email or password');
-          break;
-        case 'AccessDenied':
-          setError('Account is locked or inactive. Please contact support.');
-          break;
-        case 'Configuration':
-          setError('Authentication service is temporarily unavailable. Please try again later.');
-          break;
-        default:
-          setError('Login failed. Please try again.');
+    setLoading(true);
+    setError('');
+
+    try {
+      console.log('Attempting login with:', { email: formData.email, callbackUrl });
+
+      const result = await signIn('credentials', {
+        email: formData.email,
+        password: formData.password,
+        redirect: false,
+        callbackUrl: callbackUrl || '/',
+      });
+
+      console.log('SignIn result:', result);
+
+      if (result?.error) {
+        console.error('SignIn error:', result.error);
+        // Handle specific error types
+        switch (result.error) {
+          case 'CredentialsSignin':
+            setError('Invalid email or password');
+            break;
+          case 'AccessDenied':
+            setError('Account is locked or inactive. Please contact support.');
+            break;
+          case 'Configuration':
+            setError('Authentication service is temporarily unavailable. Please try again later.');
+            break;
+          default:
+            setError('Login failed. Please try again.');
+        }
+        setLoading(false);
+        return;
       }
+
+      if (result?.ok) {
+        console.log('Login successful, updating session...');
+        // Force session update and wait for it
+        await update();
+
+        // Small delay to ensure session is updated
+        setTimeout(() => {
+          // Force a page reload to ensure middleware picks up the new session
+          window.location.href = result.url || callbackUrl || '/';
+        }, 500);
+        return;
+      }
+
+      setError('Login failed. Please try again.');
       setLoading(false);
-      return;
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('An error occurred during login. Please try again.');
+      setLoading(false);
     }
-
-    if (result?.ok) {
-      // Success - let the useEffect handle the redirect
-      // Just refresh the session and let NextAuth handle the rest
-      await update();
-      return;
-    }
-
-    setError('Login failed. Please try again.');
-    setLoading(false);
-  } catch (err) {
-    console.error('Login error:', err);
-    setError('An error occurred during login. Please try again.');
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100 px-4 py-12">
