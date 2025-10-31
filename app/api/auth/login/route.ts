@@ -8,6 +8,7 @@ import {
 } from '@/lib/security';
 import { rateLimitService } from '@/lib/security/rate-limit';
 import { SECURITY_CONFIG } from '@/lib/security/config';
+import { withDbTimeout } from '@/lib/utils/timeout';
 
 export async function POST(request: NextRequest) {
   try {
@@ -92,8 +93,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user by email
-    const user = await database.findUserByEmail(email);
+    // Find user by email with timeout
+    const user = await withDbTimeout(database.findUserByEmail(email), 'Find user by email');
     if (!user) {
       // Record attempts in parallel; do not block on logging
       await Promise.allSettled([
@@ -148,8 +149,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify password
-    const isPasswordValid = await comparePassword(password, user.password);
+    // Verify password with timeout
+    const isPasswordValid = await withDbTimeout(comparePassword(password, user.password), 'Password verification');
     if (!isPasswordValid) {
       await Promise.allSettled([
         rateLimitService.recordLoginAttempt(clientIP, false),
@@ -213,37 +214,43 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Successful login - reset rate limits and login attempts
-    await Promise.allSettled([
-      rateLimitService.recordLoginAttempt(clientIP, true),
-      rateLimitService.recordLoginAttempt(email, true),
-      database.resetLoginAttempts(email),
-      database.updateLastLogin(user._id!, clientIP),
-    ]);
-
-    // Generate tokens
+    // Generate tokens first (no DB dependency)
     const tokenPair = generateTokenPair(
       { id: user._id!.toString(), email: user.email, role: user.role },
       rememberMe
     );
 
-    // Store refresh token (await but in parallel with logging)
-    const addTokenPromise = database.addRefreshToken(user._id!, {
-      token: tokenPair.refreshToken,
-      expiresAt: tokenPair.expiresAt,
-      deviceInfo: userAgent,
-      ipAddress: clientIP,
-      createdAt: new Date()
-    });
-    const logSuccessPromise = database.logSecurityEvent({
-      userId: user._id,
-      eventType: 'LOGIN_SUCCESS',
-      ipAddress: clientIP,
-      userAgent,
-      details: { rememberMe }
-    });
+    // Critical operations that must complete
+    const criticalOperations = [
+      database.resetLoginAttempts(email),
+      database.updateLastLogin(user._id!, clientIP),
+      database.addRefreshToken(user._id!, {
+        token: tokenPair.refreshToken,
+        expiresAt: tokenPair.expiresAt,
+        deviceInfo: userAgent,
+        ipAddress: clientIP,
+        createdAt: new Date()
+      })
+    ];
 
-    await Promise.allSettled([addTokenPromise, logSuccessPromise]);
+    // Non-critical operations (fire and forget)
+    const nonCriticalOperations = [
+      rateLimitService.recordLoginAttempt(clientIP, true),
+      rateLimitService.recordLoginAttempt(email, true),
+      database.logSecurityEvent({
+        userId: user._id,
+        eventType: 'LOGIN_SUCCESS',
+        ipAddress: clientIP,
+        userAgent,
+        details: { rememberMe }
+      })
+    ];
+
+    // Wait only for critical operations
+    await Promise.allSettled(criticalOperations);
+    
+    // Fire non-critical operations without waiting
+    Promise.allSettled(nonCriticalOperations).catch(() => {});
 
     // Prepare user response (without sensitive data)
     const userResponse = {

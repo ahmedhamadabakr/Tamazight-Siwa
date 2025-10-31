@@ -104,9 +104,30 @@ export class Database {
       // Only connect if we're not in build mode
       if (!process.env.NEXT_PHASE || process.env.NEXT_PHASE !== 'phase-production-build') {
         this.db = dbConnect();
+        this.ensureIndexes();
       }
     } else {
       this.db = dbConnect();
+      this.ensureIndexes();
+    }
+  }
+
+  private async ensureIndexes() {
+    try {
+      const db = await this.getDb();
+      
+      // Create indexes for better performance
+      await Promise.allSettled([
+        db.collection('users').createIndex({ email: 1 }, { unique: true, background: true }),
+        db.collection('users').createIndex({ 'refreshTokens.token': 1 }, { background: true }),
+        db.collection('ratelimits').createIndex({ identifier: 1 }, { unique: true, background: true }),
+        db.collection('securityevents').createIndex({ userId: 1, timestamp: -1 }, { background: true }),
+      ]);
+    } catch (error) {
+      // Ignore index creation errors in production
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('Index creation warning:', error);
+      }
     }
   }
 
@@ -114,7 +135,13 @@ export class Database {
     if (!this.db) {
       this.db = dbConnect();
     }
-    return await this.db;
+    try {
+      return await this.db;
+    } catch (error) {
+      // Reset connection on error and retry once
+      this.db = dbConnect();
+      return await this.db;
+    }
   }
 
   // User operations

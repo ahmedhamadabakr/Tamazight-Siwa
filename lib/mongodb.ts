@@ -46,8 +46,12 @@ async function dbConnect(): Promise<Db> {
   if (!cached.promise) {
     const opts = {
       maxPoolSize: 10,
-      serverSelectionTimeoutMS: 5000,
+      serverSelectionTimeoutMS: 10000, // Increased for Vercel
       socketTimeoutMS: 45000,
+      connectTimeoutMS: 10000,
+      maxIdleTimeMS: 30000,
+      retryWrites: true,
+      retryReads: true,
     };
 
     cached.promise = MongoClient.connect(MONGODB_URI, opts).then((client) => {
@@ -83,8 +87,12 @@ async function getMongoClient(): Promise<MongoClient> {
     if (!clientPromise) {
       const opts = {
         maxPoolSize: 10,
-        serverSelectionTimeoutMS: 5000,
+        serverSelectionTimeoutMS: 10000, // Increased for Vercel
         socketTimeoutMS: 45000,
+        connectTimeoutMS: 10000,
+        maxIdleTimeMS: 30000,
+        retryWrites: true,
+        retryReads: true,
       };
 
       clientPromise = MongoClient.connect(MONGODB_URI, opts);

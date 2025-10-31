@@ -1,7 +1,7 @@
 // Security configuration constants
 export const SECURITY_CONFIG = {
-  // Password security
-  BCRYPT_SALT_ROUNDS: 12,
+  // Password security - Reduced for Vercel performance
+  BCRYPT_SALT_ROUNDS: process.env.NODE_ENV === 'production' ? 10 : 8,
   MIN_PASSWORD_SCORE: 2, // zxcvbn score (0-4, where 2 is "fair")
   
   // Token expiration
