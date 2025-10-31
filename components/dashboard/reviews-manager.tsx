@@ -216,61 +216,61 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center">
-            <MessageSquare className="h-8 w-8 text-blue-600" />
-            <div className="mr-4">
-              <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
-              <p className="text-gray-600">Total Reviews</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+          <div className="flex items-center space-x-3">
+            <MessageSquare className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.total}</p>
+              <p className="text-sm sm:text-base text-gray-600 truncate">Total Reviews</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center">
-            <Clock className="h-8 w-8 text-yellow-600" />
-            <div className="mr-4">
-              <p className="text-2xl font-semibold text-gray-900">{stats.pending}</p>
-              <p className="text-gray-600">Pending</p>
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+          <div className="flex items-center space-x-3">
+            <Clock className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-600 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.pending}</p>
+              <p className="text-sm sm:text-base text-gray-600 truncate">Pending</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center">
-            <CheckCircle className="h-8 w-8 text-green-600" />
-            <div className="mr-4">
-              <p className="text-2xl font-semibold text-gray-900">{stats.approved}</p>
-              <p className="text-gray-600">Approved</p>
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+          <div className="flex items-center space-x-3">
+            <CheckCircle className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.approved}</p>
+              <p className="text-sm sm:text-base text-gray-600 truncate">Approved</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center">
-            <XCircle className="h-8 w-8 text-red-600" />
-            <div className="mr-4">
-              <p className="text-2xl font-semibold text-gray-900">{stats.rejected}</p>
-              <p className="text-gray-600">Rejected</p>
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+          <div className="flex items-center space-x-3">
+            <XCircle className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.rejected}</p>
+              <p className="text-sm sm:text-base text-gray-600 truncate">Rejected</p>
             </div>
           </div>
         </div>
         
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center">
-            <Star className="h-8 w-8 text-yellow-400" />
-            <div className="mr-4">
-              <p className="text-2xl font-semibold text-gray-900">{stats.averageRating.toFixed(1)}</p>
-              <p className="text-gray-600">Average Rating</p>
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+          <div className="flex items-center space-x-3">
+            <Star className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-400 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.averageRating.toFixed(1)}</p>
+              <p className="text-sm sm:text-base text-gray-600 truncate">Average Rating</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="relative">
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
@@ -329,10 +329,10 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
         <div className="space-y-4">
           {reviews.map((review) => {
             return (
-              <div key={review._id} className="bg-white rounded-lg shadow p-6">
+              <div key={review._id} className="bg-white rounded-lg shadow p-4 sm:p-6">
                 {/* Review Header */}
-                <div className="flex items-start justify-between mb-4">
-                  <div className="flex items-center space-x-3 space-x-reverse">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between mb-4 gap-3">
+                  <div className="flex items-center space-x-3">
                     {review.userImage ? (
                       <Image
                         src={review.userImage}
@@ -365,7 +365,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-shrink-0">
                     <span className={`px-2 py-1 text-xs rounded-full flex items-center gap-1 ${getStatusColor(review.status)}`}>
                       {getStatusIcon(review.status)}
                       {getStatusText(review.status)}
@@ -389,7 +389,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
 
                 {/* Review Images */}
                 {review.images && review.images.length > 0 && (
-                  <div className="grid grid-cols-3 gap-2 mb-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-4">
                     {review.images.slice(0, 3).map((image, index) => (
                       <Image
                         key={index}
@@ -417,7 +417,7 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
                 )}
 
                 {/* Actions */}
-                <div className="flex gap-2 pt-4 border-t">
+                <div className="flex flex-wrap gap-2 pt-4 border-t">
                   {review.status === 'pending' && (
                     <>
                       <button
@@ -464,10 +464,10 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
 
       {/* Admin Response Modal */}
       {showResponseModal && selectedReview && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
-            <h3 className="text-lg font-semibold mb-4">Admin Response</h3>
-            <p className="text-sm text-gray-600 mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+          <div className="bg-white rounded-lg max-w-md w-full p-4 sm:p-6 max-h-[90vh] overflow-y-auto">
+            <h3 className="text-base sm:text-lg font-semibold mb-4">Admin Response</h3>
+            <p className="text-sm text-gray-600 mb-4 line-clamp-2">
               Reply to review: {selectedReview.title}
             </p>
             <textarea
@@ -475,22 +475,22 @@ export default function ReviewsManager({ className = '' }: ReviewsManagerProps) 
               onChange={(e) => setAdminResponse(e.target.value)}
               placeholder="Write admin response here..."
               rows={4}
-              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base"
             />
-            <div className="flex gap-3 mt-4">
+            <div className="flex flex-col sm:flex-row gap-3 mt-4">
               <button
                 onClick={() => {
                   setShowResponseModal(false)
                   setAdminResponse('')
                   setSelectedReview(null)
                 }}
-                className="flex-1 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600"
+                className="flex-1 bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 onClick={sendAdminResponse}
-                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                className="flex-1 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm sm:text-base"
               >
                 Send Response
               </button>

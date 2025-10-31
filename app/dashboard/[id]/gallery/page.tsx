@@ -33,7 +33,7 @@ export default function GalleryDashboard() {
     useEffect(() => {
         if (sessionStatus === 'loading') return;
 
-        if (!session?.user || session.user.role !== 'manager') {
+        if (!session?.user || (session.user as any).role !== 'manager') {
             router.push('/');
             return;
         }
@@ -154,63 +154,63 @@ export default function GalleryDashboard() {
     return (
         <DashboardLayout>
             <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                    <h1 className="text-3xl font-bold">Gallery Management</h1>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <h1 className="text-2xl sm:text-3xl font-bold">Gallery Management</h1>
                     <button
                         onClick={() => setShowAddModal(true)}
-                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 text-sm sm:text-base"
                     >
-                        <Plus size={20} />
+                        <Plus size={18} />
                         Add New Image
                     </button>
                 </div>
 
                 {/* Statistics Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                    <div className="bg-white p-6 rounded-lg shadow">
-                        <div className="flex items-center">
-                            <div className="p-2 bg-blue-100 rounded-lg">
-                                <Eye className="h-6 w-6 text-blue-600" />
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+                        <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                                <Eye className="h-5 w-5 sm:h-6 sm:w-6 text-blue-600" />
                             </div>
-                            <div className="mr-4">
-                                <p className="text-sm font-medium text-gray-600">Total Images</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-lg shadow">
-                        <div className="flex items-center">
-                            <div className="p-2 bg-green-100 rounded-lg">
-                                <Eye className="h-6 w-6 text-green-600" />
-                            </div>
-                            <div className="mr-4">
-                                <p className="text-sm font-medium text-gray-600">Active Images</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.active}</p>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Total Images</p>
+                                <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.total}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white p-6 rounded-lg shadow">
-                        <div className="flex items-center">
-                            <div className="p-2 bg-red-100 rounded-lg">
-                                <Eye className="h-6 w-6 text-red-600" />
+                    <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+                        <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
+                                <Eye className="h-5 w-5 sm:h-6 sm:w-6 text-green-600" />
                             </div>
-                            <div className="mr-4">
-                                <p className="text-sm font-medium text-gray-600">Inactive Images</p>
-                                <p className="text-2xl font-bold text-gray-900">{stats.inactive}</p>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Active Images</p>
+                                <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.active}</p>
                             </div>
                         </div>
                     </div>
 
-                    <div className="bg-white p-6 rounded-lg shadow">
-                        <div className="flex items-center">
-                            <div className="p-2 bg-purple-100 rounded-lg">
-                                <Upload className="h-6 w-6 text-purple-600" />
+                    <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+                        <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-red-100 rounded-lg flex-shrink-0">
+                                <Eye className="h-5 w-5 sm:h-6 sm:w-6 text-red-600" />
                             </div>
-                            <div className="mr-4">
-                                <p className="text-sm font-medium text-gray-600">Categories</p>
-                                <p className="text-2xl font-bold text-gray-900">{categories.length}</p>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Inactive Images</p>
+                                <p className="text-xl sm:text-2xl font-bold text-gray-900">{stats.inactive}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+                        <div className="flex items-center space-x-3">
+                            <div className="p-2 bg-purple-100 rounded-lg flex-shrink-0">
+                                <Upload className="h-5 w-5 sm:h-6 sm:w-6 text-purple-600" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                                <p className="text-xs sm:text-sm font-medium text-gray-600 truncate">Categories</p>
+                                <p className="text-xl sm:text-2xl font-bold text-gray-900">{categories.length}</p>
                             </div>
                         </div>
                     </div>
@@ -266,10 +266,10 @@ export default function GalleryDashboard() {
                             </div>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 p-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 p-4 sm:p-6">
                             {images.map((image) => (
                                 <div key={image._id} className="bg-gray-50 rounded-lg overflow-hidden">
-                                    <div className="relative h-48">
+                                    <div className="relative h-40 sm:h-48">
                                         <Image
                                             src={image.imageUrl}
                                             alt={image.title}
@@ -286,22 +286,22 @@ export default function GalleryDashboard() {
                                         </div>
                                     </div>
 
-                                    <div className="p-4">
-                                        <h3 className="font-medium text-gray-900 mb-1">{image.title}</h3>
-                                        <p className="text-sm text-gray-600 mb-2">{image.description}</p>
+                                    <div className="p-3 sm:p-4">
+                                        <h3 className="font-medium text-gray-900 mb-1 text-sm sm:text-base truncate">{image.title}</h3>
+                                        <p className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-2">{image.description}</p>
                                         <p className="text-xs text-gray-500 mb-3">Category: {image.category}</p>
 
-                                        <div className="flex gap-2">
+                                        <div className="flex flex-col sm:flex-row gap-2">
                                             <button
                                                 onClick={() => setEditingImage(image)}
-                                                className="flex-1 bg-blue-500 text-white px-3 py-2 rounded text-sm hover:bg-blue-600 flex items-center justify-center gap-1"
+                                                className="flex-1 bg-blue-500 text-white px-2 sm:px-3 py-2 rounded text-xs sm:text-sm hover:bg-blue-600 flex items-center justify-center gap-1"
                                             >
-                                                <Edit size={14} />
+                                                <Edit size={12} />
                                                 Edit
                                             </button>
                                             <button
                                                 onClick={() => handleStatusToggle(image._id, image.isActive)}
-                                                className={`flex-1 px-3 py-2 rounded text-sm ${image.isActive
+                                                className={`flex-1 px-2 sm:px-3 py-2 rounded text-xs sm:text-sm ${image.isActive
                                                     ? 'bg-yellow-500 text-white hover:bg-yellow-600'
                                                     : 'bg-green-500 text-white hover:bg-green-600'
                                                     }`}
@@ -310,9 +310,9 @@ export default function GalleryDashboard() {
                                             </button>
                                             <button
                                                 onClick={() => handleDelete(image._id)}
-                                                className="bg-red-500 text-white px-3 py-2 rounded text-sm hover:bg-red-600"
+                                                className="bg-red-500 text-white px-2 sm:px-3 py-2 rounded text-xs sm:text-sm hover:bg-red-600 flex items-center justify-center"
                                             >
-                                                <Trash2 size={14} />
+                                                <Trash2 size={12} />
                                             </button>
                                         </div>
                                     </div>

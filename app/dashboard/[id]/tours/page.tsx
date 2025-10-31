@@ -124,47 +124,44 @@ export default function ToursPage({ params }: ToursPageProps) {
 
     return (
         <DashboardLayout>
-            <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
-                <div className="max-w-7xl mx-auto">
-                    {/* Header */}
-                    <div className="mb-8">
-                        <div className="flex justify-between items-center">
-                            <div>
-                                <h1 className="text-3xl font-bold text-gray-900">Tour Management</h1>
-                                <p className="mt-2 text-gray-600">Manage and edit your tours</p>
-                            </div>
-                            <Link
-                                href={`/dashboard/${params.id}/tours/new-trip`}
-                                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                            >
-                                <FiPlus className="mr-2 h-4 w-4" />
-                                Add New Tour
-                            </Link>
-                        </div>
+            <div className="space-y-6">
+                {/* Header */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Tour Management</h1>
+                        <p className="mt-2 text-gray-600">Manage and edit your tours</p>
                     </div>
+                    <Link
+                        href={`/dashboard/${params.id}/tours/new-trip`}
+                        className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                        <FiPlus className="mr-2 h-4 w-4" />
+                        Add New Tour
+                    </Link>
+                </div>
 
-                    {/* Tours Grid */}
-                    {tours.length === 0 ? (
-                        <div className="text-center py-12">
-                            <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                <FiMapPin className="w-12 h-12 text-gray-400" />
-                            </div>
-                            <h3 className="text-lg font-medium text-gray-900 mb-2">No tours found</h3>
-                            <p className="text-gray-500 mb-6">Start by adding your first tour</p>
-                            <Link
-                                href={`/dashboard/${params.id}/tours/new-trip`}
-                                className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
-                            >
-                                <FiPlus className="mr-2 h-4 w-4" />
-                                Add New Tour
-                            </Link>
+                {/* Tours Grid */}
+                {tours.length === 0 ? (
+                    <div className="text-center py-12">
+                        <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <FiMapPin className="w-10 h-10 sm:w-12 sm:h-12 text-gray-400" />
                         </div>
-                    ) : (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {tours.map((tour) => (
-                                <div key={tour._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                                    {/* Tour Image */}
-                                    <div className="h-48 bg-gray-200 relative">
+                        <h3 className="text-lg font-medium text-gray-900 mb-2">No tours found</h3>
+                        <p className="text-gray-500 mb-6">Start by adding your first tour</p>
+                        <Link
+                            href={`/dashboard/${params.id}/tours/new-trip`}
+                            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700"
+                        >
+                            <FiPlus className="mr-2 h-4 w-4" />
+                            Add New Tour
+                        </Link>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+                        {tours.map((tour) => (
+                            <div key={tour._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+                                {/* Tour Image */}
+                                <div className="h-40 sm:h-48 bg-gray-200 relative">
                                         {tour.images && tour.images.length > 0 && tour.images[0] ? (
                                             <img
                                                 src={tour.images[0]}
@@ -221,18 +218,18 @@ export default function ToursPage({ params }: ToursPageProps) {
                                         </div>
                                     </div>
 
-                                    {/* Tour Content */}
-                                    <div className="p-6">
-                                        <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-                                            {tour.title}
-                                        </h3>
+                                {/* Tour Content */}
+                                <div className="p-4 sm:p-6">
+                                    <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+                                        {tour.title}
+                                    </h3>
 
-                                        <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                                            {tour.description}
-                                        </p>
+                                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                                        {tour.description}
+                                    </p>
 
-                                        {/* Tour Details */}
-                                        <div className="space-y-2 mb-4">
+                                    {/* Tour Details */}
+                                    <div className="space-y-2 mb-4">
                                             <div className="flex items-center text-sm text-gray-500">
                                                 <FiMapPin className="w-4 h-4 mr-2" />
                                                 {tour.location}
@@ -251,32 +248,30 @@ export default function ToursPage({ params }: ToursPageProps) {
                                             </div>
                                         </div>
 
-                                        {/* Actions */}
-                                        <div className="flex space-x-2">
-                                            <button
-                                                onClick={() => router.push(`/dashboard/${params.id}/tours/edit/${tour._id}`)}
-                                                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                                            >
-                                                <FiEdit className="w-4 h-4 mr-1" />
-                                                Edit
-                                            </button>
+                                    {/* Actions */}
+                                    <div className="flex flex-col sm:flex-row gap-2">
+                                        <button
+                                            onClick={() => router.push(`/dashboard/${params.id}/tours/edit/${tour._id}`)}
+                                            className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                                        >
+                                            <FiEdit className="w-4 h-4 mr-1" />
+                                            Edit
+                                        </button>
 
-                                            <button
-                                                onClick={() => handleDelete(tour._id)}
-                                                className="inline-flex items-center justify-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-                                            >
-                                                <FiTrash2 className="w-4 h-4" />
-                                                Delete
-                                            </button>
-                                        </div>
+                                        <button
+                                            onClick={() => handleDelete(tour._id)}
+                                            className="flex-1 sm:flex-none inline-flex items-center justify-center px-3 py-2 border border-red-300 rounded-md text-sm font-medium text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                                        >
+                                            <FiTrash2 className="w-4 h-4 sm:mr-0" />
+                                            <span className="sm:hidden ml-1">Delete</span>
+                                        </button>
                                     </div>
                                 </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                            </div>
+                        ))}
+                    </div>
+                )}
             </div>
         </DashboardLayout>
-
     );
 }

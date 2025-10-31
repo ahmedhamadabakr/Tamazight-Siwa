@@ -2,6 +2,7 @@
 
 import { SessionProvider } from 'next-auth/react'
 import { AuthErrorBoundary } from './AuthErrorBoundary'
+import { AuthStateManager } from './auth/AuthStateManager'
 
 export function AuthProvider({
   children,
@@ -19,6 +20,7 @@ export function AuthProvider({
         refetchWhenOffline={false} // Don't refetch when offline
         basePath="/api/auth" // Ensure correct auth path
       >
+        <AuthStateManager />
         {children}
       </SessionProvider>
     </AuthErrorBoundary>

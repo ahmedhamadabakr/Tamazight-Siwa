@@ -186,14 +186,14 @@ export default function GalleryManager() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-bold text-gray-900">Gallery Manager</h1>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">Gallery Manager</h1>
         <button
           onClick={() => {
             setEditingImage(null)
             setShowForm(true)
           }}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center justify-center gap-2 text-sm sm:text-base"
         >
           <Plus className="h-4 w-4" />
           Add New Image
@@ -201,48 +201,48 @@ export default function GalleryManager() {
       </div>
 
       {/* Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center">
-            <ImageIcon className="h-8 w-8 text-blue-600" />
-            <div className="mr-4">
-              <p className="text-2xl font-semibold text-gray-900">{stats.total}</p>
-              <p className="text-gray-600">Total Images</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+          <div className="flex items-center space-x-3">
+            <ImageIcon className="h-6 w-6 sm:h-8 sm:w-8 text-blue-600 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.total}</p>
+              <p className="text-sm sm:text-base text-gray-600 truncate">Total Images</p>
             </div>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center">
-            <Eye className="h-8 w-8 text-green-600" />
-            <div className="mr-4">
-              <p className="text-2xl font-semibold text-gray-900">{stats.active}</p>
-              <p className="text-gray-600">Active Images</p>
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+          <div className="flex items-center space-x-3">
+            <Eye className="h-6 w-6 sm:h-8 sm:w-8 text-green-600 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.active}</p>
+              <p className="text-sm sm:text-base text-gray-600 truncate">Active Images</p>
             </div>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center">
-            <EyeOff className="h-8 w-8 text-red-600" />
-            <div className="mr-4">
-              <p className="text-2xl font-semibold text-gray-900">{stats.inactive}</p>
-              <p className="text-gray-600">Inactive Images</p>
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+          <div className="flex items-center space-x-3">
+            <EyeOff className="h-6 w-6 sm:h-8 sm:w-8 text-red-600 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{stats.inactive}</p>
+              <p className="text-sm sm:text-base text-gray-600 truncate">Inactive Images</p>
             </div>
           </div>
         </div>
-        <div className="bg-white p-6 rounded-lg shadow">
-          <div className="flex items-center">
-            <Filter className="h-8 w-8 text-purple-600" />
-            <div className="mr-4">
-              <p className="text-2xl font-semibold text-gray-900">{Object.keys(stats.categories).length}</p>
-              <p className="text-gray-600">Categories</p>
+        <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+          <div className="flex items-center space-x-3">
+            <Filter className="h-6 w-6 sm:h-8 sm:w-8 text-purple-600 flex-shrink-0" />
+            <div className="min-w-0 flex-1">
+              <p className="text-xl sm:text-2xl font-semibold text-gray-900">{Object.keys(stats.categories).length}</p>
+              <p className="text-sm sm:text-base text-gray-600 truncate">Categories</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Filters */}
-      <div className="bg-white p-6 rounded-lg shadow">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="bg-white p-4 sm:p-6 rounded-lg shadow">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="relative">
             <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
@@ -270,7 +270,7 @@ export default function GalleryManager() {
 
       {/* Images Grid */}
       {loading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {[...Array(8)].map((_, i) => (
             <div key={i} className="bg-white rounded-lg shadow animate-pulse">
               <div className="h-48 bg-gray-300 rounded-t-lg"></div>
@@ -290,10 +290,10 @@ export default function GalleryManager() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
           {filteredImages.map((image) => (
             <div key={image._id} className="bg-white rounded-lg shadow hover:shadow-lg transition-shadow">
-              <div className="relative h-48 rounded-t-lg overflow-hidden">
+              <div className="relative h-40 sm:h-48 rounded-t-lg overflow-hidden">
                 <Image
                   src={image.imageUrl}
                   alt={image.title}
@@ -310,15 +310,15 @@ export default function GalleryManager() {
                 </div>
               </div>
               
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900 mb-1 truncate">{image.title}</h3>
-                <p className="text-sm text-gray-600 mb-2 line-clamp-2">{image.description}</p>
+              <div className="p-3 sm:p-4">
+                <h3 className="font-semibold text-gray-900 mb-1 truncate text-sm sm:text-base">{image.title}</h3>
+                <p className="text-xs sm:text-sm text-gray-600 mb-2 line-clamp-2">{image.description}</p>
                 <div className="flex items-center justify-between text-xs text-gray-500 mb-3">
-                  <span className="bg-gray-100 px-2 py-1 rounded">{image.category}</span>
-                  <span>{formatFileSize(image.bytes)}</span>
+                  <span className="bg-gray-100 px-2 py-1 rounded text-xs">{image.category}</span>
+                  <span className="text-xs">{formatFileSize(image.bytes)}</span>
                 </div>
                 
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <button
                     onClick={() => handleStatusToggle(image._id, image.isActive)}
                     className={`flex-1 px-3 py-1 text-xs rounded ${

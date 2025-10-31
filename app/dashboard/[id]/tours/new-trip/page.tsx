@@ -125,14 +125,14 @@ export default function NewTrip() {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-gray-50 py-10 px-6">
-        <div className="max-w-5xl mx-auto bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
-          <h1 className="text-3xl font-semibold text-gray-800 mb-6">Add New Trip</h1>
-          <p className="text-gray-500 mb-8">Create a new tour and add all the details below.</p>
+      <div className="space-y-6">
+        <div className="bg-white p-4 sm:p-6 lg:p-8 rounded-lg shadow-sm border border-gray-100">
+          <h1 className="text-2xl sm:text-3xl font-semibold text-gray-800 mb-4 sm:mb-6">Add New Trip</h1>
+          <p className="text-gray-500 mb-6 sm:mb-8">Create a new tour and add all the details below.</p>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
             {/* Title Fields */}
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
               <div>
                 <label className="text-sm font-medium text-gray-600 block mb-1">
@@ -142,14 +142,14 @@ export default function NewTrip() {
                   type="text"
                   value={formData.title}
                   onChange={e => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 sm:p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                   required
                 />
               </div>
             </div>
 
             {/* Description Fields */}
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
 
               <div>
                 <label className="text-sm font-medium text-gray-600 block mb-1">
@@ -158,7 +158,7 @@ export default function NewTrip() {
                 <textarea
                   value={formData.description}
                   onChange={e => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 sm:p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                   rows={4}
                   required
                 />
@@ -166,7 +166,7 @@ export default function NewTrip() {
             </div>
 
             {/* Duration / Price / Location */}
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
               <div>
                 <label className="text-sm font-medium text-gray-600 block mb-1">Duration</label>
                 <input
@@ -174,7 +174,7 @@ export default function NewTrip() {
                   value={formData.duration}
                   onChange={e => setFormData({ ...formData, duration: e.target.value })}
                   placeholder="e.g. 3 days"
-                  className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 sm:p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                   required
                 />
               </div>
@@ -184,7 +184,7 @@ export default function NewTrip() {
                   type="number"
                   value={formData.price}
                   onChange={e => setFormData({ ...formData, price: e.target.value })}
-                  className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 sm:p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                   required
                 />
               </div>
@@ -194,14 +194,14 @@ export default function NewTrip() {
                   type="text"
                   value={formData.location}
                   onChange={e => setFormData({ ...formData, location: e.target.value })}
-                  className="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  className="w-full p-2 sm:p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                   required
                 />
               </div>
             </div>
 
             {/* Start Date / End Date */}
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="text-sm font-medium text-gray-600 block mb-1">
                  Start Date
@@ -230,7 +230,7 @@ export default function NewTrip() {
             </div>
 
             {/* Category & Featured */}
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="text-sm font-medium text-gray-600 block mb-1">Category</label>
                 <select
@@ -263,7 +263,7 @@ export default function NewTrip() {
             </div>
 
             {/* Group Size & Difficulty */}
-            <div className="grid md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               <div>
                 <label className="text-sm font-medium text-gray-600 block mb-1">Group Size</label>
                 <input
@@ -295,19 +295,19 @@ export default function NewTrip() {
             <div>
               <label className="text-sm font-medium text-gray-600 block mb-1">Tour Highlights</label>
               <div className="space-y-2">
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <input
                     type="text"
                     value={newHighlight}
                     onChange={e => setNewHighlight(e.target.value)}
                     onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddHighlight())}
                     placeholder="Add a highlight..."
-                    className="flex-1 p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                    className="flex-1 p-2 sm:p-2.5 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm sm:text-base"
                   />
                   <button
                     type="button"
                     onClick={handleAddHighlight}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+                    className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm sm:text-base"
                   >
                     Add
                   </button>
@@ -343,7 +343,7 @@ export default function NewTrip() {
                 {uploading && <p className="text-blue-600">Uploading image...</p>}
 
                 {images.length > 0 && (
-                  <div className="grid grid-cols-3 gap-4 mt-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 mt-2">
                     {images.map((image, index) => (
                       <div key={index} className="relative group">
                         <img
@@ -366,17 +366,17 @@ export default function NewTrip() {
             </div>
 
             {/* Buttons */}
-            <div className="flex justify-end gap-3 pt-6">
+            <div className="flex flex-col sm:flex-row justify-end gap-3 pt-4 sm:pt-6">
               <button
                 type="button"
                 onClick={() => router.back()}
-                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition"
+                className="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-100 transition text-sm sm:text-base"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+                className="px-5 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition text-sm sm:text-base"
               >
                 Add Trip
               </button>

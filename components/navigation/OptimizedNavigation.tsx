@@ -3,6 +3,7 @@
 import { useState, Suspense, lazy } from "react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User } from "lucide-react";
 import { NavigationSkeleton } from "./NavigationSkeleton";
@@ -35,11 +36,15 @@ export function OptimizedNavigation() {
     ? user.role === 'manager' || user.role === 'admin' ? `/dashboard/${user.id}` : `/user/${user.id}`
     : '/login';
 
+  const { logout } = useAuth(); // Use useAuth hook
+
   // Handle sign out
   const handleSignOutClick = async () => {
-    const { signOut } = await import("next-auth/react");
-    await signOut({ callbackUrl: '/' });
-    setIsOpen(false);
+    try {
+      await logout({ callbackUrl: '/' });
+    } finally {
+      setIsOpen(false);
+    }
   };
 
   // Show skeleton while loading

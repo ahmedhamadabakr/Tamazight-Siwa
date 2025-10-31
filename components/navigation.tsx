@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo, memo } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
+import { useAuth } from "@/hooks/useAuth";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, User, LogOut, Settings, Shield } from "lucide-react";
@@ -23,12 +24,29 @@ const NavigationComponent = memo(function Navigation() {
   const [scrolled, setScrolled] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [isSigningOut, setIsSigningOut] = useState(false);
-  const { data: session, status } = useSession();
+  const { data: session, status, update: updateSession } = useSession();
+  const { logout, subscribeToAuthChanges } = useAuth();
   const pathname = usePathname();
+  const [localUser, setLocalUser] = useState<SessionUser | null>(null);
 
-  const user = session?.user as SessionUser | undefined;
-  const userRole = user?.role;
-  const displayUser = isSigningOut ? null : user;
+  // Keep local user state in sync with session
+  useEffect(() => {
+    setLocalUser(session?.user as SessionUser | null);
+  }, [session]);
+
+  // Subscribe to auth changes
+  useEffect(() => {
+    const unsubscribe = subscribeToAuthChanges(() => {
+      // Force update the session when auth state changes
+      updateSession();
+      // Close any open dropdowns
+      setIsOpen(false);
+    });
+    
+    return () => unsubscribe();
+  }, [subscribeToAuthChanges, updateSession]);
+
+  const userRole = localUser?.role;
 
   useEffect(() => {
     setMounted(true);
@@ -57,18 +75,18 @@ const NavigationComponent = memo(function Navigation() {
   useEffect(() => setIsOpen(false), [pathname]);
 
   useEffect(() => {
-    if (status === "unauthenticated" && isSigningOut) {
+    // Show loading state while checking auth status or during sign out
+    if (status === 'loading' || isSigningOut) {
       setIsSigningOut(false);
     }
   }, [status, isSigningOut]);
 
   const profileLink = useMemo(() => {
-    if (!mounted || !displayUser?.id) return "/login";
-    if (userRole === "manager") return `/dashboard/${displayUser.id}`;
-    if (userRole === "admin") return "/admin/dashboard";
-    if (userRole === "user") return `/user/${displayUser.id}`;
-    return "/login";
-  }, [mounted, displayUser, userRole]);
+    if (!localUser?.id) return '/login';
+    return (userRole === 'manager' || userRole === 'admin') 
+      ? `/dashboard/${localUser.id}` 
+      : `/user/${localUser.id}`;
+  }, [localUser?.id, userRole]);
 
   const isActive = useCallback(
     (href: string) => {
@@ -81,28 +99,24 @@ const NavigationComponent = memo(function Navigation() {
   const handleSignOut = useCallback(async () => {
     if (isSigningOut) return;
     setIsSigningOut(true);
-
+    
     try {
       setIsOpen(false);
-
-      if (typeof window !== "undefined") {
-        localStorage.removeItem("nextauth.message");
-        sessionStorage.clear();
-      }
-
-      await signOut({
-        redirect: false,
-        callbackUrl: "/",
+      await logout({ 
+        callbackUrl: '/',
+        redirect: true
       });
-
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
-      window.location.href = "/";
+      
+      // Reset local state
+      setLocalUser(null);
     } catch (error) {
       console.error("Sign out error:", error);
-      window.location.href = "/";
+      // Force redirect on error
+      window.location.href = `/?error=logout_failed&t=${Date.now()}`;
+    } finally {
+      setIsSigningOut(false);
     }
-  }, [isSigningOut]);
+  }, [isSigningOut, logout]);
 
   const navClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
     scrolled
@@ -150,15 +164,15 @@ const NavigationComponent = memo(function Navigation() {
             </div>
 
             {/* Auth Section */}
-            {mounted && status === "authenticated" && displayUser && !isSigningOut ? (
+            {mounted && status === "authenticated" && localUser && !isSigningOut ? (
               <div className="flex items-center space-x-4 ml-4">
                 <Link href={profileLink} prefetch={false}>
                   <div className="flex items-center space-x-2 px-3 py-2 rounded-xl hover:bg-gray-50 transition-all border border-transparent hover:border-gray-200 cursor-pointer">
                     <div className="relative">
-                      {displayUser.image ? (
+                      {localUser.image ? (
                         <Image
-                          src={displayUser.image}
-                          alt={displayUser.name || "User"}
+                          src={localUser.image}
+                          alt={localUser.name || "User"}
                           className="h-9 w-9 rounded-full object-cover ring-2 ring-primary/20 hover:ring-primary/30 transition-all"
                         />
                       ) : (
@@ -170,7 +184,7 @@ const NavigationComponent = memo(function Navigation() {
                     </div>
                     <div className="hidden lg:block text-left">
                       <p className="text-sm font-medium text-gray-900">
-                        {displayUser.name || "User"}
+                        {localUser.name || "User"}
                       </p>
                       <p className="text-xs text-gray-500 capitalize">{userRole}</p>
                     </div>
@@ -240,14 +254,14 @@ const NavigationComponent = memo(function Navigation() {
               ))}
             </div>
 
-            {displayUser && !isSigningOut ? (
+            {localUser && !isSigningOut ? (
               <>
                 <div className="px-4 py-3 border-t border-gray-200">
                   <div className="flex items-center space-x-3">
-                    {displayUser.image ? (
+                    {localUser.image ? (
                       <Image
-                        src={displayUser.image}
-                        alt={displayUser.name || "User"}
+                        src={localUser.image}
+                        alt={localUser.name || "User"}
                         className="w-12 h-12 rounded-full object-cover"
                       />
                     ) : (
@@ -256,8 +270,8 @@ const NavigationComponent = memo(function Navigation() {
                       </div>
                     )}
                     <div>
-                      <p className="font-semibold text-gray-900">{displayUser.name || "User"}</p>
-                      <p className="text-sm text-gray-600">{displayUser.email || ""}</p>
+                      <p className="font-semibold text-gray-900">{localUser.name || "User"}</p>
+                      <p className="text-sm text-gray-600">{localUser.email || ""}</p>
                     </div>
                   </div>
                 </div>

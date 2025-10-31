@@ -3,6 +3,7 @@
 import { useState, memo, useCallback, useEffect } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogOut } from "lucide-react";
 import Image from "next/image";
@@ -23,12 +24,42 @@ const preloadRoutes = ['/tours', '/gallery', '/about', '/login', '/register'];
 export const FastNavigation = memo(function FastNavigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { data: session, status } = useSession();
-  const user = session?.user as SessionUser | undefined;
-  const userRole = user?.role;
+  const { data: session, status, update } = useSession();
+  const { logout, subscribeToAuthChanges } = useAuth();
+  const [localUser, setLocalUser] = useState<SessionUser | undefined>();
+  const [isSigningOut, setIsSigningOut] = useState(false);
+  
+  // Keep local state in sync with session
+  useEffect(() => {
+    setLocalUser(session?.user as SessionUser | undefined);
+  }, [session]);
+  
+  // Subscribe to auth changes
+  useEffect(() => {
+    const unsubscribe = subscribeToAuthChanges(() => {
+      // Force update the session when auth state changes
+      update().then((updatedSession) => {
+        // Clear local state if user is not authenticated
+        if (!updatedSession) {
+          setLocalUser(undefined);
+        } else {
+          setLocalUser(updatedSession.user as SessionUser | undefined);
+        }
+        // Close any open dropdowns
+        setIsDropdownOpen(false);
+        setIsOpen(false);
+      });
+    });
+    
+    return () => unsubscribe();
+  }, [subscribeToAuthChanges, update]);
+  
+  const userRole = localUser?.role;
 
-  const profileLink = user?.id 
-    ? (user.role === 'manager' || user.role === 'admin') ? `/dashboard/${user.id}` : `/user/${user.id}`
+  const profileLink = localUser?.id 
+    ? (localUser.role === 'manager' || localUser.role === 'admin') 
+      ? `/dashboard/${localUser.id}` 
+      : `/user/${localUser.id}`
     : '/login';
 
   // Preload routes on component mount
@@ -43,17 +74,50 @@ export const FastNavigation = memo(function FastNavigation() {
     }
   }, []);
 
-  // Optimized callbacks
-  const handleSignOutClick = useCallback(async () => {
+  const handleSignOut = useCallback(async () => {
+    if (isSigningOut) return;
+    setIsSigningOut(true);
+    
     try {
-      await signOut({ callbackUrl: '/' });
-    } catch (error) {
-      console.error('Sign out error:', error);
-    } finally {
-      setIsOpen(false);
+      // Clear UI state immediately
+      setLocalUser(undefined);
       setIsDropdownOpen(false);
+      setIsOpen(false);
+      
+      // Clear all auth-related data from client storage
+      if (typeof window !== 'undefined') {
+        // Clear all auth-related data
+        const authKeys = Object.keys(localStorage).filter(key => 
+          key.startsWith('next-auth.') || 
+          key.startsWith('auth.') ||
+          key.startsWith('token')
+        );
+        
+        authKeys.forEach(key => localStorage.removeItem(key));
+        sessionStorage.clear();
+        
+        // Clear any service worker caches that might contain auth data
+        if ('caches' in window) {
+          caches.keys().then(cacheNames => {
+            cacheNames.forEach(cacheName => caches.delete(cacheName));
+          });
+        }
+      }
+      
+      // Perform the actual logout
+      await logout({ 
+        callbackUrl: '/',
+        redirect: false // We'll handle the redirect manually
+      });
+      
+      // Force a hard redirect with cache busting
+      window.location.href = `/?logout=${Date.now()}`;
+    } catch (error) {
+      console.error("Sign out error:", error);
+      // Force redirect on error with cache busting
+      window.location.href = `/?error=logout_failed&t=${Date.now()}`;
     }
-  }, []);
+  }, [isSigningOut, logout]);
 
   const toggleMobileMenu = useCallback(() => {
     setIsOpen(prev => !prev);
@@ -67,8 +131,8 @@ export const FastNavigation = memo(function FastNavigation() {
     setIsDropdownOpen(prev => !prev);
   }, []);
 
-  // Fast loading state with immediate logo
-  if (status === 'loading') {
+  // Fast loading state  // Show skeleton while loading or signing out
+  if (status === 'loading' || isSigningOut) {
     return (
       <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-200/50 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -152,7 +216,7 @@ export const FastNavigation = memo(function FastNavigation() {
               </Link>
             </div>
 
-            {status === 'authenticated' && user ? (
+            {status === 'authenticated' && localUser ? (
               <div className="flex items-center space-x-4 ml-4">
                 <div className="relative">
                   <Button 
@@ -160,10 +224,10 @@ export const FastNavigation = memo(function FastNavigation() {
                     className="relative h-10 w-10 rounded-full p-0"
                     onClick={toggleDropdown}
                   >
-                    {user.image ? (
+                    {localUser.image ? (
                       <Image
-                        src={user.image}
-                        alt={user.name || 'User'}
+                        src={localUser.image}
+                        alt={localUser.name || 'User'}
                         className="h-10 w-10 rounded-full object-cover"
                         loading="lazy"
                       />
@@ -178,8 +242,8 @@ export const FastNavigation = memo(function FastNavigation() {
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-56 bg-white rounded-md shadow-lg border border-gray-200 py-1 z-50">
                       <div className="px-4 py-2 border-b border-gray-100">
-                        <p className="text-sm font-medium text-gray-900">{user.name || 'User'}</p>
-                        <p className="text-xs text-gray-500 truncate">{user.email || ''}</p>
+                        <p className="text-sm font-medium text-gray-900">{localUser.name || 'User'}</p>
+                        <p className="text-xs text-gray-500 truncate">{localUser.email || ''}</p>
                       </div>
                       
                       {(userRole === 'manager' || userRole === 'admin') && (
@@ -204,7 +268,7 @@ export const FastNavigation = memo(function FastNavigation() {
                       
                       <div className="border-t border-gray-100 mt-1 pt-1">
                         <button
-                          onClick={handleSignOutClick}
+                          onClick={handleSignOut}
                           className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"
                         >
                           <LogOut className="w-4 h-4 mr-2 inline" />
@@ -279,14 +343,14 @@ export const FastNavigation = memo(function FastNavigation() {
               </Link>
             </div>
 
-            {user ? (
+            {localUser ? (
               <div className="pt-4 pb-3 border-t border-gray-200">
                 <div className="flex items-center px-4 mb-3">
                   <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center overflow-hidden mr-3">
-                    {user.image ? (
+                    {localUser.image ? (
                       <Image
-                        src={user.image}
-                        alt={user.name || 'User'}
+                        src={localUser.image}
+                        alt={localUser.name || 'User'}
                         className="w-full h-full object-cover"
                         loading="lazy"
                       />
@@ -295,8 +359,8 @@ export const FastNavigation = memo(function FastNavigation() {
                     )}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-gray-900">{user.name || 'User'}</p>
-                    <p className="text-xs text-gray-500">{user.email || ''}</p>
+                    <p className="text-sm font-medium text-gray-900">{localUser.name || 'User'}</p>
+                    <p className="text-xs text-gray-500">{localUser.email || ''}</p>
                   </div>
                 </div>
                 <div className="px-2 space-y-1">
