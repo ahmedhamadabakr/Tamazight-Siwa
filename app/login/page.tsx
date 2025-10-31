@@ -99,18 +99,42 @@ export default function LoginPage() {
     try {
       console.log('Attempting login with:', { email: formData.email, callbackUrl });
 
-      // Try with redirect: true to let NextAuth handle everything
       const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
+        redirect: false,
         callbackUrl: callbackUrl || '/',
       });
 
-      // With redirect: true, NextAuth will handle the redirect automatically
-      // If we reach here, there was an error
-      console.log('SignIn completed, result:', result);
-      
-      // This should not happen with redirect: true, but handle just in case
+      console.log('SignIn result:', result);
+
+      if (result?.error) {
+        console.error('SignIn error:', result.error);
+        switch (result.error) {
+          case 'CredentialsSignin':
+            setError('Invalid email or password');
+            break;
+          case 'AccessDenied':
+            setError('Account is locked or inactive. Please contact support.');
+            break;
+          case 'Configuration':
+            setError('Authentication service is temporarily unavailable. Please try again later.');
+            break;
+          default:
+            setError('Login failed. Please try again.');
+        }
+        setLoading(false);
+        return;
+      }
+
+      if (result?.ok) {
+        console.log('Login successful! Redirecting to:', result.url || callbackUrl);
+
+        // Force a hard redirect to ensure cookies are set properly
+        window.location.replace(result.url || callbackUrl || '/');
+        return;
+      }
+
       setError('Login failed. Please try again.');
       setLoading(false);
     } catch (err) {

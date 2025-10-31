@@ -124,7 +124,7 @@ export const authOptions = {
             })
           ]);
 
-          return {
+          const userResponse = {
             id: user._id!.toString(),
             name: user.name,
             email: user.email,
@@ -132,6 +132,14 @@ export const authOptions = {
             image: user.image,
             fullName: user.fullName,
           };
+          
+          console.log('Credentials provider - Returning user:', {
+            id: userResponse.id,
+            email: userResponse.email,
+            role: userResponse.role
+          });
+          
+          return userResponse;
 
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -182,25 +190,56 @@ export const authOptions = {
 
   callbacks: {
     async jwt({ token, user, account }: any) {
+      console.log('JWT callback called:', { 
+        hasAccount: !!account, 
+        hasUser: !!user, 
+        tokenSub: token?.sub,
+        userEmail: user?.email 
+      });
+      
       // Initial sign in - cache user data in token
       if (account && user) {
-        console.log('JWT callback - Initial sign in:', { userId: user.id, email: user.email });
-        return {
+        console.log('JWT callback - Initial sign in:', { 
+          userId: user.id, 
+          email: user.email, 
+          role: user.role 
+        });
+        
+        const newToken = {
           ...token,
           id: user.id,
-          role: (user as any).role,
-          fullName: (user as any).fullName,
+          role: user.role,
+          fullName: user.fullName,
           email: user.email,
           name: user.name,
           image: user.image,
         };
+        
+        console.log('JWT callback - New token created:', { 
+          id: newToken.id, 
+          role: newToken.role 
+        });
+        
+        return newToken;
       }
 
+      console.log('JWT callback - Returning existing token:', { 
+        id: token?.id, 
+        role: token?.role 
+      });
+      
       // Return cached token data (no DB calls)
       return token;
     },
 
     async session({ session, token }: any) {
+      console.log('Session callback called:', { 
+        hasSession: !!session, 
+        hasToken: !!token,
+        tokenId: token?.id,
+        tokenRole: token?.role 
+      });
+      
       // Fast session creation from cached token data
       if (token) {
         session.user = {
@@ -211,8 +250,16 @@ export const authOptions = {
           fullName: token.fullName as string,
           image: token.image as string,
         };
-        console.log('Session callback - User data:', { userId: session.user.id, role: session.user.role });
+        
+        console.log('Session callback - Created session user:', { 
+          userId: session.user.id, 
+          role: session.user.role,
+          email: session.user.email 
+        });
+      } else {
+        console.log('Session callback - No token available');
       }
+      
       return session;
     },
 
