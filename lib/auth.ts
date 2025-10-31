@@ -132,28 +132,21 @@ export const authOptions = {
             image: user.image,
             fullName: user.fullName,
           };
-          
+
           console.log('Credentials provider - Returning user:', {
             id: userResponse.id,
             email: userResponse.email,
             role: userResponse.role
           });
-          
+
           return userResponse;
 
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-          console.error('Authentication error:', errorMessage);
+          console.error('Credentials provider error:', errorMessage);
 
-          // Only log detailed errors in development
-          if (process.env.NODE_ENV === 'development') {
-            console.error('Error details:', {
-              message: errorMessage,
-              stack: error instanceof Error ? error.stack : undefined,
-              credentials: { email: credentials?.email, hasPassword: !!credentials?.password }
-            });
-          }
-          throw error;
+          // Return null instead of throwing to prevent NextAuth from crashing
+          return null;
         }
       }
     })
@@ -172,94 +165,51 @@ export const authOptions = {
 
   jwt: {
     maxAge: 30 * 24 * 60 * 60, // 30 days
-    secret: process.env.NEXTAUTH_SECRET,
+    // Let NextAuth use NEXTAUTH_SECRET automatically
   },
 
-  cookies: {
-    sessionToken: {
-      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
-      options: {
-        httpOnly: true,
-        sameSite: 'lax',
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        // Don't set domain for Vercel - let it use the current domain
-      }
-    }
-  },
+  // Remove custom cookie config - let NextAuth handle it automatically
+  // cookies: {
+  //   sessionToken: {
+  //     name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: 'lax',
+  //       path: '/',
+  //       secure: process.env.NODE_ENV === 'production',
+  //     }
+  //   }
+  // },
 
   callbacks: {
     async jwt({ token, user, account }: any) {
-      console.log('JWT callback called:', { 
-        hasAccount: !!account, 
-        hasUser: !!user, 
-        tokenSub: token?.sub,
-        userEmail: user?.email 
-      });
-      
       // Initial sign in - cache user data in token
       if (account && user) {
-        console.log('JWT callback - Initial sign in:', { 
-          userId: user.id, 
-          email: user.email, 
-          role: user.role 
-        });
-        
-        const newToken = {
+        console.log('JWT: Creating token for user:', user.email);
+        return {
           ...token,
           id: user.id,
           role: user.role,
           fullName: user.fullName,
-          email: user.email,
-          name: user.name,
-          image: user.image,
         };
-        
-        console.log('JWT callback - New token created:', { 
-          id: newToken.id, 
-          role: newToken.role 
-        });
-        
-        return newToken;
       }
 
-      console.log('JWT callback - Returning existing token:', { 
-        id: token?.id, 
-        role: token?.role 
-      });
-      
-      // Return cached token data (no DB calls)
+      // Return existing token
       return token;
     },
 
     async session({ session, token }: any) {
-      console.log('Session callback called:', { 
-        hasSession: !!session, 
-        hasToken: !!token,
-        tokenId: token?.id,
-        tokenRole: token?.role 
-      });
-      
-      // Fast session creation from cached token data
       if (token) {
+        console.log('Session: Creating session for token:', token.id);
         session.user = {
-          id: token.id as string,
-          name: token.name as string,
-          email: token.email as string,
-          role: token.role as string,
-          fullName: token.fullName as string,
-          image: token.image as string,
+          id: token.id,
+          name: token.name,
+          email: token.email,
+          role: token.role,
+          fullName: token.fullName,
+          image: token.image,
         };
-        
-        console.log('Session callback - Created session user:', { 
-          userId: session.user.id, 
-          role: session.user.role,
-          email: session.user.email 
-        });
-      } else {
-        console.log('Session callback - No token available');
       }
-      
       return session;
     },
 
@@ -294,7 +244,7 @@ export const authOptions = {
     },
   },
 
-  debug: process.env.NODE_ENV === 'development',
+  debug: true, // Enable debug in production temporarily
   trustHost: true, // Important for Vercel deployments
 };
 
