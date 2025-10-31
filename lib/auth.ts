@@ -124,7 +124,7 @@ export const authOptions = {
             })
           ]);
 
-          const userResponse = {
+          return {
             id: user._id!.toString(),
             name: user.name,
             email: user.email,
@@ -132,14 +132,6 @@ export const authOptions = {
             image: user.image,
             fullName: user.fullName,
           };
-
-          console.log('Credentials provider - Returning user:', {
-            id: userResponse.id,
-            email: userResponse.email,
-            role: userResponse.role
-          });
-
-          return userResponse;
 
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -182,7 +174,6 @@ export const authOptions = {
   callbacks: {
     async jwt({ token, user }: any) {
       if (user) {
-        console.log('JWT: User signed in:', user.email);
         token.id = user.id;
         token.role = user.role;
         token.fullName = user.fullName;
@@ -192,7 +183,6 @@ export const authOptions = {
 
     async session({ session, token }: any) {
       if (token && session.user) {
-        console.log('Session: Adding user data from token');
         session.user.id = token.id;
         session.user.role = token.role;
         session.user.fullName = token.fullName;
@@ -201,22 +191,10 @@ export const authOptions = {
     },
 
     async redirect({ url, baseUrl }: any) {
-      console.log('Redirect callback:', { url, baseUrl });
-
       // Allows relative callback URLs
-      if (url.startsWith('/')) {
-        const redirectUrl = `${baseUrl}${url}`;
-        console.log('Redirecting to:', redirectUrl);
-        return redirectUrl;
-      }
-
+      if (url.startsWith('/')) return `${baseUrl}${url}`;
       // Allows callback URLs on the same origin
-      if (new URL(url).origin === baseUrl) {
-        console.log('Same origin redirect:', url);
-        return url;
-      }
-
-      console.log('Default redirect to baseUrl:', baseUrl);
+      else if (new URL(url).origin === baseUrl) return url;
       return baseUrl;
     }
   },
@@ -232,7 +210,7 @@ export const authOptions = {
   },
 
   secret: process.env.NEXTAUTH_SECRET,
-  debug: true, // Enable debug in production temporarily
+  debug: process.env.NODE_ENV === 'development',
   trustHost: true, // Important for Vercel deployments
 };
 

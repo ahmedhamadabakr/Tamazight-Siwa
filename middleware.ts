@@ -54,7 +54,15 @@ function hasRequiredRole(userRole: string, requiredRole: string): boolean {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+
+  // Use the new secret directly (temporary fix until Vercel env is updated)
+  const secret = 'ae34ac568d6f9b6fab0aaa890d15a7b4f406f8d70f417cc874ada63af8081a8d';
+  const token = await getToken({
+    req: request,
+    secret: secret
+  });
+
+  console.log('Middleware - Path:', pathname, 'Has secret:', !!secret, 'Token:', token ? { id: token.id, role: token.role } : null);
 
   // Add security headers
   const response = NextResponse.next();
@@ -92,6 +100,7 @@ export async function middleware(request: NextRequest) {
   const requiredRole = getRequiredRole(pathname);
 
   if (requiredRole && !token) {
+    console.log('Middleware - No token, redirecting to login for:', pathname);
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('callbackUrl', pathname);
@@ -100,14 +109,18 @@ export async function middleware(request: NextRequest) {
 
   if (requiredRole && token) {
     const userRole = token.role as string;
+    console.log('Middleware - Checking role:', { userRole, requiredRole, hasAccess: hasRequiredRole(userRole, requiredRole) });
 
     if (!hasRequiredRole(userRole, requiredRole)) {
+      console.log('Middleware - Access denied, redirecting to unauthorized');
       const url = request.nextUrl.clone();
       url.pathname = '/unauthorized';
       url.searchParams.set('required', requiredRole);
       url.searchParams.set('current', userRole);
       return NextResponse.redirect(url);
     }
+
+    console.log('Middleware - Access granted for:', pathname);
   }
 
   return response;
