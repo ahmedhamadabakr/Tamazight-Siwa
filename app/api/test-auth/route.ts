@@ -1,36 +1,30 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { database } from '@/lib/models';
-import { validateLoginData } from '@/lib/security';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const body = await request.json();
-    
-    // Test validation
-    const validatedData = validateLoginData({
-      email: body.email,
-      password: body.password,
-      rememberMe: false
-    });
-    
-    // Test database user lookup
-    const user = await database.findUserByEmail(validatedData.email);
+    const session = await getServerSession(authOptions);
     
     return NextResponse.json({
       success: true,
-      message: 'Auth test completed',
-      validatedData,
-      userFound: !!user,
-      userRole: user?.role || null,
-      timestamp: new Date().toISOString(),
+      authenticated: !!session,
+      session: session ? {
+        user: {
+          id: session.user?.id,
+          email: session.user?.email,
+          role: (session.user as any)?.role,
+          name: session.user?.name
+        }
+      } : null,
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Auth test error:', error);
-    
+    console.error('Test auth error:', error);
     return NextResponse.json({
       success: false,
-      error: error instanceof Error ? error.message : 'Unknown auth error',
-      timestamp: new Date().toISOString(),
+      error: error instanceof Error ? error.message : 'Unknown error',
+      timestamp: new Date().toISOString()
     }, { status: 500 });
   }
 }

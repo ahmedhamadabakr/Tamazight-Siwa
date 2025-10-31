@@ -21,9 +21,9 @@ export const authOptions = {
           }
 
           // Get client IP for rate limiting
-          const clientIP = req?.headers?.get?.('x-forwarded-for') || 
-                          req?.headers?.get?.('x-real-ip') || 
-                          '127.0.0.1';
+          const clientIP = req?.headers?.get?.('x-forwarded-for') ||
+            req?.headers?.get?.('x-real-ip') ||
+            '127.0.0.1';
           const userAgent = req?.headers?.get?.('user-agent') || 'Unknown';
 
           // Validate input data
@@ -43,7 +43,7 @@ export const authOptions = {
             await database.logSecurityEvent({
               eventType: 'RATE_LIMIT_EXCEEDED',
               ipAddress: clientIP,
-              details: { 
+              details: {
                 identifier: !ipRateLimit.allowed ? clientIP : validatedData.email,
                 type: !ipRateLimit.allowed ? 'ip' : 'email'
               }
@@ -136,7 +136,7 @@ export const authOptions = {
         } catch (error) {
           const errorMessage = error instanceof Error ? error.message : 'Unknown error';
           console.error('Authentication error:', errorMessage);
-          
+
           // Only log detailed errors in development
           if (process.env.NODE_ENV === 'development') {
             console.error('Error details:', {
@@ -150,7 +150,7 @@ export const authOptions = {
       }
     })
   ],
-  
+
   pages: {
     signIn: '/login',
     error: '/login',
@@ -164,6 +164,20 @@ export const authOptions = {
 
   jwt: {
     maxAge: 30 * 24 * 60 * 60, // 30 days
+    secret: process.env.NEXTAUTH_SECRET,
+  },
+
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : 'next-auth.session-token',
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+        // Don't set domain for Vercel - let it use the current domain
+      }
+    }
   },
 
   callbacks: {
@@ -204,20 +218,20 @@ export const authOptions = {
 
     async redirect({ url, baseUrl }: any) {
       console.log('Redirect callback:', { url, baseUrl });
-      
+
       // Allows relative callback URLs
       if (url.startsWith('/')) {
         const redirectUrl = `${baseUrl}${url}`;
         console.log('Redirecting to:', redirectUrl);
         return redirectUrl;
       }
-      
+
       // Allows callback URLs on the same origin
       if (new URL(url).origin === baseUrl) {
         console.log('Same origin redirect:', url);
         return url;
       }
-      
+
       console.log('Default redirect to baseUrl:', baseUrl);
       return baseUrl;
     }
@@ -227,13 +241,14 @@ export const authOptions = {
     async signIn({ user, account, profile, isNewUser }: any) {
       console.log('User signed in:', { userId: user.id, email: user.email });
     },
-    
+
     async signOut({ session, token }: any) {
       console.log('User signed out:', { userId: token?.id });
     },
   },
 
   debug: process.env.NODE_ENV === 'development',
+  trustHost: true, // Important for Vercel deployments
 };
 
 // Export function for backward compatibility
