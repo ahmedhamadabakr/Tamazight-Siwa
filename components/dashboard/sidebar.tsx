@@ -63,10 +63,18 @@ export function DashboardLayout({ children }: SidebarProps) {
     };
   }, [isMobileMenuOpen]);
 
-  // 🧭 توجيه المستخدم للصفحة الرئيسية بعد تسجيل الخروج
+  // 🧭 تسجيل خروج فعلي مع إعادة توجيه
   const handleLogout = async () => {
-    await signOut({ redirect: false });
-    router.push('/');
+    try {
+      await signOut({ 
+        callbackUrl: '/',
+        redirect: true 
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+      // Fallback: force redirect
+      router.push('/');
+    }
   };
 
   // 🧩 عناصر القائمة الجانبية

@@ -5,39 +5,69 @@ import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  User, 
-  Shield, 
-  Clock, 
-  LogOut,
-  RefreshCw,
-  Eye,
-  EyeOff
-} from 'lucide-react';
+import { User, Shield, Clock, LogOut, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 
 export function SessionInfo() {
-  const { user, logout, refreshSession, isLoading } = useAuth();
+  const { user, isLoading, logout, refreshSession } = useAuth();
   const { data: session } = useSession();
-  const [showTokens, setShowTokens] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  if (!user || !session) {
-    return null;
-  }
-
-  const handleRefreshSession = async () => {
-    setRefreshing(true);
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
     try {
       await refreshSession();
-    } catch (error) {
-      console.error('Failed to refresh session:', error);
     } finally {
-      setRefreshing(false);
+      setIsRefreshing(false);
     }
   };
 
-  const getRoleColor = (role: string) => {
+  const handleLogout = async () => {
+    await logout({ redirect: true, callbackUrl: '/login' });
+  };
+
+  if (isLoading) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="w-5 h-5" />
+            Session Information
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="animate-pulse space-y-3">
+            <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (!user) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="w-5 h-5" />
+            Session Information
+          </CardTitle>
+          <CardDescription>
+            You are not currently signed in
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button asChild>
+            <a href="/login">Sign In</a>
+          </Button>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  const getRoleBadgeColor = (role: string) => {
     switch (role) {
       case 'admin':
         return 'bg-red-100 text-red-800 border-red-200';
@@ -50,11 +80,6 @@ export function SessionInfo() {
     }
   };
 
-  const formatTokenPreview = (token: string) => {
-    if (!token) return 'Not available';
-    return `${token.substring(0, 20)}...${token.substring(token.length - 10)}`;
-  };
-
   return (
     <Card>
       <CardHeader>
@@ -63,113 +88,75 @@ export function SessionInfo() {
           Session Information
         </CardTitle>
         <CardDescription>
-          Current session details and authentication status
+          Current user session details
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {/* User Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">Name</label>
-            <p className="text-sm">{user.name || 'Not provided'}</p>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-500">Name:</span>
+            <span className="text-sm text-gray-900">{user.fullName || user.name}</span>
           </div>
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">Email</label>
-            <p className="text-sm">{user.email}</p>
+          
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-500">Email:</span>
+            <span className="text-sm text-gray-900">{user.email}</span>
           </div>
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">User ID</label>
-            <p className="text-sm font-mono">{user.id}</p>
-          </div>
-          <div>
-            <label className="text-sm font-medium text-muted-foreground">Role</label>
-            <div className="mt-1">
-              <Badge className={getRoleColor(user.role || 'user')}>
-                <Shield className="w-3 h-3 mr-1" />
-                {user.role || 'user'}
-              </Badge>
-            </div>
-          </div>
-        </div>
-
-        {/* Session Status */}
-        <div className="pt-4 border-t">
-          <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-medium">Session Status</h4>
-            <Badge variant="outline" className="text-green-600 border-green-200">
-              <div className="w-2 h-2 bg-green-500 rounded-full mr-2"></div>
-              Active
+          
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-500">Role:</span>
+            <Badge className={getRoleBadgeColor(user.role || 'user')}>
+              <Shield className="w-3 h-3 mr-1" />
+              {user.role?.toUpperCase()}
             </Badge>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-            <div>
-              <label className="text-muted-foreground">Session Started</label>
-              <p className="flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                {new Date().toLocaleString()}
-              </p>
-            </div>
-            <div>
-              <label className="text-muted-foreground">Loading State</label>
-              <p>{isLoading ? 'Loading...' : 'Ready'}</p>
-            </div>
+          <div className="flex items-center justify-between">
+            <span className="text-sm font-medium text-gray-500">User ID:</span>
+            <span className="text-xs text-gray-600 font-mono">{user.id}</span>
           </div>
         </div>
 
-        {/* Token Information (Debug) */}
-        {process.env.NODE_ENV === 'development' && (
-          <div className="pt-4 border-t">
-            <div className="flex items-center justify-between mb-3">
-              <h4 className="text-sm font-medium">Token Information</h4>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowTokens(!showTokens)}
-              >
-                {showTokens ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-              </Button>
-            </div>
+        {/* Session Actions */}
+        <div className="pt-4 border-t border-gray-200 space-y-2">
+          <div className="flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleRefresh}
+              disabled={isRefreshing}
+              className="flex-1"
+            >
+              <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              Refresh
+            </Button>
             
-            {showTokens && (
-              <div className="space-y-2 text-xs font-mono bg-gray-50 p-3 rounded-lg">
-                <div>
-                  <label className="text-muted-foreground">Access Token:</label>
-                  <p className="break-all">
-                    {formatTokenPreview((session as any)?.accessToken || '')}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-muted-foreground">Session Expires:</label>
-                  <p>
-                    {session.expires ? new Date(session.expires).toLocaleString() : 'Unknown'}
-                  </p>
-                </div>
-              </div>
-            )}
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleLogout}
+              className="flex-1"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
+            </Button>
+          </div>
+        </div>
+
+        {/* Development Info */}
+        {process.env.NODE_ENV === 'development' && session && (
+          <div className="pt-4 border-t border-gray-200">
+            <details className="text-xs">
+              <summary className="cursor-pointer text-gray-500 hover:text-gray-700">
+                Session Debug Info (Development Only)
+              </summary>
+              <pre className="mt-2 p-2 bg-gray-50 rounded text-xs overflow-auto">
+                {JSON.stringify(session, null, 2)}
+              </pre>
+            </details>
           </div>
         )}
-
-        {/* Actions */}
-        <div className="pt-4 border-t flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefreshSession}
-            disabled={refreshing}
-          >
-            <RefreshCw className={`w-4 h-4 mr-2 ${refreshing ? 'animate-spin' : ''}`} />
-            Refresh Session
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            onClick={() => logout()}
-          >
-            <LogOut className="w-4 h-4 mr-2" />
-            Logout
-          </Button>
-        </div>
       </CardContent>
     </Card>
   );

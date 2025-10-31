@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { getAuthOptions } from '@/lib/auth';
+import { getServerAuthSession } from '@/lib/server-auth';
+
+
+
 import { getMongoClient } from '@/lib/mongodb';
 import { IBooking, bookingCollectionName, bookingSchema } from '@/models/Booking';
 import { ObjectId } from 'mongodb';

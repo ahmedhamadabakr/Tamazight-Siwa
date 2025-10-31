@@ -1,12 +1,64 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getToken } from 'next-auth/jwt';
 
-// No-op middleware: allows all routes without authentication/authorization.
-// Keeps basic security headers only.
+// Protected routes configuration
+const protectedRoutes = {
+  admin: ['/admin'],
+  manager: ['/dashboard', '/admin'],
+  user: ['/user', '/dashboard', '/admin'],
+};
 
-export async function middleware(_request: NextRequest) {
+// Public routes that don't require authentication
+const publicRoutes = [
+  '/',
+  '/about',
+  '/contact',
+  '/tours',
+  '/gallery',
+  '/login',
+  '/register',
+  '/forgot-password',
+  '/reset-password',
+  '/verify-email',
+  '/verify-code',
+  '/verify-token',
+  '/unauthorized',
+  '/test-auth',
+  '/api/auth',
+];
+
+function isPublicRoute(pathname: string): boolean {
+  return publicRoutes.some(route => {
+    if (route === '/') return pathname === '/';
+    return pathname.startsWith(route);
+  });
+}
+
+function getRequiredRole(pathname: string): string | null {
+  if (pathname.startsWith('/admin')) return 'admin';
+  if (pathname.startsWith('/dashboard') && pathname !== '/dashboard') return 'manager';
+  if (pathname.startsWith('/user')) return 'user';
+  if (pathname === '/dashboard' || pathname === '/security') return 'user'; // Any authenticated user
+  return null;
+}
+
+function hasRequiredRole(userRole: string, requiredRole: string): boolean {
+  const roleHierarchy: Record<string, string[]> = {
+    admin: ['admin', 'manager', 'user'],
+    manager: ['manager', 'user'],
+    user: ['user'],
+  };
+
+  return roleHierarchy[userRole]?.includes(requiredRole) || false;
+}
+
+export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const token = await getToken({ req: request, secret: process.env.NEXTAUTH_SECRET });
+
+  // Add security headers
   const response = NextResponse.next();
 
-  // Basic security headers
   response.headers.set('X-Frame-Options', 'DENY');
   response.headers.set('X-Content-Type-Options', 'nosniff');
   response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
@@ -31,10 +83,38 @@ export async function middleware(_request: NextRequest) {
     response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
 
+  // Skip auth checks for public routes
+  if (isPublicRoute(pathname)) {
+    return response;
+  }
+
+  // Check if route requires authentication
+  const requiredRole = getRequiredRole(pathname);
+
+  if (requiredRole && !token) {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    url.searchParams.set('callbackUrl', pathname);
+    return NextResponse.redirect(url);
+  }
+
+  if (requiredRole && token) {
+    const userRole = token.role as string;
+
+    if (!hasRequiredRole(userRole, requiredRole)) {
+      const url = request.nextUrl.clone();
+      url.pathname = '/unauthorized';
+      url.searchParams.set('required', requiredRole);
+      url.searchParams.set('current', userRole);
+      return NextResponse.redirect(url);
+    }
+  }
+
   return response;
 }
 
-// Apply to all routes (no exclusions specific to auth)
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 };

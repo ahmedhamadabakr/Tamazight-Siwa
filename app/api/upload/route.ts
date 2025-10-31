@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
-import { getServerSession } from 'next-auth/next';
-import { getAuthOptions } from '@/lib/auth';
+import { getServerAuthSession } from '@/lib/server-auth';
+
+
+
 
 interface CustomSession {
   user?: {

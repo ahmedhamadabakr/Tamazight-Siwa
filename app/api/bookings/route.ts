@@ -5,15 +5,17 @@ import { bookingCollectionName } from '@/models/Booking'
 
 export async function POST(req: Request) {
   try {
-    // Check if we're in build time - use multiple indicators
-    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
-      process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === undefined;
-
-    if (isBuildTime) {
-      return NextResponse.json({
-        success: false,
-        error: 'API routes are not available during build time'
-      }, { status: 503 });
+    // Skip build time check in development
+    if (process.env.NODE_ENV !== 'development') {
+      // Check if we're in build time only in production
+      const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build';
+      
+      if (isBuildTime) {
+        return NextResponse.json({
+          success: false,
+          error: 'API routes are not available during build time'
+        }, { status: 503 });
+      }
     }
 
     // Only connect to DB if not in build time

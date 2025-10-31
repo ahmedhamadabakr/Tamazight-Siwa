@@ -1,7 +1,6 @@
-export async function GET() {
-  return Response.json({ success: false, message: 'Authentication is disabled' }, { status: 404 });
-}
+import NextAuth from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
-export async function POST() {
-  return Response.json({ success: false, message: 'Authentication is disabled' }, { status: 404 });
-}
+const handler = NextAuth(authOptions);
+
+export { handler as GET, handler as POST };

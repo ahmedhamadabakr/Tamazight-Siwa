@@ -1,10 +1,17 @@
-'use client'
+'use client';
 
-export function AuthProvider({
-  children,
-}: {
-  children: React.ReactNode
-  session?: any
-}) {
-  return <>{children}</>
+import { SessionProvider } from 'next-auth/react';
+import { ReactNode } from 'react';
+
+interface AuthProviderProps {
+  children: ReactNode;
+  session?: any;
+}
+
+export function AuthProvider({ children, session }: AuthProviderProps) {
+  return (
+    <SessionProvider session={session}>
+      {children}
+    </SessionProvider>
+  );
 }

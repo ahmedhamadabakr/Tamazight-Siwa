@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useAuth } from '@/hooks/useAuth';
-import { Button } from '@/components/ui/button';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { 
@@ -11,50 +10,101 @@ import {
   Smartphone, 
   Tablet, 
   Globe, 
-  LogOut, 
+  Clock, 
+  Trash2, 
   Shield,
-  Clock,
-  MapPin
+  RefreshCw,
+  AlertTriangle
 } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
-interface ActiveSession {
+interface Session {
   id: string;
   deviceInfo: string;
   ipAddress: string;
-  lastActive: Date;
-  isCurrent: boolean;
   location?: string;
+  lastActive: string;
+  createdAt: string;
+  isCurrent: boolean;
 }
 
 export function SessionManager() {
   const { user, logout } = useAuth();
-  const [sessions, setSessions] = useState<ActiveSession[]>([]);
+  const [sessions, setSessions] = useState<Session[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState('');
+  const [actionLoading, setActionLoading] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      fetchActiveSessions();
-    }
-  }, [user]);
-
-  const fetchActiveSessions = async () => {
+  const fetchSessions = async () => {
     try {
       setLoading(true);
-      const response = await fetch('/api/auth/sessions', {
-        credentials: 'include',
-      });
-
+      const response = await fetch('/api/auth/sessions');
+      
       if (!response.ok) {
         throw new Error('Failed to fetch sessions');
       }
-
+      
       const data = await response.json();
       setSessions(data.sessions || []);
+      setError('');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load sessions');
     } finally {
       setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      fetchSessions();
+    }
+  }, [user]);
+
+  const handleTerminateSession = async (sessionId: string) => {
+    try {
+      setActionLoading(sessionId);
+      
+      const response = await fetch(`/api/auth/sessions/${sessionId}`, {
+        method: 'DELETE',
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to terminate session');
+      }
+      
+      // Refresh sessions list
+      await fetchSessions();
+      setError('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to terminate session');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleTerminateAllOther = async () => {
+    try {
+      setActionLoading('all-others');
+      
+      const response = await fetch('/api/auth/logout-all', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ keepCurrent: true }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to terminate other sessions');
+      }
+      
+      // Refresh sessions list
+      await fetchSessions();
+      setError('');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to terminate other sessions');
+    } finally {
+      setActionLoading(null);
     }
   };
 
@@ -69,77 +119,31 @@ export function SessionManager() {
     return <Monitor className="w-4 h-4" />;
   };
 
-  const formatLastActive = (date: Date) => {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleString();
+  };
+
+  const getRelativeTime = (dateString: string) => {
+    const date = new Date(dateString);
     const now = new Date();
-    const diff = now.getTime() - date.getTime();
-    const minutes = Math.floor(diff / (1000 * 60));
-    const hours = Math.floor(diff / (1000 * 60 * 60));
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / (1000 * 60));
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
 
-    if (minutes < 1) return 'Just now';
-    if (minutes < 60) return `${minutes}m ago`;
-    if (hours < 24) return `${hours}h ago`;
-    return `${days}d ago`;
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${diffDays}d ago`;
   };
 
-  const handleLogoutAll = async () => {
-    try {
-      await logout({ allDevices: true, callbackUrl: '/login' });
-    } catch (error) {
-      console.error('Failed to logout from all devices:', error);
-    }
-  };
-
-  const handleLogoutSession = async (sessionId: string) => {
-    try {
-      const response = await fetch(`/api/auth/sessions/${sessionId}`, {
-        method: 'DELETE',
-        credentials: 'include',
-      });
-
-      if (response.ok) {
-        setSessions(sessions.filter(s => s.id !== sessionId));
-      }
-    } catch (error) {
-      console.error('Failed to logout session:', error);
-    }
-  };
-
-  if (loading) {
+  if (!user) {
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5" />
-            Active Sessions
-          </CardTitle>
-          <CardDescription>Loading your active sessions...</CardDescription>
+          <CardTitle>Session Manager</CardTitle>
+          <CardDescription>Please sign in to manage your sessions</CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="animate-pulse space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="h-16 bg-gray-200 rounded-lg"></div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Shield className="w-5 h-5" />
-            Active Sessions
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Alert variant="destructive">
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        </CardContent>
       </Card>
     );
   }
@@ -147,79 +151,129 @@ export function SessionManager() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Shield className="w-5 h-5" />
-          Active Sessions
-        </CardTitle>
-        <CardDescription>
-          Manage your active sessions across different devices
-        </CardDescription>
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5" />
+              Active Sessions
+            </CardTitle>
+            <CardDescription>
+              Manage your active sessions across different devices
+            </CardDescription>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={fetchSessions}
+            disabled={loading}
+          >
+            <RefreshCw className={`w-4 h-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        </div>
       </CardHeader>
+      
       <CardContent className="space-y-4">
-        {sessions.length === 0 ? (
-          <p className="text-muted-foreground text-center py-4">
-            No active sessions found
-          </p>
+        {error && (
+          <Alert variant="destructive">
+            <AlertTriangle className="w-4 h-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {loading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="animate-pulse">
+                <div className="h-16 bg-gray-200 rounded-lg"></div>
+              </div>
+            ))}
+          </div>
+        ) : sessions.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <Shield className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+            <p>No active sessions found</p>
+          </div>
         ) : (
           <>
             <div className="space-y-3">
               {sessions.map((session) => (
                 <div
                   key={session.id}
-                  className={`flex items-center justify-between p-4 rounded-lg border ${
+                  className={`p-4 border rounded-lg ${
                     session.isCurrent 
-                      ? 'border-primary bg-primary/5' 
-                      : 'border-gray-200'
+                      ? 'border-green-200 bg-green-50' 
+                      : 'border-gray-200 bg-white'
                   }`}
                 >
-                  <div className="flex items-center gap-3">
-                    {getDeviceIcon(session.deviceInfo)}
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">
-                          {session.deviceInfo.split(' ')[0] || 'Unknown Device'}
-                        </span>
-                        {session.isCurrent && (
-                          <Badge variant="secondary" className="text-xs">
-                            Current
-                          </Badge>
-                        )}
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-start gap-3">
+                      <div className="mt-1">
+                        {getDeviceIcon(session.deviceInfo)}
                       </div>
-                      <div className="flex items-center gap-4 text-sm text-muted-foreground mt-1">
-                        <div className="flex items-center gap-1">
-                          <MapPin className="w-3 h-3" />
-                          {session.ipAddress}
+                      
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {session.deviceInfo}
+                          </p>
+                          {session.isCurrent && (
+                            <Badge variant="secondary" className="text-xs">
+                              Current
+                            </Badge>
+                          )}
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" />
-                          {formatLastActive(session.lastActive)}
+                        
+                        <div className="space-y-1 text-xs text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Globe className="w-3 h-3" />
+                            <span>{session.ipAddress}</span>
+                            {session.location && (
+                              <span>• {session.location}</span>
+                            )}
+                          </div>
+                          
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            <span>Last active: {getRelativeTime(session.lastActive)}</span>
+                          </div>
+                          
+                          <div>
+                            Created: {formatDate(session.createdAt)}
+                          </div>
                         </div>
                       </div>
                     </div>
+                    
+                    {!session.isCurrent && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleTerminateSession(session.id)}
+                        disabled={actionLoading === session.id}
+                        className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
-                  {!session.isCurrent && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => handleLogoutSession(session.id)}
-                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                    >
-                      <LogOut className="w-4 h-4" />
-                    </Button>
-                  )}
                 </div>
               ))}
             </div>
 
-            {sessions.length > 1 && (
-              <div className="pt-4 border-t">
+            {sessions.filter(s => !s.isCurrent).length > 0 && (
+              <div className="pt-4 border-t border-gray-200">
                 <Button
                   variant="destructive"
-                  onClick={handleLogoutAll}
+                  onClick={handleTerminateAllOther}
+                  disabled={actionLoading === 'all-others'}
                   className="w-full"
                 >
-                  <LogOut className="w-4 h-4 mr-2" />
-                  Logout from all devices
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  {actionLoading === 'all-others' 
+                    ? 'Terminating...' 
+                    : 'Terminate All Other Sessions'
+                  }
                 </Button>
               </div>
             )}

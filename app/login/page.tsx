@@ -52,17 +52,22 @@ export default function LoginPage() {
       let redirectPath = callbackUrl;
       
       // Override callback URL based on user role if it's just the home page
-      if (callbackUrl === '/') {
+      if (callbackUrl === '/' || !callbackUrl) {
         if (userRole === 'admin') {
           redirectPath = '/admin/dashboard';
         } else if (userRole === 'manager') {
           redirectPath = `/dashboard/${(session.user as any).id}`;
         } else if (userRole === 'user') {
           redirectPath = `/user/${(session.user as any).id}`;
+        } else {
+          redirectPath = '/dashboard';
         }
       }
       
-      router.replace(redirectPath);
+      // Only redirect if we're not already on the target path
+      if (window.location.pathname !== redirectPath) {
+        router.replace(redirectPath);
+      }
     }
   }, [status, session, router, callbackUrl]);
 
@@ -119,33 +124,9 @@ export default function LoginPage() {
     }
 
     if (result?.ok) {
-      // Small delay to ensure auth cookies are written
-      await new Promise((r) => setTimeout(r, 150));
-
-      // Refresh session immediately
-      const newSession = await update();
-
-      // Decide redirect based on role and callbackUrl
-      let redirectPath = callbackUrl || '/';
-      const userRole = (newSession?.user as any)?.role;
-      const userId = (newSession?.user as any)?.id;
-
-      if (redirectPath === '/') {
-        if (userRole === 'admin') redirectPath = '/admin/dashboard';
-        else if (userRole === 'manager') redirectPath = `/dashboard/${userId}`;
-        else if (userId) redirectPath = `/user/${userId}`;
-      }
-
-      // Navigate and ensure server components refresh
-      router.replace(redirectPath);
-      router.refresh();
-
-      // Fallback: if still not reflected, force a hard navigation
-      setTimeout(() => {
-        if (typeof window !== 'undefined') {
-          window.location.href = redirectPath;
-        }
-      }, 400);
+      // Success - let the useEffect handle the redirect
+      // Just refresh the session and let NextAuth handle the rest
+      await update();
       return;
     }
 

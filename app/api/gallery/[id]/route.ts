@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import dbConnect from '@/lib/mongodb';
 import { GalleryImage, validateGalleryImage } from '@/models/Gallery';
-import { getServerSession } from 'next-auth/next';
-import { getAuthOptions } from '@/lib/auth';
+import { getServerAuthSession } from '@/lib/server-auth';
+
+
+
 import { ObjectId } from 'mongodb';
 
 // GET - Fetch single gallery image

@@ -1,20 +1,24 @@
 import { NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { getAuthOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/server-auth';
+
+
+
 import { getMongoClient } from '@/lib/mongodb'
 import { bookingCollectionName } from '@/models/Booking'
 
 export async function GET(req: Request) {
   try {
-    // Check if we're in build time
-    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
-                       process.env.NODE_ENV === 'production' && process.env.VERCEL_ENV === undefined;
-
-    if (isBuildTime) {
-      return NextResponse.json({
-        success: false,
-        error: 'API routes are not available during build time'
-      }, { status: 503 });
+    // Skip build time check in development
+    if (process.env.NODE_ENV !== 'development') {
+      // Check if we're in build time only in production
+      const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build';
+      
+      if (isBuildTime) {
+        return NextResponse.json({
+          success: false,
+          error: 'API routes are not available during build time'
+        }, { status: 503 });
+      }
     }
 
     if (!process.env.MONGODB_URI) {
@@ -24,7 +28,7 @@ export async function GET(req: Request) {
       }, { status: 503 });
     }
 
-    const session = await getServerSession(await getAuthOptions()) as any
+    const session = await getServerAuthSession() as any
     
     if (!session?.user?.id) {
       return NextResponse.json(

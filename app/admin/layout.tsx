@@ -1,6 +1,8 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { getServerSession } from 'next-auth/next'
+import { getServerAuthSession } from '@/lib/server-auth';
+
+
 import { AdminSidebar } from '@/components/admin/AdminSidebar'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 
@@ -18,8 +20,8 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerSession()
-  
+  const session = await getServerAuthSession()
+
   // Check if user is authenticated and has admin/manager role
   if (!session?.user) {
     redirect('/login?callbackUrl=/admin/dashboard')

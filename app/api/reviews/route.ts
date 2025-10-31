@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServerSession } from 'next-auth/next'
-import { getAuthOptions } from '@/lib/auth'
+import { getServerAuthSession } from '@/lib/server-auth';
+
+
+
 import dbConnect from '@/lib/mongodb'
 import { ObjectId } from 'mongodb'
 import { Review, validateReview, reviewCollectionName } from '@/models/Review'

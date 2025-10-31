@@ -4,7 +4,7 @@ import type { Metadata } from "next"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
-import { getServerSession } from 'next-auth/next'
+import { getServerAuthSession } from '@/lib/server-auth'
 import { Cairo } from "next/font/google"
 
 import "./globals.css"
@@ -35,7 +35,7 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
   const enableAnalytics = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === 'true'
-  const session = await getServerSession()
+  const session = await getServerAuthSession()
   return (
     <html lang="en" dir="ltr" className="scroll-smooth">
       <head>
