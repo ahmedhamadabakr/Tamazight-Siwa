@@ -18,7 +18,7 @@ Allow: /about/
 Allow: /contact/
 
 # Sitemap location
-Sitemap: https://siwa-with-us.com/sitemap.xml
+Sitemap: https://www.tamazightsiwa.com/sitemap.xml
 
 # Crawl delay for better server performance
 Crawl-delay: 1

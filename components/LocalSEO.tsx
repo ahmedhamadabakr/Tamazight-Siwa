@@ -8,12 +8,12 @@ export const LocalSEO = memo(() => {
     "name": "Siwa With Us",
     "alternateName": "Siwa Tours Egypt",
     "description": "Leading eco-tourism and cultural heritage tour operator in Siwa Oasis, Egypt",
-    "url": "https://siwa-with-us.com",
-    "logo": "https://siwa-with-us.com/logo.png",
+    "url": "https://www.tamazightsiwa.com",
+    "logo": "https://www.tamazightsiwa.com/logo.png",
     "image": [
-      "https://siwa-with-us.com/siwa-oasis-sunset-salt-lakes-reflection.jpg",
-      "https://siwa-with-us.com/siwa-springs.jpg",
-      "https://siwa-with-us.com/desert-safari.jpg"
+      "https://www.tamazightsiwa.com/siwa-oasis-sunset-salt-lakes-reflection.jpg",
+      "https://www.tamazightsiwa.com/siwa-springs.jpg",
+      "https://www.tamazightsiwa.com/desert-safari.jpg"
     ],
     "address": {
       "@type": "PostalAddress",
@@ -159,10 +159,10 @@ export const LocalSEO = memo(() => {
     "alternateName": ["Siwa", "Oasis of Siwa", "Siwa Depression"],
     "description": "Ancient oasis in Egypt's Western Desert, famous for its natural springs, salt lakes, and rich Berber culture",
     "image": [
-      "https://siwa-with-us.com/siwa-oasis-sunset-salt-lakes-reflection.jpg",
-      "https://siwa-with-us.com/cleopatra-bath.jpg",
-      "https://siwa-with-us.com/temple-oracle.jpg",
-      "https://siwa-with-us.com/salt-lakes.jpg"
+      "https://www.tamazightsiwa.com/siwa-oasis-sunset-salt-lakes-reflection.jpg",
+      "https://www.tamazightsiwa.com/cleopatra-bath.jpg",
+      "https://www.tamazightsiwa.com/temple-oracle.jpg",
+      "https://www.tamazightsiwa.com/salt-lakes.jpg"
     ],
     "address": {
       "@type": "PostalAddress",
