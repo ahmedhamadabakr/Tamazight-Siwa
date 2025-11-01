@@ -2,7 +2,7 @@
 import { ClientOnlyNavigation } from "@/components/ClientOnlyNavigation"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
-import { Camera, MapPin, Images, Users } from "lucide-react"
+import { Camera, MapPin, Images, Users, Link } from "lucide-react"
 import Image from "next/image"
 import { GalleryClient } from "@/components/gallery/GalleryClient"
 import dbConnect from '@/lib/mongodb'
@@ -187,25 +187,45 @@ export default function GalleryPage() {
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4 mb-8">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer">
+            {[
+              '/siwa-oasis-photography-golden-hour-palm-trees.jpg',
+              '/siwa-oasis-sunset-salt-lakes-reflection.jpg',
+              '/siwa-night-sky-stars-milky-way-desert.jpg',
+              '/crystal-clear-natural-spring-water-in-siwa-oasis.jpg',
+              '/great-sand-sea-dunes-golden-hour.jpg',
+              '/siwa-traditional-crafts-berber-culture.jpg'
+            ].map((src, i) => (
+              <Link
+                key={src}
+                href="https://www.instagram.com/"
+                target="_blank"
+          
+                className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
+                aria-label={`Open Instagram post ${i + 1}`}
+              >
                 <Image
-                  src='/cleopatra-bath-natural-spring-siwa.jpg'
-                  alt={`Instagram Post ${i}`}
+                  src={src}
+                  alt={`Instagram Post ${i + 1}`}
                   fill
                   sizes="(min-width: 768px) 16.6vw, (min-width: 640px) 33vw, 50vw"
                   className="object-cover hover:scale-110 transition-transform duration-500"
                 />
-              </div>
+              </Link>
             ))}
           </div>
 
-          <Button
-            size="lg"
-            className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white border-0"
+          <Link
+            href="https://www.instagram.com/"
+            target="_blank"
+       
           >
-            Follow on Instagram
-          </Button>
+            <Button
+              size="lg"
+              className="bg-gradient-to-r from-pink-500 to-purple-500 hover:from-pink-600 hover:to-purple-600 text-white border-0"
+            >
+              Follow on Instagram
+            </Button>
+          </Link>
         </div>
       </section>
 

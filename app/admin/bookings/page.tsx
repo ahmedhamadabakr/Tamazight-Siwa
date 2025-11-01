@@ -250,12 +250,7 @@ export default function AdminBookings() {
               </select>
             </div>
 
-            <div className="flex items-end">
-              <Button variant="outline" className="w-full">
-                <Download className="w-4 h-4 ml-2" />
-                Export to Excel
-              </Button>
-            </div>
+            
           </div>
         </div>
 

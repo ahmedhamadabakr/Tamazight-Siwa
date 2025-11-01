@@ -62,8 +62,7 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const authOptions = await getAuthOptions()
-    const session = await getServerSession(authOptions) as CustomSession
+    const session = await getServerAuthSession() as CustomSession
 
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
@@ -136,8 +135,7 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const authOptions = await getAuthOptions()
-    const session = await getServerSession(authOptions) as CustomSession
+    const session = await getServerAuthSession() as CustomSession
 
     if (!session?.user) {
       return NextResponse.json(

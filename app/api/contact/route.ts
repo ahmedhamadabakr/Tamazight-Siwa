@@ -1,5 +1,8 @@
 import nodemailer from "nodemailer"
 
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
 export async function POST(req: Request) {
   try {
     const { name, email, subject, message } = await req.json()
@@ -39,9 +42,11 @@ export async function POST(req: Request) {
       })
     }
 
-    // Configure SMTP
+    // Configure SMTP (explicit host/port is more reliable on many hosts)
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587,
+      secure: false,
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_APP_PASSWORD,
@@ -50,7 +55,8 @@ export async function POST(req: Request) {
 
     // Send email
     await transporter.sendMail({
-      from: `"${name}" <${email}>`,
+      // From must match the authenticated user for Gmail to accept reliably
+      from: process.env.GMAIL_USER,
       to: process.env.GMAIL_USER,
       replyTo: email,
       subject: subject || 'New Contact Form Message',

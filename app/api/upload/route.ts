@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { v2 as cloudinary } from 'cloudinary';
 import { getServerAuthSession } from '@/lib/server-auth';
 
-
-
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
 
 interface CustomSession {
   user?: {
@@ -24,9 +24,8 @@ cloudinary.config({
 
 export async function POST(request: NextRequest) {
   try {
-    const authOptions = await getAuthOptions();
-    const session = await getServerSession(authOptions) as CustomSession;
-    
+    const session = await getServerAuthSession() as CustomSession;
+
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
         { success: false, message: 'You are not authorized to perform this action' },
@@ -34,7 +33,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validate Cloudinary env
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      return NextResponse.json(
+        { success: false, message: 'Server configuration error: Cloudinary environment variables are missing' },
+        { status: 500 }
+      )
+    }
+
     const data = await request.formData();
+
     const file: File | null = data.get('image') as unknown as File;
     const folder = data.get('folder') as string || 'gallery';
 
@@ -121,8 +129,7 @@ export async function POST(request: NextRequest) {
 // DELETE - Delete image from Cloudinary
 export async function DELETE(request: NextRequest) {
   try {
-    const authOptions = await getAuthOptions();
-    const session = await getServerSession(authOptions) as CustomSession;
+    const session = await getServerAuthSession() as CustomSession;
     
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(

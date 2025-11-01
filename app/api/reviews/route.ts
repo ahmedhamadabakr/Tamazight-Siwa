@@ -33,8 +33,7 @@ export async function GET(request: NextRequest) {
 
     // Check if user is admin for admin requests
     if (admin === 'true') {
-      const authOptions = await getAuthOptions()
-      const session = await getServerSession(authOptions) as CustomSession
+      const session = await getServerAuthSession() as CustomSession
 
       if (!session?.user || session.user.role !== 'manager') {
         return NextResponse.json(
@@ -115,8 +114,7 @@ export async function GET(request: NextRequest) {
 // POST - Create new review
 export async function POST(request: NextRequest) {
   try {
-    const authOptions = await getAuthOptions()
-    const session = await getServerSession(authOptions) as CustomSession
+    const session = await getServerAuthSession() as CustomSession
 
     if (!session?.user) {
       return NextResponse.json(

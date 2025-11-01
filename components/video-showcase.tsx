@@ -1,11 +1,14 @@
 "use client"
 import { useState, useRef } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Play, Pause, Volume2, VolumeX } from "lucide-react"
 
 export function VideoShowcase() {
   const [isPlaying, setIsPlaying] = useState(false)
   const [isMuted, setIsMuted] = useState(true)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
   const [sourcesLoaded, setSourcesLoaded] = useState(false)
   const videoRef = useRef<HTMLVideoElement>(null)
 
@@ -37,6 +40,22 @@ export function VideoShowcase() {
     }
   }
 
+  // Format seconds as MM:SS
+  const formatTime = (secs: number) => {
+    if (!secs || !isFinite(secs)) return '0:00'
+    const m = Math.floor(secs / 60)
+    const s = Math.floor(secs % 60)
+    return `${m}:${s < 10 ? '0' : ''}${s}`
+  }
+
+  // Seek handler
+  const handleSeek = (e: any) => {
+    if (!videoRef.current) return
+    const t = parseFloat(e.target.value)
+    videoRef.current.currentTime = t
+    setCurrentTime(t)
+  }
+
   return (
     <section className="py-20 bg-gradient-to-b from-muted/30 to-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,6 +81,8 @@ export function VideoShowcase() {
               playsInline
               preload="none"
               poster="/siwa-oasis-photography-golden-hour-palm-trees.jpg"
+              onTimeUpdate={() => setCurrentTime(videoRef.current?.currentTime || 0)}
+              onLoadedMetadata={() => setDuration(videoRef.current?.duration || 0)}
             >
               <track kind="captions" src="/captions-en.vtt" srcLang="en" label="English captions" default />
               {sourcesLoaded && (
@@ -91,6 +112,29 @@ export function VideoShowcase() {
                 >
                   {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
                 </Button>
+              </div>
+            </div>
+
+            {/* Slim progress bar + time */}
+            <div className="absolute left-0 right-0 bottom-0">
+              <div className="relative h-1.5 bg-white/20">
+                <div
+                  className="absolute left-0 top-0 h-full bg-primary"
+                  style={{ width: `${(currentTime / (duration || 1)) * 100}%` }}
+                />
+                <input
+                  type="range"
+                  min={0}
+                  max={duration || 0}
+                  step={0.1}
+                  value={currentTime}
+                  onChange={handleSeek}
+                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  aria-label="Seek video"
+                />
+              </div>
+              <div className="absolute -top-7 right-3 text-white/90 text-xs font-mono bg-black/40 rounded px-2 py-0.5">
+                {formatTime(currentTime)} / {formatTime(duration)}
               </div>
             </div>
 
@@ -124,12 +168,16 @@ export function VideoShowcase() {
               Join hundreds of visitors who have experienced an unforgettable journey in Siwa Oasis
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-full">
-                Book Your Trip Now
-              </Button>
-              <Button size="lg" variant="outline" className="border-2 px-8 py-4 rounded-full">
-                Contact Us
-              </Button>
+              <Link href="/tours" passHref>
+                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 rounded-full">
+                  Book Your Trip Now
+                </Button>
+              </Link>
+              <Link href="/contact" passHref>
+                <Button size="lg" variant="outline" className="border-2 px-8 py-4 rounded-full">
+                  Contact Us
+                </Button>
+              </Link>
             </div>
           </div>
         </div>
