@@ -227,13 +227,13 @@ export const generateOrganizationSchema = () => ({
   },
   "contactPoint": {
     "@type": "ContactPoint",
-    "telephone": "+20-xxx-xxx-xxxx",
+    "telephone": "+201552624123",
     "contactType": "Customer Service",
-    "availableLanguage": ["English", "Arabic", "Berber"]
+    "availableLanguage": ["English", "Arabic", "Berber","Hangul"]
   },
   "sameAs": [
-    "https://www.facebook.com/SiwaWithUs",
-    "https://www.instagram.com/SiwaWithUs",
+    "https://www.facebook.com/tamazight.siwa/",
+    "https://www.instagram.com/tamazight_siwa",
     "https://www.twitter.com/SiwaWithUs",
     "https://www.youtube.com/SiwaWithUs"
   ],

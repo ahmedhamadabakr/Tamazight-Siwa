@@ -210,7 +210,7 @@ export default function GalleryPage() {
             ].map((src, i) => (
               <Link
                 key={src}
-                href="https://www.instagram.com/"
+                href="https://www.instagram.com/tamazight_siwa/"
                 target="_blank"
           
                 className="relative aspect-square rounded-lg overflow-hidden group cursor-pointer"
@@ -228,7 +228,7 @@ export default function GalleryPage() {
           </div>
 
           <Link
-            href="https://www.instagram.com/"
+            href="https://www.instagram.com/tamazight_siwa/"
             target="_blank"
        
           >

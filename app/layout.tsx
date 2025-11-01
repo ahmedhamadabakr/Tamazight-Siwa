@@ -142,8 +142,8 @@ export default function RootLayout({
           "url": "https://siwa-with-us.com",
           "logo": "https://siwa-with-us.com/placeholder-logo.png",
           "sameAs": [
-            "https://www.facebook.com/SiwaWithUs",
-            "https://www.instagram.com/",
+            "https://www.facebook.com/tamazight.siwa/",
+            "https://www.instagram.com/tamazight_siwa/",
             "https://x.com/"
           ],
           "contactPoint": [{
@@ -151,7 +151,7 @@ export default function RootLayout({
             "telephone": "+201552624123",
             "contactType": "customer service",
             "areaServed": "EG",
-            "availableLanguage": ["en", "ar"]
+            "availableLanguage": ["en", "ar","ber","ko"]
           }]
         }) }} />
 

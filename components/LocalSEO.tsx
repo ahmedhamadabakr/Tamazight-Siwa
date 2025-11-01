@@ -31,9 +31,9 @@ export const LocalSEO = memo(() => {
     "contactPoint": [
       {
         "@type": "ContactPoint",
-        "telephone": "+20-xxx-xxx-xxxx",
+        "telephone": "+201552624123",
         "contactType": "customer service",
-        "availableLanguage": ["English", "Arabic", "Berber"],
+        "availableLanguage": ["English", "Arabic", "Berber","Hangul"],
         "hoursAvailable": {
           "@type": "OpeningHoursSpecification",
           "dayOfWeek": [
@@ -46,14 +46,14 @@ export const LocalSEO = memo(() => {
       },
       {
         "@type": "ContactPoint",
-        "telephone": "+20-xxx-xxx-xxxx",
+        "telephone": "+201552624123",
         "contactType": "reservations",
         "availableLanguage": ["English", "Arabic"]
       }
     ],
     "sameAs": [
-      "https://www.facebook.com/SiwaWithUs",
-      "https://www.instagram.com/SiwaWithUs", 
+      "https://www.facebook.com/tamazight.siwa/",
+      "https://www.instagram.com/tamazight_siwa", 
       "https://www.twitter.com/SiwaWithUs",
       "https://www.youtube.com/SiwaWithUs",
       "https://www.tripadvisor.com/SiwaWithUs"
