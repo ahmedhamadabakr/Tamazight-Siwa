@@ -153,20 +153,33 @@ export default function AboutContent() {
             className="relative"
           >
             <div className="relative z-10">
-              <span className="inline-block text-sm font-medium text-primary mb-3">Our Heritage</span>
+              <span className="inline-block text-sm font-medium text-primary mb-3">Our Story</span>
               <h2 className="text-4xl md:text-5xl font-bold text-foreground mb-6 leading-tight">
-                The Soul of Siwa,<br /><span className="text-primary">Our Story</span>
+                Hidden deep in Egypt's<br /><span className="text-primary">far west</span>
               </h2>
               <div className="space-y-6 text-lg text-muted-foreground">
                 <p>
-                  Tamazight Siwa was born from a deep love for the mystical Siwa Oasis and its rich Amazigh heritage. 
-                  Founded by local guides who grew up among the palm groves and salt lakes, we are dedicated to 
-                  sharing the authentic beauty of our homeland while preserving its cultural integrity.
+                  Siwa feels like another world — a place where time slows down and life follows the rhythm of nature. 
+                  Surrounded by palm trees, salt lakes, and golden dunes, Siwa's spirit is closer to Libya and Morocco 
+                  than to any other Egyptian city. Its long isolation preserved a culture of peace, warmth, and deep 
+                  connection to the land.
+                </p>
+                <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">My Journey to Siwa</h3>
+                <p>
+                  Coming here felt like stepping into a dream — pure, alive, and timeless. From the first moment, I felt 
+                  at home. Each sunrise brought a new promise, every salt lake carried me in its calm embrace, and the 
+                  Great Sand Sea whispered stories beneath a sky full of stars.
                 </p>
                 <p>
-                  Our name "Tamazight" honors the ancient Berber language still spoken in Siwa, connecting visitors 
-                  to thousands of years of desert wisdom and tradition. Every experience we offer is crafted to 
-                  respect both our environment and our ancestors' legacy.
+                  With time, Siwa became more than a destination — it became a way of life. And here, I found love too — 
+                  the love of nature itself.
+                </p>
+                <p>
+                  After years of living in Siwa, our dream grew simple yet powerful: to share this beauty with the world. 
+                  Through our guesthouse and tours, we welcome travelers not as visitors, but as friends.
+                </p>
+                <p className="text-xl font-semibold text-primary italic">
+                  From Siwa to the world, our message is simple: Live slowly, love deeply, and let your heart find peace in the desert.
                 </p>
               </div>
               <div className="mt-8 flex flex-wrap gap-4">

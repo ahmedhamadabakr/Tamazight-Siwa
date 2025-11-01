@@ -77,7 +77,10 @@ export async function middleware(request: NextRequest) {
   const sessionCookie = request.cookies.get('__Secure-next-auth.session-token') ||
     request.cookies.get('next-auth.session-token');
 
-  console.log('Middleware - Path:', pathname, 'Token:', token ? { id: token.id, role: token.role } : null, 'Has session cookie:', !!sessionCookie);
+  // Debug logging (remove in production)
+  if (process.env.NODE_ENV === 'development') {
+    console.log('Middleware - Path:', pathname, 'Token:', token ? { id: token.id, role: token.role } : null);
+  }
 
   // Add security headers
   const response = NextResponse.next();
@@ -115,13 +118,10 @@ export async function middleware(request: NextRequest) {
   const requiredRole = getRequiredRole(pathname);
 
   if (requiredRole && !token) {
-    // If no token but session cookie exists, allow access (temporary fix)
+    // If no token but session cookie exists, allow access (fallback)
     if (sessionCookie) {
-      console.log('Middleware - No token but session cookie exists, allowing access');
       return response;
     }
-
-    console.log('Middleware - No token, redirecting to login for:', pathname);
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     url.searchParams.set('callbackUrl', pathname);

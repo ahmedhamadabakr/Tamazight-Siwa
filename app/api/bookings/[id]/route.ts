@@ -1,18 +1,15 @@
 import { NextResponse } from 'next/server'
-import { getServerAuthSession } from '@/lib/server-auth';
-
-
-
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { getMongoClient } from '@/lib/mongodb'
 import { ObjectId } from 'mongodb'
-import { bookingCollectionName } from '@/models/Booking'
 
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(await getAuthOptions()) as any
+    const session = await getServerSession(authOptions) as any
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -35,7 +32,7 @@ export async function PUT(
     const db = client.db()
 
     // Check if booking exists and belongs to user
-    const existingBooking = await db.collection(bookingCollectionName).findOne({
+    const existingBooking = await db.collection('bookings').findOne({
       _id: new ObjectId(id),
       user: new ObjectId(session.user.id)
     })
@@ -48,7 +45,7 @@ export async function PUT(
     }
 
     // Update booking
-    const result = await db.collection(bookingCollectionName).updateOne(
+    const result = await db.collection('bookings').updateOne(
       { _id: new ObjectId(id) },
       {
         $set: {
@@ -104,7 +101,7 @@ export async function GET(
       }, { status: 503 });
     }
 
-    const session = await getServerSession(await getAuthOptions()) as any
+    const session = await getServerSession(authOptions) as any
 
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -133,7 +130,7 @@ export async function GET(
       matchCondition.user = new ObjectId(session.user.id)
     }
 
-    const booking = await db.collection(bookingCollectionName).aggregate([
+    const booking = await db.collection('bookings').aggregate([
       {
         $match: matchCondition
       },

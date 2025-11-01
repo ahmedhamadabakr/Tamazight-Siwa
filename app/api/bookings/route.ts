@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { getMongoClient } from '@/lib/mongodb'
 import { ObjectId } from 'mongodb'
-import { bookingCollectionName } from '@/models/Booking'
 
 export async function POST(req: Request) {
   try {
@@ -26,8 +27,15 @@ export async function POST(req: Request) {
       }, { status: 503 });
     }
 
-    // Public endpoint: use a default guest user context
-    const session = { user: { id: '000000000000000000000000', email: 'guest@example.com', name: 'Guest' } } as any
+    // Get authenticated session
+    const session = await getServerSession(authOptions) as any
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { success: false, message: 'Authentication required' },
+        { status: 401 }
+      )
+    }
 
     const data = await req.json()
     const { tourId, numberOfTravelers, specialRequests, totalAmount } = data
@@ -103,12 +111,8 @@ export async function POST(req: Request) {
     }
 
     // Create booking
-    // For guest bookings, use a fixed ObjectId
-    const userObjectId = ObjectId.isValid(session.user.id)
-      ? new ObjectId(session.user.id)
-      : new ObjectId('000000000000000000000000')
+    const userObjectId = new ObjectId(session.user.id)
 
-    // Create a simple booking object first
     const booking = {
       user: userObjectId,
       trip: new ObjectId(tourId),
@@ -116,7 +120,7 @@ export async function POST(req: Request) {
       specialRequests: specialRequests || '',
       totalAmount: parseFloat(totalAmount),
       status: 'confirmed',
-      paymentStatus: 'on-demand',
+      paymentStatus: 'pending',
       bookingReference,
       createdAt: new Date(),
       updatedAt: new Date()

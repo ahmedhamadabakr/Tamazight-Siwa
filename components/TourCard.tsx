@@ -31,8 +31,8 @@ export function TourCard({ tour, index = 0 }: TourCardProps) {
   const tourLink = `/tours/${tour.slug || tour._id || tour.id}`
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 40 }} 
+    <motion.div
+      initial={{ opacity: 0, y: 40 }}
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
       viewport={{ once: true }}
@@ -40,23 +40,23 @@ export function TourCard({ tour, index = 0 }: TourCardProps) {
       <Card className="overflow-hidden border-0 shadow-lg hover:shadow-2xl transition-all duration-300 group h-full">
         {/* Image Section */}
         <div className="relative h-48 overflow-hidden">
-          <Image 
-            src={tour.images[0] || "/placeholder.svg"} 
-            alt={tour.title} 
-            fill 
-            className="object-cover group-hover:scale-110 transition-transform duration-500" 
+          <Image
+            src={tour.images[0] || "/placeholder.svg"}
+            alt={tour.title}
+            fill
+            className="object-cover group-hover:scale-110 transition-transform duration-500"
             loading="lazy"
           />
-          
+
           {/* Gradient Overlay */}
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          
+
           {/* Image Count Badge */}
           {tour.images && tour.images.length > 1 && (
             <div className="absolute top-3 right-3 bg-black/70 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
-              {tour.images.length}   
+              {tour.images.length}
               Images
-                       </div>
+            </div>
           )}
 
           {/* Featured Badge */}
@@ -89,16 +89,16 @@ export function TourCard({ tour, index = 0 }: TourCardProps) {
           <div className="space-y-2 mb-4">
             <div className="flex items-center text-sm text-muted-foreground">
               <Clock className="w-4 h-4 mr-2 text-primary" />
-              <span>{tour.duration}</span>
+              <span>{parseInt(tour.duration) > 1 ? 'days' : 'day'}</span>
             </div>
-            
+
             {tour.groupSize && (
               <div className="flex items-center text-sm text-muted-foreground">
                 <Users className="w-4 h-4 mr-2 text-primary" />
                 <span>{tour.groupSize} People</span>
               </div>
             )}
-            
+
             <div className="flex items-center text-sm text-muted-foreground">
               <MapPin className="w-4 h-4 mr-2 text-primary" />
               <span>{tour.location} Location</span>

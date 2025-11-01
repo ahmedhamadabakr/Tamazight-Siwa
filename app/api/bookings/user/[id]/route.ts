@@ -1,30 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getServerAuthSession } from '@/lib/server-auth';
-
-
-
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 import { getMongoClient } from '@/lib/mongodb';
-import { IBooking, bookingCollectionName, bookingSchema } from '@/models/Booking';
 import { ObjectId } from 'mongodb';
 
-interface BookingResponse {
-  _id: string;
-  trip: {
-    _id: string;
-    destination: string;
-    startDate: Date;
-    endDate: Date;
-    price: number;
-  };
-  status: 'pending' | 'confirmed' | 'completed' | 'cancelled';
-  bookingDate: Date;
-  paymentStatus: 'pending' | 'paid' | 'refunded' | 'failed' | 'on-demand';
-  totalAmount: number;
-  numberOfTravelers: number;
-  user: string;
-  role: string;
-  specialRequests?: string;
-}
+
 
 export async function GET(
   request: Request,
@@ -32,7 +12,7 @@ export async function GET(
 ) {
   try {
     // Get user session
-    const session = await getServerSession(await getAuthOptions()) as any;
+    const session = await getServerSession(authOptions) as any;
 
     // Check if user is authenticated
     if (!session?.user?.id) {
@@ -58,7 +38,7 @@ export async function GET(
 
     // Find all bookings for the user with tour details
     const bookings = await db
-      .collection<IBooking>(bookingCollectionName)
+      .collection('bookings')
       .aggregate([
         {
           $match: {
@@ -129,46 +109,3 @@ export async function GET(
   }
 }
 
-// Create a validator for the bookings collection
-async function createBookingsCollection(db: any) {
-  try {
-    await db.createCollection(bookingCollectionName, {
-      validator: {
-        $jsonSchema: bookingSchema.$jsonSchema
-      }
-    });
-
-    // Create indexes
-    await db.collection(bookingCollectionName).createIndex({ user: 1 });
-    await db.collection(bookingCollectionName).createIndex({ trip: 1 });
-    await db.collection(bookingCollectionName).createIndex({ status: 1 });
-;
-  } catch (error) {
-    // Collection might already exist, which is fine
-    if (error instanceof Error && error.message.includes('already exists')) {
-      return NextResponse.json(
-        { success: false, message: 'Bookings collection already exists' },
-        { status: 400 }
-      )
-    } else {
-      throw error;
-    }
-  }
-}
-
-// Initialize the collection when this module is imported
-(async () => {
-  try {
-    const client = await getMongoClient();
-    await createBookingsCollection(client.db());
-  } catch (error) {
-    return NextResponse.json(
-      {
-        success: false,
-        message: 'Error initializing bookings collection',
-        error: error instanceof Error ? error.message : 'Unknown error'
-      },
-      { status: 500 }
-    );
-  }
-})();
