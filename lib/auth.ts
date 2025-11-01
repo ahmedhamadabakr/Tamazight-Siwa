@@ -215,13 +215,13 @@ export const authOptions = {
 };
 
 // Export function for backward compatibility
-// Validate environment variables
+// Validate environment variables (warn instead of throwing to avoid hard crashes in serverless)
 if (!process.env.NEXTAUTH_SECRET) {
-  throw new Error('NEXTAUTH_SECRET is not defined');
+  console.warn('Warning: NEXTAUTH_SECRET is not defined');
 }
 
 if (!process.env.JWT_SECRET) {
-  throw new Error('JWT_SECRET is not defined');
+  console.warn('Warning: JWT_SECRET is not defined');
 }
 
 export async function getAuthOptions() {

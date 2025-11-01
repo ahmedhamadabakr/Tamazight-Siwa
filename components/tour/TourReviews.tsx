@@ -6,6 +6,7 @@ import { ReviewsList } from '@/components/reviews/ReviewsList'
 import { ReviewStats } from '@/components/reviews/ReviewStats'
 import { ReviewForm } from '@/components/reviews/ReviewForm'
 import { Review, ReviewStats as ReviewStatsType, calculateReviewStats } from '@/models/Review'
+import Link from 'next/link'
 
 interface TourReviewsProps {
   tourId: string
@@ -171,9 +172,9 @@ export function TourReviews({ tourId, currentUserId, className = '' }: TourRevie
               <>
                 <MessageSquare className="h-5 w-5 text-blue-600" />
                 <p className="text-blue-800">
-                  <a href="/login" className="font-medium hover:underline">
+                  <Link href="/login" className="font-medium hover:underline">
                     Log in
-                  </a>
+                  </Link>
                   {' '}to add a review for this tour
                 </p>
               </>

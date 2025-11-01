@@ -133,13 +133,13 @@ export default function AboutContent() {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="mt-12"
           >
-            <a
+            <Link
               href="#our-story"
               className="inline-flex items-center justify-center w-12 h-12 rounded-full border-2 border-white/50 hover:border-white transition-colors group"
               aria-label="Scroll to Our Story"
             >
               <span className="block w-2 h-4 border-r-2 border-b-2 border-white transform rotate-45 translate-y-1/4 group-hover:translate-y-1/2 transition-transform"></span>
-            </a>
+            </Link>
           </MotionDiv>
         </div>
       </section>

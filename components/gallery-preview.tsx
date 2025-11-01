@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import Image from "next/image"
 
 const galleryImages = [
   {
@@ -67,7 +68,7 @@ export function GalleryPreview() {
               key={index}
               className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 mb-6 break-inside-avoid"
             >
-              <img
+              <Image
                 src={image.src || "/placeholder.svg"}
                 alt={image.alt}
                 className="w-full object-cover group-hover:scale-110 transition-transform duration-700"

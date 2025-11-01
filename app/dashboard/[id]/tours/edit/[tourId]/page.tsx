@@ -16,6 +16,7 @@ import {
     FiTrash2
 } from 'react-icons/fi';
 import { DashboardLayout } from '@/components/dashboard/sidebar';
+import Image from 'next/image';
 
 type Tour = {
     _id: string;
@@ -556,29 +557,12 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                 <div className="mb-6">
                                     <div className="relative w-full h-64 bg-gray-100 rounded-lg overflow-hidden">
                                         {imagePreviews[mainImageIndex] ? (
-                                            <img
+                                            <Image
                                                 src={imagePreviews[mainImageIndex]}
                                                 alt="Tour Image"
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => {
-                                                    const target = e.target as HTMLImageElement;
-                                                    target.style.display = 'none';
-                                                    const parent = target.parentElement;
-                                                    if (parent && !parent.querySelector('.error-placeholder')) {
-                                                        const errorDiv = document.createElement('div');
-                                                        errorDiv.className = 'error-placeholder w-full h-full flex items-center justify-center bg-gray-200';
-                                                        errorDiv.innerHTML = `
-                              <div class="text-center">
-                                <svg class="w-16 h-16 text-gray-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                </svg>
-                                <p class="text-gray-500 text-sm">Failed to load image</p>
-                                <p class="text-gray-400 text-xs mt-1">URL: ${imagePreviews[mainImageIndex].substring(0, 50)}...</p>
-                              </div>
-                            `;
-                                                        parent.appendChild(errorDiv);
-                                                    }
-                                                }}
+                                                fill
+                                                className="object-cover"
+                                                priority={false}
                                             />
                                         ) : (
                                             <div className="w-full h-full flex items-center justify-center bg-gray-200">
@@ -601,25 +585,12 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                                                 onClick={() => setMainImageIndex(idx)}
                                             >
                                                 {img ? (
-                                                    <img
+                                                    <Image
                                                         src={img}
                                                         alt={`Tour Image ${idx + 1}`}
-                                                        className="w-full h-full object-cover"
-                                                        onError={(e) => {
-                                                            const target = e.target as HTMLImageElement;
-                                                            target.style.display = 'none';
-                                                            const parent = target.parentElement;
-                                                            if (parent && !parent.querySelector('.thumb-error')) {
-                                                                const errorDiv = document.createElement('div');
-                                                                errorDiv.className = 'thumb-error w-full h-full flex items-center justify-center bg-gray-100';
-                                                                errorDiv.innerHTML = `
-                                  <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                  </svg>
-                                `;
-                                                                parent.appendChild(errorDiv);
-                                                            }
-                                                        }}
+                                                        fill
+                                                        className="object-cover"
+                                                        sizes="80px"
                                                     />
                                                 ) : (
                                                     <div className="w-full h-full flex items-center justify-center bg-gray-100">

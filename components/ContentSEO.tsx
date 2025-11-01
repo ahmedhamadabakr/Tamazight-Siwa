@@ -1,4 +1,5 @@
 import { memo, ReactNode } from 'react'
+import Link from 'next/link'
 
 interface ArticleSEOProps {
   title: string
@@ -184,12 +185,12 @@ export const BreadcrumbSEO = memo(({
                 {item.name}
               </span>
             ) : (
-              <a 
+              <Link 
                 href={item.url} 
                 className="link hover:text-primary transition-colors"
               >
                 {item.name}
-              </a>
+              </Link>
             )}
           </li>
         ))}

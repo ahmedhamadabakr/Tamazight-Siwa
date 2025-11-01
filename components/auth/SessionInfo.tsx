@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { User, Shield, Clock, LogOut, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export function SessionInfo() {
   const { user, isLoading, logout, refreshSession } = useAuth();
@@ -60,7 +61,7 @@ export function SessionInfo() {
         </CardHeader>
         <CardContent>
           <Button asChild>
-            <a href="/login">Sign In</a>
+            <Link href="/login">Sign In</Link>
           </Button>
         </CardContent>
       </Card>

@@ -40,9 +40,9 @@ export const SEOLink = memo(({
 
   if (isExternal) {
     return (
-      <a href={href} {...linkProps}>
+      <Link href={href} {...linkProps}>
         {children}
-      </a>
+      </Link>
     )
   }
 

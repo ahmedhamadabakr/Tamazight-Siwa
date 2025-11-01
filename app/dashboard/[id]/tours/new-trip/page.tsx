@@ -4,6 +4,7 @@ import { DashboardLayout } from '@/components/dashboard/sidebar'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import Image from 'next/image'
 
 export default function NewTrip() {
   const router = useRouter()
@@ -346,7 +347,7 @@ export default function NewTrip() {
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 mt-2">
                     {images.map((image, index) => (
                       <div key={index} className="relative group">
-                        <img
+                        <Image
                           src={image}
                           alt={`Trip ${index + 1}`}
                           className="w-full h-28 object-cover rounded-lg border"

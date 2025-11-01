@@ -3,8 +3,6 @@ import dbConnect from '@/lib/mongodb';
 import { GalleryImage, validateGalleryImage } from '@/models/Gallery';
 import { getServerAuthSession } from '@/lib/server-auth';
 
-
-
 import { ObjectId } from 'mongodb';
 
 // GET - Fetch single gallery image
@@ -52,9 +50,8 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   try {
-    const authOptions = await getAuthOptions();
-    const session = await getServerSession(authOptions);
-    
+    const session = await getServerAuthSession();
+
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
         { success: false, message: 'You are not authorized to perform this action' },
@@ -129,9 +126,8 @@ export async function DELETE(
   { params }: { params: { id: string } }
 ) {
   try {
-    const authOptions = await getAuthOptions();
-    const session = await getServerSession(authOptions);
-    
+    const session = await getServerAuthSession();
+
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
         { success: false, message: 'You are not authorized to perform this action' },

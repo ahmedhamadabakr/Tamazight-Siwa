@@ -16,6 +16,7 @@ import {
 import Link from 'next/link';
 import { DashboardLayout } from '@/components/dashboard/sidebar';
 import { useSession } from 'next-auth/react';
+import Image from 'next/image';
 
 type Tour = {
     _id: string;
@@ -161,62 +162,39 @@ export default function ToursPage({ params }: ToursPageProps) {
                         {tours.map((tour) => (
                             <div key={tour._id} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                                 {/* Tour Image */}
-                                <div className="h-40 sm:h-48 bg-gray-200 relative">
-                                        {tour.images && tour.images.length > 0 && tour.images[0] ? (
-                                            <img
-                                                src={tour.images[0]}
-                                                alt={tour.title}
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => {
-                                                    const target = e.target as HTMLImageElement;
-                                                    target.style.display = 'none';
-                                                    const parent = target.parentElement;
-                                                    if (parent) {
-                                                        parent.innerHTML = `
-                            <div class="w-full h-full flex items-center justify-center bg-gray-100">
-                              <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                              </svg>
-                            </div>
-                          `;
-                                                    }
-                                                }}
-                                            />
-                                        ) : tour.image ? (
-                                            <img
-                                                src={tour.image}
-                                                alt={tour.title}
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => {
-                                                    const target = e.target as HTMLImageElement;
-                                                    target.style.display = 'none';
-                                                    const parent = target.parentElement;
-                                                    if (parent) {
-                                                        parent.innerHTML = `
-                            <div class="w-full h-full flex items-center justify-center bg-gray-100">
-                              <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                              </svg>
-                            </div>
-                          `;
-                                                    }
-                                                }}
-                                            />
-                                        ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-gray-100">
-                                                <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                                                </svg>
-                                            </div>
-                                        )}
-
-                                        {/* Category Badge */}
-                                        <div className="absolute top-3 left-3">
-                                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                                {tour.category}
-                                            </span>
+                                <div className="relative h-40 sm:h-48 bg-gray-200">
+                                    {(tour.images && tour.images[0]) || tour.image ? (
+                                        <Image
+                                            src={(tour.images && tour.images[0]) || tour.image!}
+                                            alt={tour.title}
+                                            fill
+                                            priority={false}
+                                            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                                            className="object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                                            <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                            </svg>
                                         </div>
+                                    )}
+                                    {/* Overlay gradient */}
+                                    <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                                    {/* Category Badge */}
+                                    <div className="absolute top-3 left-3">
+                                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            {tour.category}
+                                        </span>
                                     </div>
+                                    {/* Duration Chip */}
+                                    <div className="absolute top-3 right-3">
+                                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-white/90 text-gray-800 backdrop-blur">
+                                            <FiClock className="w-3.5 h-3.5 mr-1" />
+                                            {parseInt(tour.duration) > 1 ? `${tour.duration} days` : `${tour.duration} day`}
+                                        </span>
+                                    </div>
+                                </div>
 
                                 {/* Tour Content */}
                                 <div className="p-4 sm:p-6">
