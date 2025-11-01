@@ -3,10 +3,6 @@ import dbConnect from '@/lib/mongodb';
 import { GalleryImage, validateGalleryImage } from '@/models/Gallery';
 import { getServerAuthSession } from '@/lib/server-auth';
 
-
-
-import { ObjectId } from 'mongodb';
-
 // GET - Fetch all gallery images
 export async function GET(request: NextRequest) {
   try {
@@ -59,8 +55,7 @@ export async function GET(request: NextRequest) {
 // POST - Create new gallery image
 export async function POST(request: NextRequest) {
   try {
-    const authOptions = await getAuthOptions();
-    const session = await getServerSession(authOptions);
+    const session = await getServerAuthSession();
     
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(
@@ -95,7 +90,7 @@ export async function POST(request: NextRequest) {
       updatedAt: new Date()
     };
 
-    const result = await collection.insertOne(newImage);
+    const result = await collection.insertOne(newImage as any);
     const insertedImage = await collection.findOne({ _id: result.insertedId });
 
     return NextResponse.json({
