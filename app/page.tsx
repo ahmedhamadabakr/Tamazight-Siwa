@@ -10,8 +10,9 @@ const GalleryPreviewLazy = dynamic(() => import("@/components/gallery-preview").
 const TestimonialsSectionLazy = dynamic(() => import("@/components/testimonials-section").then(m => ({ default: m.TestimonialsSection })), { ssr: false })
 const ServicesSectionLazy = dynamic(() => import("@/components/services-section").then(m => ({ default: m.ServicesSection })), { ssr: false })
 import { Footer } from "@/components/footer"
-import { ResourceHints } from "@/components/PerformanceMonitor"
-import { GlobalPerformanceOptimizer, CriticalCSS } from "@/components/GlobalPerformanceOptimizer"
+
+// Defer the global optimizer to post-hydration
+const GlobalPerfLazy = dynamic(() => import("@/components/GlobalPerformanceOptimizer").then(m => ({ default: m.GlobalPerformanceOptimizer })), { ssr: false, loading: () => null })
 import { HomePageSEO } from "@/components/PageSEO"
 import { LocalSEO } from "@/components/LocalSEO"
 
@@ -22,10 +23,7 @@ export default function HomePage() {
       <HomePageSEO />
       <LocalSEO />
       
-      {/* Essential optimizations only */}
-      <CriticalCSS />
-      <ResourceHints />
-      <GlobalPerformanceOptimizer />
+      {/* Essential optimizations handled in root layout */}
       
       <main className="min-h-screen">
         <ClientOnlyNavigation />
@@ -39,6 +37,7 @@ export default function HomePage() {
         <ServicesSectionLazy />
         <Footer />
       </main>
+      <GlobalPerfLazy />
     </>
   )
 }

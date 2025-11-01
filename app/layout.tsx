@@ -4,8 +4,7 @@ import type { Metadata } from "next"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
-import { getServerAuthSession } from '@/lib/server-auth'
-import { Cairo } from "next/font/google"
+import { cairo } from "./fonts"
 
 import "./globals.css"
 import Loading from "./loading"
@@ -25,27 +24,21 @@ export const metadata: Metadata = generateAdvancedMetadata({
   alternateLocales: ["ar_EG"]
 })
 
-const cairo = Cairo({ subsets: ["latin"], weight: ["400", "700"], display: "swap" })
-
-export const dynamic = 'force-dynamic'
-
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
   const enableAnalytics = process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === 'true'
-  const session = await getServerAuthSession()
+
   return (
     <html lang="en" dir="ltr" className="scroll-smooth">
       <head>
         {/* DNS Prefetch for external domains */}
         <link rel="dns-prefetch" href="//res.cloudinary.com" />
         <link rel="dns-prefetch" href="//images.unsplash.com" />
-        <link rel="dns-prefetch" href="//vercel.live" />
 
         {/* Preconnect for critical resources */}
-        <link rel="preconnect" href="https://vercel.live" />
         <link rel="preconnect" href="https://res.cloudinary.com" />
         <link rel="preconnect" href="https://images.unsplash.com" />
 
@@ -201,10 +194,10 @@ export default async function RootLayout({
         {/* Resource Hints */}
         <ResourceHints />
       </head>
-      <body className={`${cairo.className} font-cairo antialiased`} suppressHydrationWarning>
+      <body className={`${cairo.variable} font-cairo antialiased`} suppressHydrationWarning>
         <ErrorBoundary>
           <Suspense fallback={<Loading />}>
-            <AuthProvider session={session}>
+            <AuthProvider>
               {children}
             </AuthProvider>
           </Suspense>
