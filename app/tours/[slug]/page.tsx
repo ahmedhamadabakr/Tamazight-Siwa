@@ -47,6 +47,8 @@ export default function TourDetailsPage() {
     location: string;
     images: string[];
     highlights: string[];
+    reviews?: number;
+    rating?: number;
   }
 
 
@@ -155,8 +157,8 @@ export default function TourDetailsPage() {
       />
       {/* Breadcrumbs */}
       <div className="max-w-5xl mx-auto px-4 pt-4">
-        <TourBreadcrumbs 
-          tourTitle={tour.title} 
+        <TourBreadcrumbs
+          tourTitle={tour.title}
           tourSlug={tour.slug || slug as string}
         />
       </div>
@@ -187,8 +189,8 @@ export default function TourDetailsPage() {
       {/* Image Gallery */}
       <section className="max-w-5xl mx-auto px-4 py-8">
         <h2 className="text-2xl font-bold mb-4">Image Gallery</h2>
-        <ImageGalleryFallback 
-          images={tour.images || []} 
+        <ImageGalleryFallback
+          images={tour.images || []}
           title={tour.title}
           className="h-96"
         />
@@ -207,9 +209,12 @@ export default function TourDetailsPage() {
               ))}
             </div>
             <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6">
-              <div className="flex items-center gap-1"><Clock className="w-4 h-4" /> {tour.duration}</div>
-              {/*   <div className="flex items-center gap-1"><Users className="w-4 h-4" /> {tour.groupSize}</div> */}
-              {/*    <div className="flex items-center gap-1"><Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />{tour.rating} ({tour.reviews})</div> */}
+              <div className="flex items-center gap-1"><Clock className="w-4 h-4" /> {parseInt(tour.duration) > 1 ? `${tour.duration} days` : `${tour.duration} day`}</div>
+              <div className="flex items-center gap-1"><Users className="w-4 h-4" /> {tour.groupSize} {parseInt(tour.groupSize) > 1 ? 'People' : 'Person'}</div>
+              <div className="flex items-center gap-1">
+                <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                {tour.rating ?? 'N/A'} ({tour.reviews ?? 0})
+              </div>
             </div>
           </div>
 
@@ -262,8 +267,8 @@ export default function TourDetailsPage() {
 
         {/* Reviews Section */}
         <div className="mt-16 border-t pt-16">
-          <TourReviews 
-            tourId={tour.id} 
+          <TourReviews
+            tourId={tour.id}
             currentUserId={session.data?.user?.id}
             className="max-w-4xl"
           />

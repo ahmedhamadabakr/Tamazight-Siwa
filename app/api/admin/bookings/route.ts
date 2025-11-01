@@ -1,10 +1,7 @@
 import { NextResponse } from 'next/server'
-import { getServerAuthSession } from '@/lib/server-auth';
-
-
-
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { getMongoClient } from '@/lib/mongodb'
-import { bookingCollectionName } from '@/models/Booking'
 
 export async function GET(req: Request) {
   try {
@@ -28,7 +25,7 @@ export async function GET(req: Request) {
       }, { status: 503 });
     }
 
-    const session = await getServerAuthSession() as any
+    const session = await getServerSession(authOptions) as any
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -49,8 +46,10 @@ export async function GET(req: Request) {
     const db = client.db()
 
 
+
+
     // Get all bookings with user and tour details
-    const bookings = await db.collection(bookingCollectionName).aggregate([
+    const bookings = await db.collection('bookings').aggregate([
       {
         $lookup: {
           from: 'users',
@@ -68,10 +67,16 @@ export async function GET(req: Request) {
         }
       },
       {
-        $unwind: '$userDetails'
+        $unwind: {
+          path: '$userDetails',
+          preserveNullAndEmptyArrays: true
+        }
       },
       {
-        $unwind: '$tourDetails'
+        $unwind: {
+          path: '$tourDetails',
+          preserveNullAndEmptyArrays: true
+        }
       },
       {
         $project: {
@@ -86,18 +91,18 @@ export async function GET(req: Request) {
           createdAt: 1,
           updatedAt: 1,
           user: {
-            name: '$userDetails.name',
-            email: '$userDetails.email',
-            phone: '$userDetails.phone'
+            name: { $ifNull: ['$userDetails.name', 'Unknown User'] },
+            email: { $ifNull: ['$userDetails.email', 'No Email'] },
+            phone: { $ifNull: ['$userDetails.phone', ''] }
           },
           tour: {
-            _id: '$tourDetails._id',
-            title: '$tourDetails.title',
-            destination: '$tourDetails.destination',
-            duration: '$tourDetails.duration',
-            price: '$tourDetails.price',
-            startDate: '$tourDetails.startDate',
-            endDate: '$tourDetails.endDate'
+            _id: { $ifNull: ['$tourDetails._id', null] },
+            title: { $ifNull: ['$tourDetails.title', 'Unknown Tour'] },
+            destination: { $ifNull: ['$tourDetails.destination', 'Unknown Destination'] },
+            duration: { $ifNull: ['$tourDetails.duration', 0] },
+            price: { $ifNull: ['$tourDetails.price', 0] },
+            startDate: { $ifNull: ['$tourDetails.startDate', new Date()] },
+            endDate: { $ifNull: ['$tourDetails.endDate', new Date()] }
           }
         }
       },
@@ -105,8 +110,6 @@ export async function GET(req: Request) {
         $sort: { createdAt: -1 }
       }
     ]).toArray()
-
-   
 
     return NextResponse.json({
       success: true,

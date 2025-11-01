@@ -8,7 +8,7 @@ import {
 } from '@/lib/security';
 import { rateLimitService } from '@/lib/security/rate-limit';
 import { SECURITY_CONFIG } from '@/lib/security/config';
-import { withDbTimeout } from '@/lib/utils/timeout';
+
 
 export async function POST(request: NextRequest) {
   try {
@@ -93,8 +93,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Find user by email with timeout
-    const user = await withDbTimeout(database.findUserByEmail(email), 'Find user by email');
+    // Find user by email
+    const user = await database.findUserByEmail(email);
     if (!user) {
       // Record attempts in parallel; do not block on logging
       await Promise.allSettled([
@@ -149,8 +149,8 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify password with timeout
-    const isPasswordValid = await withDbTimeout(comparePassword(password, user.password), 'Password verification');
+    // Verify password
+    const isPasswordValid = await comparePassword(password, user.password);
     if (!isPasswordValid) {
       await Promise.allSettled([
         rateLimitService.recordLoginAttempt(clientIP, false),

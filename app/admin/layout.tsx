@@ -1,9 +1,7 @@
 import { Metadata } from 'next'
 import { redirect } from 'next/navigation'
-import { getServerAuthSession } from '@/lib/server-auth';
-
-
-import { AdminSidebar } from '@/components/admin/AdminSidebar'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { AdminHeader } from '@/components/admin/AdminHeader'
 
 export const metadata: Metadata = {
@@ -20,7 +18,7 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await getServerAuthSession()
+  const session = await getServerSession(authOptions)
 
   // Check if user is authenticated and has admin/manager role
   if (!session?.user) {
@@ -34,15 +32,12 @@ export default async function AdminLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <AdminSidebar />
-      <div className="lg:pl-64">
-        <AdminHeader user={session.user} />
-        <main className="py-6">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            {children}
-          </div>
-        </main>
-      </div>
+      <AdminHeader user={session.user} />
+      <main className="py-6">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          {children}
+        </div>
+      </main>
     </div>
   )
 }

@@ -361,7 +361,7 @@ export default function AdminBookings() {
                         {booking.bookingReference}
                       </div>
                       <div className="text-sm text-gray-500">
-                        {new Date(booking.createdAt).toLocaleDateString('ar-EG')}
+                        {new Date(booking.createdAt).toLocaleDateString('en-US')}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">

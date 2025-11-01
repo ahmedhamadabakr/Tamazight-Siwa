@@ -11,6 +11,8 @@ export interface ITrip {
   availableSpots: number;
   images: string[];
   isActive: boolean;
+  rating?: number;
+  reviews?: number;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -64,6 +66,17 @@ export const tripSchema = {
         bsonType: 'bool',
         description: 'must be a boolean',
         default: true
+      },
+      rating: {
+        bsonType: 'number',
+        minimum: 0,
+        maximum: 5,
+        description: 'must be a number between 0 and 5'
+      },
+      reviews: {
+        bsonType: 'int',
+        minimum: 0,
+        description: 'must be a non-negative integer'
       },
       createdAt: {
         bsonType: 'date',

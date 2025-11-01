@@ -1,19 +1,15 @@
 import { NextResponse } from 'next/server'
-import { getServerAuthSession } from '@/lib/server-auth';
-
-
-
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { getMongoClient } from '@/lib/mongodb'
 import { ObjectId } from 'mongodb'
-import { bookingCollectionName } from '@/models/Booking'
-import { sendBookingCancellationEmail } from '@/lib/email-service'
 
 export async function PUT(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(await getAuthOptions()) as any
+    const session = await getServerSession(authOptions) as any
     
     if (!session?.user?.id) {
       return NextResponse.json(
@@ -44,7 +40,7 @@ export async function PUT(
     const db = client.db()
 
     // Get booking details before update (for email notification)
-    const booking = await db.collection(bookingCollectionName).aggregate([
+    const booking = await db.collection('bookings').aggregate([
       {
         $match: { _id: new ObjectId(bookingId) }
       },
@@ -82,7 +78,7 @@ export async function PUT(
     const bookingData = booking[0]
 
     // Update booking
-    const result = await db.collection(bookingCollectionName).updateOne(
+    const result = await db.collection('bookings').updateOne(
       { _id: new ObjectId(bookingId) },
       {
         $set: {
@@ -99,20 +95,10 @@ export async function PUT(
       )
     }
 
-    // Send email notification if status changed to cancelled
-    if (data.status === 'cancelled' && bookingData.status !== 'cancelled') {
-      try {
-        await sendBookingCancellationEmail(bookingData.userDetails.email, {
-          customerName: bookingData.userDetails.name,
-          bookingReference: bookingData.bookingReference,
-          tourTitle: bookingData.tourDetails.title,
-          refundAmount: bookingData.paymentStatus === 'paid' ? bookingData.totalAmount : undefined
-        })
-      } catch (emailError) {
-        console.error('Failed to send cancellation email:', emailError)
-        // Don't fail the update if email fails
-      }
-    }
+    // Email notification disabled for now
+    // if (data.status === 'cancelled' && bookingData.status !== 'cancelled') {
+    //   // Send cancellation email
+    // }
 
     return NextResponse.json({
       success: true,

@@ -90,15 +90,15 @@ const fetchTours = async () => {
                 <div className="space-y-2 mb-6">
                   <div className="flex items-center text-sm text-muted-foreground">
                     <Clock className="w-4 h-4 mr-2 text-primary" />
-                    <span>{tour.duration}</span>
+                    <span>{parseInt(tour.duration) > 1 ? `${tour.duration} days` : `${tour.duration} day`}</span>
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground">
                     <Users className="w-4 h-4 mr-2 text-primary" />
-                    <span>{tour.groupSize}</span>
+                    <span>{tour.groupSize} {parseInt(tour.groupSize) > 1 ? 'People' : 'Person'}</span>
                   </div>
                   <div className="flex items-center text-sm text-muted-foreground">
                     <MapPin className="w-4 h-4 mr-2 text-primary" />
-                    <span>{tour.location}</span>
+                    <span>{tour.location} {tour.location.split(',').length > 1 ? 'Locations' : 'Location'}</span>
                   </div>
                 </div>
                 

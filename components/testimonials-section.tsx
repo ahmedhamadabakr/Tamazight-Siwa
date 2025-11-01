@@ -8,8 +8,8 @@ import Image from "next/image"
 const testimonials = [
     {
         id: 1,
-        name: "Ahmed Mohamed",
-        location: "Cairo, Egypt",
+        name: "John Smith",
+        location: "New York, USA",
         rating: 5,
         text: "An amazing and unforgettable experience in Siwa Oasis! The team is very professional and the service is excellent. I recommend everyone to visit Siwa with this outstanding team.",
         image: "/placeholder-user.jpg",
@@ -17,8 +17,8 @@ const testimonials = [
     },
     {
         id: 2,
-        name: "Fatima Ali",
-        location: "Alexandria, Egypt",
+        name: "Emily Jones",
+        location: "London, UK",
         rating: 5,
         text: "One of the most beautiful trips I've ever taken in my life. The natural scenery is breathtaking and the hospitality is wonderful. Thank you for this amazing experience.",
         image: "/placeholder-user.jpg",
@@ -26,17 +26,17 @@ const testimonials = [
     },
     {
         id: 3,
-        name: "Mohamed Hassan",
-        location: "Giza, Egypt",
+        name: "Michael Müller",
+        location: "Berlin, Germany",
         rating: 5,
-        text: "First-class professional service. Everything was perfectly organized from transportation to accommodation and food. An experience worth repeating.",
+        text: "First-class professional service. Everything was perfectly organized, from transportation to accommodation and food. An experience worth repeating.",
         image: "/placeholder-user.jpg",
         tour: "Cultural Heritage Journey"
     },
     {
         id: 4,
-        name: "Sarah Ahmed",
-        location: "Aswan, Egypt",
+        name: "Sophie Dubois",
+        location: "Paris, France",
         rating: 5,
         text: "The best desert trip ever! The team is friendly and cooperative, and the activities are diverse and exciting. I highly recommend this unique experience.",
         image: "/placeholder-user.jpg",
@@ -44,8 +44,8 @@ const testimonials = [
     },
     {
         id: 5,
-        name: "Khaled Abdullah",
-        location: "Luxor, Egypt",
+        name: "David Lee",
+        location: "Sydney, Australia",
         rating: 5,
         text: "An exceptional experience by all standards. The traditional food is delicious and the accommodation is comfortable. Thank you for the beautiful memories.",
         image: "/placeholder-user.jpg",

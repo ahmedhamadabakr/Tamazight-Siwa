@@ -1,12 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-// Protected routes configuration
-const protectedRoutes = {
-  admin: ['/admin'],
-  manager: ['/dashboard', '/admin'],
-  user: ['/user', '/dashboard', '/admin'],
-};
+
 
 // Public routes that don't require authentication
 const publicRoutes = [
@@ -35,7 +30,15 @@ function isPublicRoute(pathname: string): boolean {
 }
 
 function getRequiredRole(pathname: string): string | null {
+  // Admin routes that require admin role only
+  if (pathname.startsWith('/admin/settings')) return 'admin';
+
+  // Admin routes that allow manager access
+  if (pathname.startsWith('/admin/bookings') || pathname.startsWith('/admin/dashboard')) return 'manager';
+
+  // Other admin routes require admin role
   if (pathname.startsWith('/admin')) return 'admin';
+
   if (pathname.startsWith('/dashboard') && pathname !== '/dashboard') return 'manager';
   if (pathname.startsWith('/user')) return 'user';
   if (pathname === '/dashboard' || pathname === '/security') return 'user'; // Any authenticated user
@@ -55,8 +58,8 @@ function hasRequiredRole(userRole: string, requiredRole: string): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Try multiple approaches to get the token
-  const secret = 'ae34ac568d6f9b6fab0aaa890d15a7b4f406f8d70f417cc874ada63af8081a8d';
+  // Get secret from environment (fallback for compatibility)
+  const secret = process.env.NEXTAUTH_SECRET || 'ae34ac568d6f9b6fab0aaa890d15a7b4f406f8d70f417cc874ada63af8081a8d';
 
   // Try different cookie names
   let token = await getToken({
@@ -77,10 +80,7 @@ export async function middleware(request: NextRequest) {
   const sessionCookie = request.cookies.get('__Secure-next-auth.session-token') ||
     request.cookies.get('next-auth.session-token');
 
-  // Debug logging (remove in production)
-  if (process.env.NODE_ENV === 'development') {
-    console.log('Middleware - Path:', pathname, 'Token:', token ? { id: token.id, role: token.role } : null);
-  }
+
 
   // Add security headers
   const response = NextResponse.next();

@@ -232,15 +232,15 @@ export default function ToursPage({ params }: ToursPageProps) {
                                     <div className="space-y-2 mb-4">
                                             <div className="flex items-center text-sm text-gray-500">
                                                 <FiMapPin className="w-4 h-4 mr-2" />
-                                                {tour.location}
+                                                {tour.location} {tour.location.split(',').length > 1 ? 'Locations' : 'Location'}
                                             </div>
                                             <div className="flex items-center text-sm text-gray-500">
                                                 <FiClock className="w-4 h-4 mr-2" />
-                                                {tour.duration}
+                                                {parseInt(tour.duration) > 1 ? `${tour.duration} days` : `${tour.duration} day`}
                                             </div>
                                             <div className="flex items-center text-sm text-gray-500">
                                                 <FiUsers className="w-4 h-4 mr-2" />
-                                                {tour.groupSize}
+                                                {tour.groupSize} {parseInt(tour.groupSize) > 1 ? 'People' : 'Person'}
                                             </div>
                                             <div className="flex items-center text-sm font-semibold text-green-600">
                                                 <FiDollarSign className="w-4 h-4 mr-2" />

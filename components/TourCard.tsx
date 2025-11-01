@@ -89,19 +89,19 @@ export function TourCard({ tour, index = 0 }: TourCardProps) {
           <div className="space-y-2 mb-4">
             <div className="flex items-center text-sm text-muted-foreground">
               <Clock className="w-4 h-4 mr-2 text-primary" />
-              <span>{parseInt(tour.duration) > 1 ? 'days' : 'day'}</span>
+              <span>{parseInt(tour.duration) > 1 ? `${tour.duration} days` : `${tour.duration} day`}</span>
             </div>
 
             {tour.groupSize && (
               <div className="flex items-center text-sm text-muted-foreground">
                 <Users className="w-4 h-4 mr-2 text-primary" />
-                <span>{tour.groupSize} People</span>
+                <span>{tour.groupSize} {parseInt(tour.groupSize) > 1 ? 'People' : 'Person'}</span>
               </div>
             )}
 
             <div className="flex items-center text-sm text-muted-foreground">
               <MapPin className="w-4 h-4 mr-2 text-primary" />
-              <span>{tour.location} Location</span>
+              <span>{tour.location} {tour.location.split(',').length > 1 ? 'Locations' : 'Location'}</span>
             </div>
           </div>
 
