@@ -107,19 +107,19 @@ export default function TourDetailsPage() {
                 "@type": "ListItem",
                 "position": 1,
                 "name": "Home",
-                "item": "https://www.tamazightsiwa.com/"
+                "item": "https://siwa-with-us.com/"
               },
               {
                 "@type": "ListItem",
                 "position": 2,
                 "name": "Tours",
-                "item": "https://www.tamazightsiwa.com/tours"
+                "item": "https://siwa-with-us.com/tours"
               },
               {
                 "@type": "ListItem",
                 "position": 3,
                 "name": tour.title,
-                "item": `https://www.tamazightsiwa.com/tours/${tour.slug || (slug as string)}`
+                "item": `https://siwa-with-us.com/tours/${tour.slug || (slug as string)}`
               }
             ]
           })
@@ -140,13 +140,13 @@ export default function TourDetailsPage() {
               "@type": "Offer",
               "price": tour.price,
               "priceCurrency": "EGP",
-              "url": `https://www.tamazightsiwa.com/tours/${tour.slug || (slug as string)}`,
+              "url": `https://siwa-with-us.com/tours/${tour.slug || (slug as string)}`,
               "availability": "http://schema.org/InStock"
             },
             "provider": {
               "@type": "Organization",
               "name": "Tamazight Siwa",
-              "url": "https://www.tamazightsiwa.com"
+              "url": "https://siwa-with-us.com"
             },
             "areaServed": {
               "@type": "Place",

@@ -38,7 +38,7 @@ export function generateAdvancedMetadata(config: SEOConfig): Metadata {
     nofollow = false
   } = config
 
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://www.tamazight-siwa.com'
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'https://siwa-with-us.com'
   const fullCanonical = canonical ? `${baseUrl}${canonical}` : baseUrl
   const fullOgImage = ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`
 
@@ -215,9 +215,9 @@ export const generateOrganizationSchema = () => ({
   "name": "Siwa With Us",
   "alternateName": "Siwa Tours",
   "description": "Authentic desert experiences and eco-tourism in Siwa Oasis, Egypt",
-  "url": "https://www.tamazightsiwa.com",
-  "logo": "https://www.tamazightsiwa.com/logo.png",
-  "image": "https://www.tamazightsiwa.com/siwa-oasis-sunset-salt-lakes-reflection.jpg",
+  "url": "https://siwa-with-us.com",
+  "logo": "https://siwa-with-us.com/logo.png",
+  "image": "https://siwa-with-us.com/siwa-oasis-sunset-salt-lakes-reflection.jpg",
   "address": {
     "@type": "PostalAddress",
     "streetAddress": "Siwa Oasis",

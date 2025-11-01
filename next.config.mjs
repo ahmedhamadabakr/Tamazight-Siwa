@@ -30,34 +30,6 @@ const nextConfig = {
     largePageDataBytes: 128 * 1000, // 128KB
   },
   
-  // Domain migration redirects
-  redirects: async () => {
-    return [
-      {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'siwa-with-us.com',
-          },
-        ],
-        destination: 'https://www.tamazightsiwa.com/:path*',
-        permanent: true,
-      },
-      {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'www.siwa-with-us.com',
-          },
-        ],
-        destination: 'https://www.tamazightsiwa.com/:path*',
-        permanent: true,
-      },
-    ]
-  },
-  
   // Production optimizations
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',

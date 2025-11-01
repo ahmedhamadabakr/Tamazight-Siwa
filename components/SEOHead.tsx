@@ -20,7 +20,7 @@ export function generateSEOMetadata({
   ogType = "website",
   noIndex = false,
 }: SEOProps): Metadata {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.tamazightsiwa.com'
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://siwa-with-us.com'
   const fullCanonical = `${baseUrl}${canonical}`
   const fullOgImage = ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`
 
@@ -106,8 +106,8 @@ export function generateStructuredData(data: {
     '@type': data.type,
     name: data.name,
     description: data.description,
-    url: data.url || 'https://www.tamazightsiwa.com',
-    image: data.image || 'https://www.tamazightsiwa.com/siwa-oasis-sunset-salt-lakes-reflection.jpg',
+    url: data.url || 'https://siwa-with-us.com',
+    image: data.image || 'https://siwa-with-us.com/siwa-oasis-sunset-salt-lakes-reflection.jpg',
   }
 
   if (data.address) {
