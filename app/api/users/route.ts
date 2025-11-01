@@ -6,27 +6,28 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const name = searchParams.get('name');
-    
+    const status = searchParams.get('status');
+
     const db = await dbConnect();
-    
+
+    const query: any = {};
     if (name) {
-      // Search for team members by name (case-insensitive, partial match)
-      const applications = await db.collection('users')
-        .find({ 
-          name: { $regex: name, $options: 'i' } 
-        })
-        .sort({ name: 1 })
-        .toArray();
-      
-      return NextResponse.json({ success: true, data: applications });
+      query.$or = [
+        { fullName: { $regex: name, $options: 'i' } },
+        { email: { $regex: name, $options: 'i' } },
+        { phone: { $regex: name, $options: 'i' } },
+      ];
     }
-    
-    // If no name parameter, return all team members
-    const applications = await db.collection('users')
-      .find({})
+    if (status) {
+      query.status = status;
+    }
+
+    const applications = await db
+      .collection('users')
+      .find(query)
       .sort({ createdAt: 1 })
       .toArray();
-      
+
     return NextResponse.json({ success: true, data: applications });
   } catch (error) {
     console.error('Error fetching join applications:', error);
