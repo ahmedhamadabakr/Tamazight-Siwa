@@ -135,13 +135,13 @@ export default function ContactPage() {
                 name: "Instagram", 
                 color: "bg-gradient-to-r from-pink-500 to-purple-500", 
                 icon: <span className="text-white font-bold text-xl">IG</span>,
-                url: "https://instagram.com/YOUR_INSTAGRAM"
+                url: "https://instagram.com/tamazight_siwa"
               },
               { 
                 name: "Facebook", 
                 color: "bg-blue-600", 
                 icon: <span className="text-white font-bold text-xl">FB</span>,
-                url: "https://facebook.com/YOUR_FACEBOOK_PAGE"
+                url: "https://facebook.com/tamazight.siwa"
               },
             ].map((social, index) => (
               <Card key={social.name} className="group border-0 shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
@@ -168,26 +168,7 @@ export default function ContactPage() {
             ))}
           </div>
 
-          <div className="relative bg-primary text-primary-foreground rounded-lg p-12 overflow-hidden">
-            <Image
-              src="/great-sand-sea-dunes-golden-hour.jpg"
-              alt="Siwa Adventure"
-              fill
-              className="object-cover opacity-20"
-              placeholder="blur"
-              blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAv/xAAhEAACAQMDBQAAAAAAAAAAAAABAgMABAUGIWGRkqGx0f/EABUBAQEAAAAAAAAAAAAAAAAAAAMF/8QAGhEAAgIDAAAAAAAAAAAAAAAAAAECEgMRkf/aAAwDAQACEQMRAD8AltJagyeH0AthI5xdrLcNM91BF5pX2HaH9bcfaSXWGaRmknyJckliyjqTzSlT54b6bk+h0R//2Q=="
-            />
-            <div className="relative z-10">
-              <h3 className="text-2xl font-bold mb-4">Ready to Book Your Adventure?</h3>
-              <p className="text-lg opacity-90 mb-6">Don&apos;t wait – Siwa&apos;s magic is calling your name!</p>
-              <Link 
-                href="/tours"
-                className="inline-flex items-center justify-center rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/90 h-10 px-4 py-2 hover:scale-105 transition-transform"
-              >
-                Start Planning Now
-              </Link>
-            </div>
-          </div>
+
         </div>
       </section>
 

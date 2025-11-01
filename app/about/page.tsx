@@ -82,7 +82,7 @@ export default function AboutContent() {
       {/* Hero Section */}
       <section className="relative h-[70vh] min-h-[500px] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-r from-primary/30 to-accent/30" />
-        <MotionDiv 
+        <MotionDiv
           className="absolute inset-0"
           initial={{ scale: 1.1 }}
           animate={{ scale: 1 }}
@@ -133,8 +133,8 @@ export default function AboutContent() {
             transition={{ duration: 0.8, delay: 0.5 }}
             className="mt-12"
           >
-            <a 
-              href="#our-story" 
+            <a
+              href="#our-story"
               className="inline-flex items-center justify-center w-12 h-12 rounded-full border-2 border-white/50 hover:border-white transition-colors group"
               aria-label="Scroll to Our Story"
             >
@@ -159,23 +159,23 @@ export default function AboutContent() {
               </h2>
               <div className="space-y-6 text-lg text-muted-foreground">
                 <p>
-                  Siwa feels like another world — a place where time slows down and life follows the rhythm of nature. 
-                  Surrounded by palm trees, salt lakes, and golden dunes, Siwa's spirit is closer to Libya and Morocco 
-                  than to any other Egyptian city. Its long isolation preserved a culture of peace, warmth, and deep 
+                  Siwa feels like another world — a place where time slows down and life follows the rhythm of nature.
+                  Surrounded by palm trees, salt lakes, and golden dunes, Siwa's spirit is closer to Libya and Morocco
+                  than to any other Egyptian city. Its long isolation preserved a culture of peace, warmth, and deep
                   connection to the land.
                 </p>
                 <h3 className="text-2xl font-bold text-foreground mt-8 mb-4">My Journey to Siwa</h3>
                 <p>
-                  Coming here felt like stepping into a dream — pure, alive, and timeless. From the first moment, I felt 
-                  at home. Each sunrise brought a new promise, every salt lake carried me in its calm embrace, and the 
+                  Coming here felt like stepping into a dream — pure, alive, and timeless. From the first moment, I felt
+                  at home. Each sunrise brought a new promise, every salt lake carried me in its calm embrace, and the
                   Great Sand Sea whispered stories beneath a sky full of stars.
                 </p>
                 <p>
-                  With time, Siwa became more than a destination — it became a way of life. And here, I found love too — 
+                  With time, Siwa became more than a destination — it became a way of life. And here, I found love too —
                   the love of nature itself.
                 </p>
                 <p>
-                  After years of living in Siwa, our dream grew simple yet powerful: to share this beauty with the world. 
+                  After years of living in Siwa, our dream grew simple yet powerful: to share this beauty with the world.
                   Through our guesthouse and tours, we welcome travelers not as visitors, but as friends.
                 </p>
                 <p className="text-xl font-semibold text-primary italic">
@@ -183,49 +183,49 @@ export default function AboutContent() {
                 </p>
               </div>
               <div className="mt-8 flex flex-wrap gap-4">
-<Link
-  href="/tours"
-  className="group relative inline-flex items-center justify-center px-8 py-3.5 overflow-hidden font-semibold rounded-xl text-white bg-gradient-to-r from-primary to-accent shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
->
-  <span className="absolute inset-0 bg-gradient-to-r from-primary/70 to-accent/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
-  <span className="relative z-10 flex items-center gap-2">
-    Explore Our Tours
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-    </svg>
-  </span>
-</Link>
+                <Link
+                  href="/tours"
+                  className="group relative inline-flex items-center justify-center px-8 py-3.5 overflow-hidden font-semibold rounded-xl text-white bg-gradient-to-r from-primary to-accent shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary"
+                >
+                  <span className="absolute inset-0 bg-gradient-to-r from-primary/70 to-accent/70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+                  <span className="relative z-10 flex items-center gap-2">
+                    Explore Our Tours
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                    </svg>
+                  </span>
+                </Link>
 
-<Link
-  href="/contact"
-  className="group relative inline-flex items-center justify-center px-8 py-3.5 font-semibold rounded-xl border-2 border-white text-primary hover:bg-primary hover:text-white transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white"
->
-  <span className="relative z-10 flex items-center gap-2">
-    Contact Us
-    <svg
-      xmlns="http://www.w3.org/2000/svg"
-      className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1"
-      fill="none"
-      viewBox="0 0 24 24"
-      stroke="currentColor"
-      strokeWidth={2}
-    >
-      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l4 4m0 0l-4 4m4-4h18" />
-    </svg>
-  </span>
-</Link>
+                <Link
+                  href="/contact"
+                  className="group relative inline-flex items-center justify-center px-8 py-3.5 font-semibold rounded-xl border-2 border-white text-primary hover:bg-primary hover:text-white transition-all duration-300 hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-white"
+                >
+                  <span className="relative z-10 flex items-center gap-2">
+                    Contact Us
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="w-4 h-4 transition-transform duration-300 group-hover:-translate-x-1"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l4 4m0 0l-4 4m4-4h18" />
+                    </svg>
+                  </span>
+                </Link>
 
               </div>
             </div>
           </MotionDiv>
-          
+
           <MotionDiv
             className="relative"
             initial={{ opacity: 0, scale: 0.95 }}
@@ -235,8 +235,8 @@ export default function AboutContent() {
           >
             <div className="relative aspect-[4/5] rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=600&h=500&fit=crop"
-                alt="Traditional Siwa mud-brick architecture"
+                src="/Siwa/WhatsApp Image 2025-10-11 at 14.22.35_c660e47a.jpg"
+                alt="Two people in Siwa Oasis"
                 fill
                 className="object-cover"
                 sizes="(max-width: 768px) 100vw, 50vw"

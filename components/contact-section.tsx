@@ -74,7 +74,7 @@ export function ContactSection() {
   return (
     <section
       id="contact"
-      className="py-20 md:py-28 relative overflow-hidden bg-gradient-to-br from-background via-background to-muted/10"
+      className="py-10 md:py-8 relative overflow-hidden bg-gradient-to-br from-background via-background to-muted/10"
     >
       {/* Decorative background elements */}
       <div className="absolute inset-0 -z-10 opacity-10 bg-grid-small-black/[0.05] dark:bg-grid-small-white/[0.1]"></div>
