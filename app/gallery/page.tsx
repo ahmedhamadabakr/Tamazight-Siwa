@@ -2,11 +2,12 @@
 import { ClientOnlyNavigation } from "@/components/ClientOnlyNavigation"
 import { Footer } from "@/components/footer"
 import { Button } from "@/components/ui/button"
-import { Camera, MapPin, Images, Users, Link } from "lucide-react"
+import { Camera, MapPin, Images, Users } from "lucide-react"
+import Link from "next/link"
 import Image from "next/image"
 import { GalleryClient } from "@/components/gallery/GalleryClient"
-import dbConnect from '@/lib/mongodb'
 import { Suspense } from "react"
+import { headers } from "next/headers"
 
 interface GalleryImage {
   _id: string
@@ -31,36 +32,48 @@ const categories = [
 
 async function getGalleryImages(): Promise<{ images: GalleryImage[], error: string | null }> {
   try {
-    const db = await dbConnect()
-    const collection = db.collection('gallery')
+    const hdrs = headers()
+    const host = hdrs.get('x-forwarded-host') || hdrs.get('host') || ''
+    const proto = hdrs.get('x-forwarded-proto') || 'https'
+    const base = process.env.NEXT_PUBLIC_SITE_URL || (host ? `${proto}://${host}` : '')
+    const url = `${base}/api/gallery?public=true`
+    const res = await fetch(url, { cache: 'no-store' })
+    if (!res.ok) return { images: [], error: 'Failed to load images' }
+    const data = await res.json()
+    if (!data?.success || !Array.isArray(data.data)) {
+      return { images: [], error: 'Invalid response from server' }
+    }
 
-    const query = { isActive: true }
-    const images = await collection
-      .find(query)
-      .sort({ createdAt: -1 })
-      .toArray()
+    const toISO = (value: any) => {
+      try {
+        if (!value) return new Date().toISOString()
+        if (value instanceof Date) return value.toISOString()
+        if (typeof value === 'string') {
+          const d = new Date(value)
+          return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString()
+        }
+        const d = new Date(value)
+        return isNaN(d.getTime()) ? new Date().toISOString() : d.toISOString()
+      } catch {
+        return new Date().toISOString()
+      }
+    }
 
-    // Convert MongoDB documents to plain objects
-    const serializedImages = images.map(img => ({
-      _id: img._id?.toString() || '',
+    const images = (data.data as any[]).map((img: any) => ({
+      _id: (img._id && img._id.toString) ? img._id.toString() : (img._id || ''),
       title: img.title || '',
       description: img.description || '',
       imageUrl: img.imageUrl || '',
-      category: img.category || 'Other',
+      category: (typeof img.category === 'string' && img.category.trim()) ? img.category : 'Other',
       isActive: img.isActive !== false,
-      createdAt: img.createdAt?.toISOString() || new Date().toISOString(),
-      updatedAt: img.updatedAt?.toISOString() || new Date().toISOString()
+      createdAt: toISO(img.createdAt),
+      updatedAt: toISO(img.updatedAt)
     }))
 
-    return { images: serializedImages, error: null }
+    return { images, error: null }
   } catch (e) {
     console.error('Error fetching gallery images:', e)
-    // Return empty array instead of error during build time
-    const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build'
-    return {
-      images: [],
-      error: isBuildTime ? null : 'Failed to connect to the server'
-    }
+    return { images: [], error: 'Failed to load images' }
   }
 }
 
