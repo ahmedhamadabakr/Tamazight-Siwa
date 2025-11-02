@@ -1,12 +1,9 @@
-// Service Worker with safe caching strategy
 const CACHE_NAME = 'siwa-v2';
 const CRITICAL_RESOURCES = [
   '/',
   '/siwa-oasis-sunset-salt-lakes-reflection.jpg',
-  'https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap'
 ];
 
-// Paths that should never be cached (auth and sensitive pages)
 const NO_CACHE_PATHS = [
   /^\/api\//,
   /^\/login$/,
@@ -15,92 +12,77 @@ const NO_CACHE_PATHS = [
   /^\/verify/,
 ];
 
-// Install event - cache critical resources
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then((cache) => {
-        return cache.addAll(CRITICAL_RESOURCES);
-      })
-      .then(() => {
-        return self.skipWaiting();
-      })
+      .then((cache) => cache.addAll(CRITICAL_RESOURCES))
+      .then(() => self.skipWaiting())
   );
 });
 
-// Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((cacheNames) => {
-      return Promise.all(
-        cacheNames.map((cacheName) => {
-          if (cacheName !== CACHE_NAME) {
-            return caches.delete(cacheName);
-          }
-        })
-      );
-    }).then(() => {
-      return self.clients.claim();
-    })
+    caches.keys().then((names) =>
+      Promise.all(names.map((n) => n !== CACHE_NAME && caches.delete(n)))
+    ).then(() => self.clients.claim())
   );
 });
 
-// Fetch event - smart strategy
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-
-  // Only handle GET requests
-  if (request.method !== 'GET') return;
-  // Skip non-HTTP
-  if (!request.url.startsWith('http')) return;
+  if (request.method !== 'GET' || !request.url.startsWith('http')) return;
 
   const url = new URL(request.url);
   const isSameOrigin = url.origin === self.location.origin;
   const path = url.pathname;
 
-  // Do not intercept auth-related and API requests at all
-  if (NO_CACHE_PATHS.some((re) => re.test(path))) {
-    return; // let the browser handle it without SW involvement
-  }
+  if (url.protocol === 'chrome-extension:' || url.protocol === 'blob:') return;
+  if (NO_CACHE_PATHS.some((re) => re.test(path))) return;
 
-  // Navigations (HTML documents): network-first, don't cache navigations
+  // Navigations
   if (request.mode === 'navigate' || request.destination === 'document') {
     event.respondWith(
-      fetch(request, { cache: 'no-store' })
-        .then((response) => response)
-        .catch(() => caches.match('/'))
+      (async () => {
+        try {
+          const netRes = await fetch(request);
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(request, netRes.clone());
+          return netRes;
+        } catch {
+          return (await caches.match(request)) || (await caches.match('/'));
+        }
+      })()
     );
     return;
   }
 
-  // For other assets: cache-first, but avoid caching non-cacheable responses
-  // Only intercept same-origin or Google Fonts CSS requests
-  if (!isSameOrigin && url.origin !== 'https://fonts.googleapis.com') {
-    return; // let the browser handle cross-origin requests to align with CSP
-  }
+  // Static assets (same-origin or fonts.googleapis.com)
+  if (!isSameOrigin && url.origin !== 'https://fonts.googleapis.com') return;
 
   event.respondWith((async () => {
     const cached = await caches.match(request);
     if (cached) return cached;
-    try {
-      const networkResp = await fetch(request);
-      try {
-        const shouldCache =
-          networkResp &&
-          networkResp.status === 200 &&
-          !/no-store|private/i.test(networkResp.headers.get('Cache-Control') || '') &&
-          (isSameOrigin || url.origin === 'https://fonts.googleapis.com');
 
-        if (shouldCache) {
-          const clone = networkResp.clone();
-          const cache = await caches.open(CACHE_NAME);
-          cache.put(request, clone);
-        }
-      } catch (_) { /* no-op */ }
-      return networkResp;
-    } catch (e) {
-      if (cached) return cached; // fallback to cache if available
-      return new Response('', { status: 504, statusText: 'SW fetch blocked or failed' });
+    try {
+      const netRes = await fetch(request);
+      const cacheable =
+        netRes &&
+        netRes.status === 200 &&
+        !/no-store|private/i.test(netRes.headers.get('Cache-Control') || '') &&
+        (isSameOrigin || url.origin === 'https://fonts.googleapis.com');
+
+      if (cacheable) {
+        const clone = netRes.clone();
+        const cache = await caches.open(CACHE_NAME);
+        cache.put(request, clone);
+      }
+
+      return netRes;
+    } catch {
+      return cached || new Response('Offline or CSP blocked this request', {
+        status: 504,
+        headers: { 'Content-Type': 'text/plain' },
+      });
     }
   })());
 });
