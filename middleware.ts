@@ -58,8 +58,8 @@ function hasRequiredRole(userRole: string, requiredRole: string): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Get secret from environment (fallback for compatibility)
-  const secret = process.env.NEXTAUTH_SECRET || 'ae34ac568d6f9b6fab0aaa890d15a7b4f406f8d70f417cc874ada63af8081a8d';
+  // Get secret from environment
+  const secret = process.env.NEXTAUTH_SECRET;
 
   // Try different cookie names
   let token = await getToken({
