@@ -1,4 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
 import { getToken } from 'next-auth/jwt';
 import { database } from '@/lib/models';
 import { rateLimitService } from '@/lib/security/rate-limit';
@@ -16,20 +18,10 @@ export async function POST(request: NextRequest) {
       secret: process.env.NEXTAUTH_SECRET
     });
 
-    if (!token) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: {
-            code: SecurityErrorCodes.TOKEN_INVALID,
-            message: 'No active session found'
-          }
-        },
-        { status: 401 }
-      );
-    }
+    // We'll proceed to clear cookies even if token is missing to ensure client is fully logged out
 
-    const userId = token.sub;
+    const userId = token?.sub;
+
     const refreshToken = request.cookies.get('refreshToken')?.value;
 
     // Remove specific refresh token if provided
@@ -42,13 +34,15 @@ export async function POST(request: NextRequest) {
     }
 
     // Log security event
-    await database.logSecurityEvent({
-      userId: userId as any,
-      eventType: 'LOGIN_SUCCESS', // We'll use this for logout tracking
-      ipAddress: clientIP,
-      userAgent,
-      details: { action: 'logout', type: 'single_session' }
-    });
+    if (userId) {
+      await database.logSecurityEvent({
+        userId: userId as any,
+        eventType: 'LOGIN_SUCCESS', // We'll use this for logout tracking
+        ipAddress: clientIP,
+        userAgent,
+        details: { action: 'logout', type: 'single_session' }
+      });
+    }
 
     // Create response and clear cookies
     const response = NextResponse.json({
@@ -65,28 +59,48 @@ export async function POST(request: NextRequest) {
       expires: new Date(0), // Expire immediately
     });
 
-    // Clear NextAuth session cookies
-    const cookiePrefix = process.env.NODE_ENV === 'production' ? '__Secure-' : '';
-    const sessionCookieName = `${cookiePrefix}next-auth.session-token`;
-    const csrfCookieName = process.env.NODE_ENV === 'production' 
-      ? '__Host-next-auth.csrf-token' 
-      : 'next-auth.csrf-token';
+    // Clear NextAuth session cookies (cover both dev and prod names)
+    const sessionCookieNames = [
+      'next-auth.session-token',
+      '__Secure-next-auth.session-token',
+    ];
+    const csrfCookieNames = [
+      'next-auth.csrf-token',
+      '__Host-next-auth.csrf-token',
+    ];
 
-    response.cookies.set(sessionCookieName, '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      expires: new Date(0),
+    sessionCookieNames.forEach((name) => {
+      response.cookies.set(name, '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        expires: new Date(0),
+      });
     });
 
-    response.cookies.set(csrfCookieName, '', {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
-      path: '/',
-      expires: new Date(0),
+    csrfCookieNames.forEach((name) => {
+      response.cookies.set(name, '', {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        expires: new Date(0),
+      });
     });
+
+    if (!token) {
+      return NextResponse.json(
+        { 
+          success: false, 
+          error: {
+            code: SecurityErrorCodes.TOKEN_INVALID,
+            message: 'No active session found'
+          }
+        },
+        { status: 401 }
+      );
+    }
 
     return response;
 

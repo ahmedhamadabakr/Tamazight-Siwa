@@ -79,37 +79,37 @@ export function useAuth(): UseAuthReturn {
     authChangeCallbacks.forEach(callback => callback());
   }, [isAuthenticated, user?.id]); // إزالة authChangeCallbacks من dependencies
 
-  const logout = useCallback(async (options?: { 
-    redirect?: boolean; 
-    callbackUrl?: string; 
-    allDevices?: boolean 
+  const logout = useCallback(async (options?: {
+    redirect?: boolean;
+    callbackUrl?: string;
+    allDevices?: boolean;
   }) => {
     try {
+      // 1) Clear server-side cookies first
       if (options?.allDevices) {
-        // Call logout-all API endpoint
         await fetch('/api/auth/logout-all', {
           method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
+        });
+      } else {
+        await fetch('/api/auth/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
         });
       }
 
+      // 2) Tell NextAuth to clear client/session state
       if (options?.redirect === false) {
         await signOut({ redirect: false });
-      } else {
-        await signOut({ 
-          callbackUrl: options?.callbackUrl || '/login',
-        });
+        router.push(options?.callbackUrl || '/login');
+        return;
       }
 
-      // If not redirecting, manually navigate
-      if (options?.redirect === false) {
-        router.push(options?.callbackUrl || '/login');
-      }
+      await signOut({ callbackUrl: options?.callbackUrl || '/login' });
     } catch (error) {
       console.error('Logout error:', error);
-      // Fallback: force redirect to login
       router.push('/login');
     }
   }, [router]);
