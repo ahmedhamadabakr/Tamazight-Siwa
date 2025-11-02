@@ -6,6 +6,15 @@ import { database } from '@/lib/models';
 import { rateLimitService } from '@/lib/security/rate-limit';
 import { SecurityErrorCodes } from '@/lib/security';
 
+function isSecureCookie(): boolean {
+  try {
+    const url = process.env.NEXTAUTH_URL || '';
+    return url.startsWith('https://');
+  } catch {
+    return process.env.NODE_ENV === 'production';
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Get client IP for logging
@@ -50,10 +59,13 @@ export async function POST(request: NextRequest) {
       message: 'Logged out successfully'
     });
 
+    // Decide cookie security based on NEXTAUTH_URL scheme for local prod testing
+    const secure = isSecureCookie();
+
     // Clear refresh token cookie
     response.cookies.set('refreshToken', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure,
       sameSite: 'lax',
       path: '/',
       expires: new Date(0), // Expire immediately
@@ -68,11 +80,14 @@ export async function POST(request: NextRequest) {
       'next-auth.csrf-token',
       '__Host-next-auth.csrf-token',
     ];
+    const miscCookieNames = [
+      'next-auth.callback-url',
+    ];
 
     sessionCookieNames.forEach((name) => {
       response.cookies.set(name, '', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure,
         sameSite: 'lax',
         path: '/',
         expires: new Date(0),
@@ -82,7 +97,18 @@ export async function POST(request: NextRequest) {
     csrfCookieNames.forEach((name) => {
       response.cookies.set(name, '', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure,
+        sameSite: 'lax',
+        path: '/',
+        expires: new Date(0),
+      });
+    });
+
+    // Clear non-HTTPOnly misc cookies as well
+    miscCookieNames.forEach((name) => {
+      response.cookies.set(name, '', {
+        httpOnly: false,
+        secure,
         sameSite: 'lax',
         path: '/',
         expires: new Date(0),

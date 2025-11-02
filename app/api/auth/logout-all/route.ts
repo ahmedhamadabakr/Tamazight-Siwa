@@ -4,6 +4,15 @@ import { database } from '@/lib/models';
 import { rateLimitService } from '@/lib/security/rate-limit';
 import { SecurityErrorCodes } from '@/lib/security';
 
+function isSecureCookie(): boolean {
+  try {
+    const url = process.env.NEXTAUTH_URL || '';
+    return url.startsWith('https://');
+  } catch {
+    return process.env.NODE_ENV === 'production';
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Get client IP for logging
@@ -76,25 +85,25 @@ export async function POST(request: NextRequest) {
       message: 'Logged out from all devices successfully'
     });
 
+    const secure = isSecureCookie();
+
     // Clear refresh token cookie
     response.cookies.set('refreshToken', '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure,
       sameSite: 'lax',
       path: '/',
       expires: new Date(0), // Expire immediately
     });
 
     // Clear NextAuth session cookies
-    const cookiePrefix = process.env.NODE_ENV === 'production' ? '__Secure-' : '';
+    const cookiePrefix = secure ? '__Secure-' : '';
     const sessionCookieName = `${cookiePrefix}next-auth.session-token`;
-    const csrfCookieName = process.env.NODE_ENV === 'production' 
-      ? '__Host-next-auth.csrf-token' 
-      : 'next-auth.csrf-token';
+    const csrfCookieName = secure ? '__Host-next-auth.csrf-token' : 'next-auth.csrf-token';
 
     response.cookies.set(sessionCookieName, '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure,
       sameSite: 'lax',
       path: '/',
       expires: new Date(0),
@@ -102,7 +111,16 @@ export async function POST(request: NextRequest) {
 
     response.cookies.set(csrfCookieName, '', {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure,
+      sameSite: 'lax',
+      path: '/',
+      expires: new Date(0),
+    });
+
+    // Also clear misc cookie
+    response.cookies.set('next-auth.callback-url', '', {
+      httpOnly: false,
+      secure,
       sameSite: 'lax',
       path: '/',
       expires: new Date(0),
