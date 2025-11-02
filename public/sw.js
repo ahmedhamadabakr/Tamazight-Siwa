@@ -58,10 +58,9 @@ self.addEventListener('fetch', (event) => {
   const isSameOrigin = url.origin === self.location.origin;
   const path = url.pathname;
 
-  // Do not cache auth-related and API requests
+  // Do not intercept auth-related and API requests at all
   if (NO_CACHE_PATHS.some((re) => re.test(path))) {
-    event.respondWith(fetch(request, { cache: 'no-store' }));
-    return;
+    return; // let the browser handle it without SW involvement
   }
 
   // Navigations (HTML documents): network-first, don't cache navigations
