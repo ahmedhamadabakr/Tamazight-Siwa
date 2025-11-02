@@ -10,10 +10,14 @@ export const SECURITY_CONFIG = {
   REMEMBER_ME_EXPIRY: '90d',
   EMAIL_VERIFICATION_EXPIRY: '24h',
   
-  // Rate limiting
+/*   // Rate limiting
   MAX_LOGIN_ATTEMPTS: 5,
-  LOGIN_LOCKOUT_DURATION: 10 * 60 * 1000, // 10 minutes in milliseconds
-  RATE_LIMIT_WINDOW: 10 * 60 * 1000, // 10 minutes
+  LOGIN_LOCKOUT_DURATION: 5 * 60 * 1000, // 5 minutes in milliseconds
+  RATE_LIMIT_WINDOW: 2 * 60 * 1000, // 2 minutes
+   */
+    MAX_LOGIN_ATTEMPTS: 100,
+    LOGIN_LOCKOUT_DURATION: 0,
+    RATE_LIMIT_WINDOW: 0,
   
   // Security headers
   CONTENT_SECURITY_POLICY: `

@@ -39,7 +39,8 @@ export const authOptions = {
             rateLimitService.checkLoginAttempts(validatedData.email),
           ]);
 
-          if (!ipRateLimit.allowed || !emailRateLimit.allowed) {
+          // Block only if BOTH IP and email are over the limit
+          if (!ipRateLimit.allowed && !emailRateLimit.allowed) {
             await database.logSecurityEvent({
               eventType: 'RATE_LIMIT_EXCEEDED',
               ipAddress: clientIP,

@@ -39,17 +39,14 @@ self.addEventListener('fetch', (event) => {
   if (url.protocol === 'chrome-extension:' || url.protocol === 'blob:') return;
   if (NO_CACHE_PATHS.some((re) => re.test(path))) return;
 
-  // Navigations
+  // Navigations (HTML): network-first, DO NOT CACHE
   if (request.mode === 'navigate' || request.destination === 'document') {
     event.respondWith(
       (async () => {
         try {
-          const netRes = await fetch(request);
-          const cache = await caches.open(CACHE_NAME);
-          cache.put(request, netRes.clone());
-          return netRes;
+          return await fetch(request, { cache: 'no-store' });
         } catch {
-          return (await caches.match(request)) || (await caches.match('/'));
+          return (await caches.match(request)) || (await caches.match('/')) || new Response('', { status: 504 });
         }
       })()
     );
