@@ -48,6 +48,18 @@ const nextConfig = {
       ],
     },
     {
+      source: '/api/auth/(.*)',
+      headers: [
+        { key: 'Cache-Control', value: 'no-store' },
+      ],
+    },
+    {
+      source: '/login',
+      headers: [
+        { key: 'Cache-Control', value: 'no-store, max-age=0' },
+      ],
+    },
+    {
       source: '/api/(.*)',
       headers: [
         { key: 'Cache-Control', value: 'public, s-maxage=60, stale-while-revalidate=300' },
