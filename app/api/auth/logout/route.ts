@@ -89,16 +89,11 @@ export async function POST(request: NextRequest) {
       });
     });
 
+    // Always return 200 with cleared cookies; include info if no token was found
     if (!token) {
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: {
-            code: SecurityErrorCodes.TOKEN_INVALID,
-            message: 'No active session found'
-          }
-        },
-        { status: 401 }
+      return new NextResponse(
+        JSON.stringify({ success: true, message: 'Logged out (no active session)' }),
+        { status: 200, headers: response.headers }
       );
     }
 
