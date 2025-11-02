@@ -64,6 +64,31 @@ const nextConfig = {
         { key: 'Content-Security-Policy', value: csp },
       ],
     },
+    // Disable caching for protected pages to enable instant account switching
+    {
+      source: '/admin/(.*)',
+      headers: [
+        { key: 'Cache-Control', value: 'no-store, max-age=0' },
+        { key: 'Pragma', value: 'no-cache' },
+        { key: 'Expires', value: '0' },
+      ],
+    },
+    {
+      source: '/dashboard/(.*)',
+      headers: [
+        { key: 'Cache-Control', value: 'no-store, max-age=0' },
+        { key: 'Pragma', value: 'no-cache' },
+        { key: 'Expires', value: '0' },
+      ],
+    },
+    {
+      source: '/user/(.*)',
+      headers: [
+        { key: 'Cache-Control', value: 'no-store, max-age=0' },
+        { key: 'Pragma', value: 'no-cache' },
+        { key: 'Expires', value: '0' },
+      ],
+    },
     // Ensure service worker is always fresh
     {
       source: '/sw.js',
