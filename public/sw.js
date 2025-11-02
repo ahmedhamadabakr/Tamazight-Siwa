@@ -74,26 +74,33 @@ self.addEventListener('fetch', (event) => {
   }
 
   // For other assets: cache-first, but avoid caching non-cacheable responses
-  event.respondWith(
-    caches.match(request).then((cached) => {
-      if (cached) return cached;
-      return fetch(request).then((networkResp) => {
-        try {
-          const shouldCache =
-            networkResp &&
-            networkResp.status === 200 &&
-            !/no-store|private/i.test(networkResp.headers.get('Cache-Control') || '') &&
-            (isSameOrigin || url.origin === 'https://fonts.googleapis.com');
+  // Only intercept same-origin or Google Fonts CSS requests
+  if (!isSameOrigin && url.origin !== 'https://fonts.googleapis.com') {
+    return; // let the browser handle cross-origin requests to align with CSP
+  }
 
-          if (shouldCache) {
-            const clone = networkResp.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(request, clone);
-            });
-          }
-        } catch (_) {}
-        return networkResp;
-      });
-    })
-  );
+  event.respondWith((async () => {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    try {
+      const networkResp = await fetch(request);
+      try {
+        const shouldCache =
+          networkResp &&
+          networkResp.status === 200 &&
+          !/no-store|private/i.test(networkResp.headers.get('Cache-Control') || '') &&
+          (isSameOrigin || url.origin === 'https://fonts.googleapis.com');
+
+        if (shouldCache) {
+          const clone = networkResp.clone();
+          const cache = await caches.open(CACHE_NAME);
+          cache.put(request, clone);
+        }
+      } catch (_) { /* no-op */ }
+      return networkResp;
+    } catch (e) {
+      if (cached) return cached; // fallback to cache if available
+      return new Response('', { status: 504, statusText: 'SW fetch blocked or failed' });
+    }
+  })());
 });
