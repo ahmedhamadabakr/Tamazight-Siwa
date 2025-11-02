@@ -64,6 +64,14 @@ const nextConfig = {
         { key: 'Content-Security-Policy', value: csp },
       ],
     },
+    // Ensure service worker is always fresh
+    {
+      source: '/sw.js',
+      headers: [
+        { key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate, max-age=0' },
+        { key: 'Service-Worker-Allowed', value: '/' },
+      ],
+    },
     {
       source: '/api/auth/(.*)',
       headers: [
