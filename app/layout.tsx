@@ -199,6 +199,7 @@ export default function RootLayout({
           <Suspense fallback={<Loading />}>
             <AuthProvider>
               {children}
+<SpeedInsights />
             </AuthProvider>
           </Suspense>
         </ErrorBoundary>
