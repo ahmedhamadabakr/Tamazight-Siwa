@@ -61,24 +61,11 @@ export async function middleware(request: NextRequest) {
   // Get secret from environment
   const secret = process.env.NEXTAUTH_SECRET;
 
-  // Try different cookie names
-  let token = await getToken({
+  // Retrieve token (let NextAuth detect cookie name automatically)
+  const token = await getToken({
     req: request,
-    secret: secret,
-    cookieName: '__Secure-next-auth.session-token'
+    secret,
   });
-
-  if (!token) {
-    token = await getToken({
-      req: request,
-      secret: secret,
-      cookieName: 'next-auth.session-token'
-    });
-  }
-
-  // Fallback: check if session cookie exists manually
-  const sessionCookie = request.cookies.get('__Secure-next-auth.session-token') ||
-    request.cookies.get('next-auth.session-token');
 
 
 
@@ -118,13 +105,11 @@ export async function middleware(request: NextRequest) {
   const requiredRole = getRequiredRole(pathname);
 
   if (requiredRole && !token) {
-    // If no token but session cookie exists, allow access (fallback)
-    if (sessionCookie) {
-      return response;
-    }
     const url = request.nextUrl.clone();
     url.pathname = '/login';
-    url.searchParams.set('callbackUrl', pathname);
+    const callbackUrl = `${pathname}${request.nextUrl.search || ''}`;
+    url.searchParams.set('callbackUrl', callbackUrl);
+    url.searchParams.set('error', 'authentication_required');
     return NextResponse.redirect(url);
   }
 
