@@ -128,10 +128,26 @@ export default function LoginPage() {
       }
 
       if (result?.ok) {
-        console.log('Login successful! Redirecting to:', result.url || callbackUrl);
+        console.log('Login successful! Updating session and redirecting...');
 
-        // Force a hard redirect to ensure cookies are set properly
-        window.location.replace(result.url || callbackUrl || '/');
+        // Ensure session is updated so cookies/JWT are available before redirect
+        const updated = await update();
+
+        // Decide redirect path based on role (simple and immediate)
+        const role = (updated?.user as any)?.role;
+        const userId = (updated?.user as any)?.id;
+        let redirectPath = callbackUrl || '/';
+
+        if (!callbackUrl || callbackUrl === '/') {
+          if (role === 'admin') redirectPath = '/admin/dashboard';
+          else if (role === 'manager') redirectPath = `/dashboard/${userId}`;
+          else if (role === 'user') redirectPath = `/user/${userId}`;
+          else redirectPath = '/dashboard';
+        }
+
+        // Use router to avoid losing client state and prevent race conditions
+        router.replace(redirectPath);
+        router.refresh();
         return;
       }
 
