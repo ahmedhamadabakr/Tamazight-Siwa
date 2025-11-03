@@ -99,23 +99,20 @@ const NavigationComponent = memo(function Navigation() {
   const handleSignOut = useCallback(async () => {
     if (isSigningOut) return;
     setIsSigningOut(true);
-    
+    setIsOpen(false);
+
     try {
-      setIsOpen(false);
-      await logout({ 
-        callbackUrl: '/',
-        redirect: true
-      });
-      
-      // Reset local state
-      setLocalUser(null);
+      // Sign out without a redirect to handle it manually
+      await logout({ redirect: false });
+
+      // Manually force a full page reload to the home page to clear all state
+      window.location.href = '/';
     } catch (error) {
       console.error("Sign out error:", error);
-      // Force redirect on error
+      // If signout fails, still force a redirect to clear state
       window.location.href = `/?error=logout_failed&t=${Date.now()}`;
-    } finally {
-      setIsSigningOut(false);
     }
+    // The page will reload, so no need to set isSigningOut back to false
   }, [isSigningOut, logout]);
 
   const navClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${

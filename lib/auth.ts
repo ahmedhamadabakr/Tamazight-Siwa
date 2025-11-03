@@ -13,46 +13,28 @@ export const authOptions = {
         rememberMe: { label: 'Remember Me', type: 'checkbox' }
       },
       async authorize(credentials, req) {
-        console.log('Authorize function called');
         try {
           if (!credentials?.email || !credentials?.password) {
-            console.log('Missing credentials');
             return null;
           }
 
           const email = String(credentials.email).trim().toLowerCase();
           const password = String(credentials.password);
-          console.log(`Attempting to authorize user: ${email}`);
 
           // Find user by email
           const user = await database.findUserByEmail(email);
           if (!user) {
-            console.log(`User not found for email: ${email}`);
             return null;
-          }
-          console.log('User found:', { id: user._id, email: user.email });
-
-          // Check if account is locked
-          if (user.lockoutUntil && user.lockoutUntil > new Date()) {
-            console.log(`Account for ${email} is locked until ${user.lockoutUntil}`);
-            return null; // Account is locked
           }
 
           // Verify password
           const isPasswordValid = await comparePassword(password, user.password);
           if (!isPasswordValid) {
-            console.log(`Invalid password for user: ${email}`);
-            // Note: You would typically increment login attempts here
             return null;
           }
-          console.log('Password is valid');
-
-          // Reset login attempts on successful login
-          await database.resetLoginAttempts(email);
-          console.log(`Login attempts reset for ${email}`);
 
           // Return minimal user object for session/jwt
-          const result = {
+          return {
             id: user._id!.toString(),
             name: user.name,
             email: user.email,
@@ -60,8 +42,6 @@ export const authOptions = {
             image: user.image,
             fullName: user.fullName,
           };
-          console.log('Authorization successful, returning user:', result);
-          return result;
 
         } catch (error) {
           console.error('Credentials provider error:', error);
