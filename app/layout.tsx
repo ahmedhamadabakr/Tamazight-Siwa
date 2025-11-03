@@ -205,7 +205,6 @@ export default function RootLayout({
           <Suspense fallback={<Loading />}>
             <AuthProvider>
               {children}
-          
             </AuthProvider>
           </Suspense>
         </ErrorBoundary>

@@ -1,146 +1,41 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { signIn, useSession } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Eye, EyeOff, LogIn } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 
 export default function LoginPage() {
-  const [formData, setFormData] = useState({ email: '', password: '' });
-  const [showPassword, setShowPassword] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { data: session, status, update } = useSession();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  // Get callback URL from search params
   const callbackUrl = searchParams.get('callbackUrl') || '/';
   const urlError = searchParams.get('error');
 
-  // Set error from URL params, then remove error param from URL
-  useEffect(() => {
-    if (!urlError) return;
-    switch (urlError) {
-      case 'authentication_required':
-        setError('Please sign in to access this page');
-        break;
-      case 'middleware_error':
-        setError('Authentication error. Please try again.');
-        break;
-      default:
-        setError('An error occurred. Please try again.');
-    }
-    // Clean the URL to avoid sticky banner
-    const params = new URLSearchParams(Array.from(searchParams.entries()));
-    params.delete('error');
-    const qs = params.toString();
-    const clean = qs ? `/login?${qs}` : '/login';
-    router.replace(clean);
-  }, [urlError, searchParams, router]);
-
-  // Redirect if already logged in
-  useEffect(() => {
-    if (status === 'authenticated' && session?.user) {
-      const userRole = (session.user as any).role;
-      let redirectPath = callbackUrl;
-
-      // Always force role-based redirects
-       if (userRole === 'manager') {
-        redirectPath = `/dashboard/${(session.user as any).id}`;
-      } else if (userRole === 'user') {
-        redirectPath = `/user/${(session.user as any).id}`;
-      } else {
-        redirectPath = '/';
-      }
-
-      // Only redirect if we're not already on the target path
-      if (window.location.pathname !== redirectPath) {
-        router.replace(redirectPath);
-      }
-    }
-  }, [status, session, router, callbackUrl]);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (error) setError('');
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
-
-  // Show loading if already authenticated and redirecting
-  if (status === 'authenticated') {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-          <p className="text-gray-600">Redirecting...</p>
-        </div>
-      </div>
-    );
-  }
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
-    if (loading || status === 'loading') return; // Prevent double submission
-
+    if (loading) return;
     setLoading(true);
-    setError('');
-
-    try {
-
-      const result = await signIn('credentials', {
-        email: formData.email,
-        password: formData.password,
-        redirect: false,
-        callbackUrl: callbackUrl || '/',
-      });
-
-      if (result?.error) {
-        switch (result.error) {
-          case 'CredentialsSignin':
-            setError('Invalid email or password');
-            break;
-          case 'AccessDenied':
-            setError('Account is locked or inactive. Please contact support.');
-            break;
-          case 'Configuration':
-            setError('Authentication service is temporarily unavailable. Please try again later.');
-            break;
-          default:
-            setError('Login failed. Please try again.');
-        }
-        setLoading(false);
-        return;
-      }
-
-      if (result?.ok) {
-        // Ensure session is updated so cookies/JWT are available before redirect
-        const updated = await update();
-
-        // Decide redirect path based on role (simple and immediate)
-        const role = (updated?.user as any)?.role;
-        const userId = (updated?.user as any)?.id;
-        let redirectPath = '/';
-        if (role === 'manager') redirectPath = `/dashboard/${userId}`;
-        else if (role === 'user') redirectPath = `/user/${userId}`;
-        else redirectPath = '/';
-
-        // Use router to avoid losing client state and prevent race conditions
-        router.replace(redirectPath);
-        router.refresh();
-        return;
-      }
-
-      setError('Login failed. Please try again.');
-      setLoading(false);
-    } catch (err) {
-      setError('An error occurred during login. Please try again.');
+    setError(null);
+    const res = await signIn('credentials', {
+      email,
+      password,
+      redirect: false,
+      callbackUrl,
+    });
+    if (res?.ok) {
+      router.replace(callbackUrl);
+    } else {
+      setError(res?.error || 'Invalid credentials');
       setLoading(false);
     }
   };
@@ -158,12 +53,11 @@ export default function LoginPage() {
           </Link>
 
           <h2 className="text-3xl font-extrabold text-gray-900">Sign in to your account</h2>
-          <p className="mt-2 text-sm text-gray-600">
-            Don’t have an account?{' '}
-            <Link href="/register" className="font-medium text-primary hover:underline">
-              Create one
-            </Link>
-          </p>
+          {(urlError || error) && (
+            <p className="mt-2 text-sm text-red-600">
+              {error || 'Sign-in error. Please try again.'}
+            </p>
+          )}
         </div>
 
         {/* Login Card */}
@@ -173,70 +67,29 @@ export default function LoginPage() {
               <LogIn className="w-5 h-5 text-primary" />
               Welcome back
             </CardTitle>
-            <CardDescription>Enter your credentials to access your account</CardDescription>
+            <CardDescription>Enter your email and password to continue</CardDescription>
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              {error && (
-                <Alert variant="destructive">
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
-
-              {/* Email */}
-              <div className="space-y-1">
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
                 <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  required
-                  placeholder="example@email.com"
-                  className="focus-visible:ring-primary"
-                />
+                <Input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} required />
               </div>
-
-              {/* Password */}
-              <div className="space-y-1">
+              <div>
                 <Label htmlFor="password">Password</Label>
-                <div className="relative">
-                  <Input
-                    id="password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    value={formData.password}
-                    onChange={handleChange}
-                    required
-                    placeholder="••••••••"
-                    className="focus-visible:ring-primary pr-10"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 transition"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                  </button>
-                </div>
+                <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required />
               </div>
-
-              {/* Submit Button */}
-              <Button
-                type="submit"
-                className="w-full font-semibold text-base"
-                disabled={loading}
-              >
+              <Button type="submit" className="w-full" disabled={loading}>
                 {loading ? 'Signing in...' : 'Sign in'}
               </Button>
             </form>
-
-            <div className="mt-5 text-center">
-              <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-                Forget password ?
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <Link href="/register">
+                <Button variant="outline" className="w-full">Register</Button>
+              </Link>
+              <Link href="/forgot-password">
+                <Button variant="ghost" className="w-full">Forgot Password</Button>
               </Link>
             </div>
           </CardContent>

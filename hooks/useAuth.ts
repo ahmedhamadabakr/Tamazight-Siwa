@@ -82,31 +82,13 @@ export function useAuth(): UseAuthReturn {
   const logout = useCallback(async (options?: {
     redirect?: boolean;
     callbackUrl?: string;
-    allDevices?: boolean;
   }) => {
     try {
-      // 1) Clear server-side cookies first
-      if (options?.allDevices) {
-        await fetch('/api/auth/logout-all', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          cache: 'no-store',
-        });
-      } else {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          cache: 'no-store',
-        });
-      }
-
-      // 2) Tell NextAuth to clear client/session state
       if (options?.redirect === false) {
         await signOut({ redirect: false });
         router.push(options?.callbackUrl || '/login');
         return;
       }
-
       await signOut({ callbackUrl: options?.callbackUrl || '/login' });
     } catch (error) {
       console.error('Logout error:', error);
