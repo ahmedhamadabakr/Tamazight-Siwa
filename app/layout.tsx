@@ -135,61 +135,67 @@ export default function RootLayout({
         <link rel="alternate" hrefLang="x-default" href="https://siwa-with-us.com" />
 
         {/* JSON-LD Structured Data */}
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "Organization",
-          "name": "Tamazight Siwa",
-          "url": "https://siwa-with-us.com",
-          "logo": "https://siwa-with-us.com/placeholder-logo.png",
-          "sameAs": [
-            "https://www.facebook.com/tamazight.siwa/",
-            "https://www.instagram.com/tamazight_siwa/",
-            "https://x.com/"
-          ],
-          "contactPoint": [{
-            "@type": "ContactPoint",
+        <script type="application/ld+json" dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "Tamazight Siwa",
+            "url": "https://siwa-with-us.com",
+            "logo": "https://siwa-with-us.com/placeholder-logo.png",
+            "sameAs": [
+              "https://www.facebook.com/tamazight.siwa/",
+              "https://www.instagram.com/tamazight_siwa/",
+              "https://x.com/"
+            ],
+            "contactPoint": [{
+              "@type": "ContactPoint",
+              "telephone": "+201552624123",
+              "contactType": "customer service",
+              "areaServed": "EG",
+              "availableLanguage": ["en", "ar", "ber", "ko"]
+            }]
+          })
+        }} />
+
+        <script type="application/ld+json" dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": "Tamazight Siwa",
+            "url": "https://siwa-with-us.com",
+            "potentialAction": {
+              "@type": "SearchAction",
+              "target": "https://siwa-with-us.com/search?q={search_term_string}",
+              "query-input": "required name=search_term_string"
+            }
+          })
+        }} />
+
+        <script type="application/ld+json" dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "Tamazight Siwa",
+            "image": [
+              "https://siwa-with-us.com/siwa-oasis-sunset-salt-lakes-reflection.jpg"
+            ],
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Siwa Oasis",
+              "addressLocality": "Siwa",
+              "addressRegion": "Matrouh Governorate",
+              "addressCountry": "EG"
+            },
             "telephone": "+201552624123",
-            "contactType": "customer service",
-            "areaServed": "EG",
-            "availableLanguage": ["en", "ar","ber","ko"]
-          }]
-        }) }} />
-
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebSite",
-          "name": "Tamazight Siwa",
-          "url": "https://siwa-with-us.com",
-          "potentialAction": {
-            "@type": "SearchAction",
-            "target": "https://siwa-with-us.com/search?q={search_term_string}",
-            "query-input": "required name=search_term_string"
-          }
-        }) }} />
-
-        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "LocalBusiness",
-          "name": "Tamazight Siwa",
-          "image": [
-            "https://siwa-with-us.com/siwa-oasis-sunset-salt-lakes-reflection.jpg"
-          ],
-          "address": {
-            "@type": "PostalAddress",
-            "streetAddress": "Siwa Oasis",
-            "addressLocality": "Siwa",
-            "addressRegion": "Matrouh Governorate",
-            "addressCountry": "EG"
-          },
-          "telephone": "+201552624123",
-          "url": "https://siwa-with-us.com",
-          "priceRange": "$$",
-          "geo": {
-            "@type": "GeoCoordinates",
-            "latitude": 29.205,
-            "longitude": 25.519
-          }
-        }) }} />
+            "url": "https://siwa-with-us.com",
+            "priceRange": "$$",
+            "geo": {
+              "@type": "GeoCoordinates",
+              "latitude": 29.205,
+              "longitude": 25.519
+            }
+          })
+        }} />
 
         {/* Resource Hints */}
         <ResourceHints />
@@ -199,7 +205,7 @@ export default function RootLayout({
           <Suspense fallback={<Loading />}>
             <AuthProvider>
               {children}
-<SpeedInsights />
+          
             </AuthProvider>
           </Suspense>
         </ErrorBoundary>

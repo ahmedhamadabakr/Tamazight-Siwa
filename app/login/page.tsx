@@ -51,17 +51,13 @@ export default function LoginPage() {
       const userRole = (session.user as any).role;
       let redirectPath = callbackUrl;
 
-      // Override callback URL based on user role if it's just the home page
-      if (callbackUrl === '/' || !callbackUrl) {
-        if (userRole === 'admin') {
-          redirectPath = '/admin/dashboard';
-        } else if (userRole === 'manager') {
-          redirectPath = `/dashboard/${(session.user as any).id}`;
-        } else if (userRole === 'user') {
-          redirectPath = `/user/${(session.user as any).id}`;
-        } else {
-          redirectPath = '/dashboard';
-        }
+      // Always force role-based redirects
+       if (userRole === 'manager') {
+        redirectPath = `/dashboard/${(session.user as any).id}`;
+      } else if (userRole === 'user') {
+        redirectPath = `/user/${(session.user as any).id}`;
+      } else {
+        redirectPath = '/';
       }
 
       // Only redirect if we're not already on the target path
@@ -97,7 +93,6 @@ export default function LoginPage() {
     setError('');
 
     try {
-      console.log('Attempting login with:', { email: formData.email, callbackUrl });
 
       const result = await signIn('credentials', {
         email: formData.email,
@@ -106,10 +101,7 @@ export default function LoginPage() {
         callbackUrl: callbackUrl || '/',
       });
 
-      console.log('SignIn result:', result);
-
       if (result?.error) {
-        console.error('SignIn error:', result.error);
         switch (result.error) {
           case 'CredentialsSignin':
             setError('Invalid email or password');
@@ -128,22 +120,16 @@ export default function LoginPage() {
       }
 
       if (result?.ok) {
-        console.log('Login successful! Updating session and redirecting...');
-
         // Ensure session is updated so cookies/JWT are available before redirect
         const updated = await update();
 
         // Decide redirect path based on role (simple and immediate)
         const role = (updated?.user as any)?.role;
         const userId = (updated?.user as any)?.id;
-        let redirectPath = callbackUrl || '/';
-
-        if (!callbackUrl || callbackUrl === '/') {
-          if (role === 'admin') redirectPath = '/admin/dashboard';
-          else if (role === 'manager') redirectPath = `/dashboard/${userId}`;
-          else if (role === 'user') redirectPath = `/user/${userId}`;
-          else redirectPath = '/dashboard';
-        }
+        let redirectPath = '/';
+        if (role === 'manager') redirectPath = `/dashboard/${userId}`;
+        else if (role === 'user') redirectPath = `/user/${userId}`;
+        else redirectPath = '/';
 
         // Use router to avoid losing client state and prevent race conditions
         router.replace(redirectPath);
@@ -154,7 +140,6 @@ export default function LoginPage() {
       setError('Login failed. Please try again.');
       setLoading(false);
     } catch (err) {
-      console.error('Login error:', err);
       setError('An error occurred during login. Please try again.');
       setLoading(false);
     }
