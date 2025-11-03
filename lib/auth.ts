@@ -32,13 +32,24 @@ export const authOptions = {
           }
           console.log('User found:', { id: user._id, email: user.email });
 
+          // Check if account is locked
+          if (user.lockoutUntil && user.lockoutUntil > new Date()) {
+            console.log(`Account for ${email} is locked until ${user.lockoutUntil}`);
+            return null; // Account is locked
+          }
+
           // Verify password
           const isPasswordValid = await comparePassword(password, user.password);
           if (!isPasswordValid) {
             console.log(`Invalid password for user: ${email}`);
+            // Note: You would typically increment login attempts here
             return null;
           }
           console.log('Password is valid');
+
+          // Reset login attempts on successful login
+          await database.resetLoginAttempts(email);
+          console.log(`Login attempts reset for ${email}`);
 
           // Return minimal user object for session/jwt
           const result = {
