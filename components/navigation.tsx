@@ -244,6 +244,7 @@ const NavigationComponent = memo(function Navigation() {
                 <Link
                   key={item.name}
                   href={item.href}
+                  prefetch={false}
                   onClick={() => setIsOpen(false)}
                   className={`block px-3 py-2 rounded-md text-base font-medium ${
                     isActive(item.href)

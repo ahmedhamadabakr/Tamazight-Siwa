@@ -30,14 +30,14 @@ export default function HomePage() {
           <ClientOnlyNavigation />
         </div>
         <HeroSection />
-        <FeaturedToursLazy />
-        <StatsSectionLazy />
-        <OverviewSectionLazy />
-        <VideoShowcaseLazy />
-        <GalleryPreviewLazy />
-        <TestimonialsSectionLazy />
-        <ServicesSectionLazy />
-        <FooterLazy />
+        <section className="cv-auto"><FeaturedToursLazy /></section>
+        <section className="cv-auto"><StatsSectionLazy /></section>
+        <section className="cv-auto"><OverviewSectionLazy /></section>
+        <section className="cv-auto"><VideoShowcaseLazy /></section>
+        <section className="cv-auto"><GalleryPreviewLazy /></section>
+        <section className="cv-auto"><TestimonialsSectionLazy /></section>
+        <section className="cv-auto"><ServicesSectionLazy /></section>
+        <section className="cv-auto"><FooterLazy /></section>
       </main>
       <GlobalPerfLazy />
     </>

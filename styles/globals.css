@@ -123,3 +123,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Performance utility: hide below-the-fold work until scrolled into view */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 700px 400px;
+}
