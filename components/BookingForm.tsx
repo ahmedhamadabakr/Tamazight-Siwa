@@ -8,7 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Loader2, CreditCard, User } from "lucide-react"
-import { BookingConfirmationModal } from './BookingConfirmationModal'
+import dynamic from 'next/dynamic'
+const BookingConfirmationModal = dynamic(() => import('./BookingConfirmationModal').then(m => m.BookingConfirmationModal), { ssr: false })
 
 interface BookingFormProps {
   tourId: string

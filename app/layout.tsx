@@ -130,7 +130,6 @@ export default function RootLayout({
         <meta name="business:contact_data:phone_number" content="+201552624123" />
 
         {/* Preload critical resources */}
-        <link rel="prefetch" href="/logo.png" as="image" />
 
         {/* Canonical and alternate languages */}
         <link rel="canonical" href="https://siwa-with-us.com" />
