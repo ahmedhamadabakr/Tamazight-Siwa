@@ -27,6 +27,13 @@ export const authOptions = {
             return null;
           }
 
+          // Block login if user is not active
+          if (!user.isActive) {
+            // Optionally, you could throw an error with a specific message
+            // throw new Error('account_not_activated');
+            return null; 
+          }
+
           // Verify password
           const isPasswordValid = await comparePassword(password, user.password);
           if (!isPasswordValid) {

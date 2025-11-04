@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     const userAgent = request.headers.get('user-agent') || 'Unknown';
 
     // Check rate limiting for email verification (5 attempts per hour per IP)
-    const ipRateLimit = await rateLimitService.checkLoginAttempts(`verify_${clientIP}`);
+    /* const ipRateLimit = await rateLimitService.checkLoginAttempts(`verify_${clientIP}`);
     if (!ipRateLimit.allowed) {
       await database.logSecurityEvent({
         eventType: 'RATE_LIMIT_EXCEEDED',
@@ -36,13 +36,13 @@ export async function POST(request: NextRequest) {
         }
       );
     }
-
+ */
     // Parse request body
     const body = await request.json();
     const { token } = body;
 
     if (!token) {
-      await rateLimitService.recordLoginAttempt(`verify_${clientIP}`, false);
+      // await rateLimitService.recordLoginAttempt(`verify_${clientIP}`, false);
       return NextResponse.json(
         { 
           success: false, 
@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
     const verifiedUser = await database.verifyEmail(token);
 
     if (!verifiedUser) {
-      await rateLimitService.recordLoginAttempt(`verify_${clientIP}`, false);
+      // await rateLimitService.recordLoginAttempt(`verify_${clientIP}`, false);
       await database.logSecurityEvent({
         eventType: 'LOGIN_FAILED',
         ipAddress: clientIP,
@@ -80,7 +80,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Record successful verification
-    await rateLimitService.recordLoginAttempt(`verify_${clientIP}`, true);
+    // await rateLimitService.recordLoginAttempt(`verify_${clientIP}`, true);
     await database.logSecurityEvent({
       userId: verifiedUser._id,
       eventType: 'LOGIN_SUCCESS',
