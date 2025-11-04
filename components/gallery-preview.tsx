@@ -67,12 +67,15 @@ export function GalleryPreview() {
             <div
               key={index}
               className="group relative overflow-hidden rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-500 mb-6 break-inside-avoid"
+              style={{ height: index % 3 === 0 ? '300px' : index % 2 === 0 ? '250px' : '200px' }}
             >
               <Image
                 src={image.src || "/placeholder.svg"}
                 alt={image.alt}
-                className="w-full object-cover group-hover:scale-110 transition-transform duration-700"
-                style={{ height: index % 3 === 0 ? '300px' : index % 2 === 0 ? '250px' : '200px' }}
+                fill
+                sizes="(min-width: 1280px) 25vw, (min-width: 1024px) 33vw, (min-width: 768px) 50vw, 100vw"
+                className="object-cover group-hover:scale-110 transition-transform duration-700"
+                priority={index < 2}
               />
 
               {/* Category Badge */}
