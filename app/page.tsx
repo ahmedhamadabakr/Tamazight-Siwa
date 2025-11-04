@@ -1,15 +1,15 @@
 import { ClientOnlyNavigation } from "@/components/ClientOnlyNavigation"
 import { HeroSection } from "@/components/hero-section"
-import { FeaturedTours } from "@/components/featured-tours"
-import { StatsSection } from "@/components/stats-section"
-import { OverviewSection } from "@/components/overview-section"
 import dynamic from "next/dynamic"
 // Defer below-the-fold components to improve FCP
 const VideoShowcaseLazy = dynamic(() => import("@/components/video-showcase").then(m => ({ default: m.VideoShowcase })), { ssr: false })
 const GalleryPreviewLazy = dynamic(() => import("@/components/gallery-preview").then(m => ({ default: m.GalleryPreview })), { ssr: false })
 const TestimonialsSectionLazy = dynamic(() => import("@/components/testimonials-section").then(m => ({ default: m.TestimonialsSection })), { ssr: false })
 const ServicesSectionLazy = dynamic(() => import("@/components/services-section").then(m => ({ default: m.ServicesSection })), { ssr: false })
-import { Footer } from "@/components/footer"
+const FeaturedToursLazy = dynamic(() => import("@/components/featured-tours").then(m => ({ default: m.FeaturedTours })), { ssr: false, loading: () => null })
+const StatsSectionLazy = dynamic(() => import("@/components/stats-section").then(m => ({ default: m.StatsSection })), { ssr: false, loading: () => null })
+const OverviewSectionLazy = dynamic(() => import("@/components/overview-section").then(m => ({ default: m.OverviewSection })), { ssr: false, loading: () => null })
+const FooterLazy = dynamic(() => import("@/components/footer").then(m => ({ default: m.Footer })), { ssr: false, loading: () => null })
 
 // Defer the global optimizer to post-hydration
 const GlobalPerfLazy = dynamic(() => import("@/components/GlobalPerformanceOptimizer").then(m => ({ default: m.GlobalPerformanceOptimizer })), { ssr: false, loading: () => null })
@@ -30,14 +30,14 @@ export default function HomePage() {
           <ClientOnlyNavigation />
         </div>
         <HeroSection />
-        <FeaturedTours />
-        <StatsSection />
-        <OverviewSection />
+        <FeaturedToursLazy />
+        <StatsSectionLazy />
+        <OverviewSectionLazy />
         <VideoShowcaseLazy />
         <GalleryPreviewLazy />
         <TestimonialsSectionLazy />
         <ServicesSectionLazy />
-        <Footer />
+        <FooterLazy />
       </main>
       <GlobalPerfLazy />
     </>
