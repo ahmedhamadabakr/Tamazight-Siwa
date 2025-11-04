@@ -62,17 +62,7 @@ export const FastNavigation = memo(function FastNavigation() {
       : `/user/${localUser.id}`
     : '/login';
 
-  // Preload routes on component mount
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      preloadRoutes.forEach(route => {
-        const link = document.createElement('link');
-        link.rel = 'prefetch';
-        link.href = route;
-        document.head.appendChild(link);
-      });
-    }
-  }, []);
+  // Removed manual prefetching to reduce contention with critical LCP assets
 
   const handleSignOut = useCallback(async () => {
     if (isSigningOut) return;
@@ -140,12 +130,12 @@ export const FastNavigation = memo(function FastNavigation() {
             {/* Logo - Always visible */}
             <Link href="/" className="flex items-center space-x-3">
               <Image
-                src="/logo.png"
+                src="/brand-logo.webp"
                 alt="Tamazight Siwa logo"
                 width={40}
                 height={40}
                 className="rounded-xl shadow-lg"
-                priority
+                loading="lazy"
               />
               <div className="flex flex-col">
                 <span className="font-bold text-xl text-gray-900">Tamazight Siwa</span>
@@ -196,12 +186,12 @@ export const FastNavigation = memo(function FastNavigation() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
             <Image
-              src="/logo.png"
+              src="/brand-logo.webp"
               alt="Tamazight Siwa logo"
               width={40}
               height={40}
               className="rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-200"
-              priority
+              loading="lazy"
             />
             <div className="flex flex-col">
               <span className="font-bold text-xl text-gray-900 group-hover:text-primary transition-colors duration-200">Tamazight Siwa</span>

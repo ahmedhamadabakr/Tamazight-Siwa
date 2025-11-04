@@ -11,12 +11,12 @@ export function Footer() {
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
               <Image
-                src="/logo.png"
+                src="/brand-logo.webp"
                 alt="Tamazight Siwa logo"
                 width={32}
                 height={32}
                 className="rounded"
-                priority
+                loading="lazy"
               />
               <span className="font-bold text-xl">Tamazight Siwa</span>
             </div>

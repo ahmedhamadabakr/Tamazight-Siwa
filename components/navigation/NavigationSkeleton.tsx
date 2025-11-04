@@ -16,12 +16,12 @@ export function NavigationSkeleton() {
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
             <Image
-              src="/logo.png"
+              src="/brand-logo.webp"
               alt="Tamazight Siwa logo"
               width={40}
               height={40}
               className="rounded-xl shadow-lg"
-              priority
+              loading="lazy"
             />
             <div className="flex flex-col">
               <span className="font-bold text-xl text-gray-900">Tamazight Siwa</span>

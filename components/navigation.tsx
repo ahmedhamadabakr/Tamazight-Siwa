@@ -128,12 +128,12 @@ const NavigationComponent = memo(function Navigation() {
           {/* Logo */}
           <Link href="/" prefetch={false} className="flex items-center space-x-3 group">
             <Image
-              src="/logo.png"
+              src="/brand-logo.webp"
               alt="Tamazight Siwa logo"
               width={40}
               height={40}
               className="rounded-xl shadow-lg group-hover:shadow-xl transition-all"
-              priority
+              loading="lazy"
             />
             <div>
               <span className="font-bold text-xl text-gray-900 group-hover:text-primary transition-colors">
