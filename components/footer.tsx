@@ -1,4 +1,5 @@
 import Link from "next/link"
+import Image from "next/image"
 import { Facebook, Instagram, Mail, Phone, MapPin } from "lucide-react"
 
 export function Footer() {
@@ -9,9 +10,14 @@ export function Footer() {
           {/* Company Info */}
           <div className="space-y-4">
             <div className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-primary-foreground font-bold text-sm">TS</span>
-              </div>
+              <Image
+                src="/logo.png"
+                alt="Tamazight Siwa logo"
+                width={32}
+                height={32}
+                className="rounded"
+                priority
+              />
               <span className="font-bold text-xl">Tamazight Siwa</span>
             </div>
             <p className="text-background/80 text-pretty">

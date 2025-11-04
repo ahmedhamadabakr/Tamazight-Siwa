@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -82,9 +83,14 @@ export default function RegisterPage() {
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
           <Link href="/" className="flex items-center justify-center gap-2 mb-6">
-            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-md">
-              <span className="text-primary-foreground font-bold text-xl">TS</span>
-            </div>
+            <Image
+              src="/logo.png"
+              alt="Tamazight Siwa logo"
+              width={48}
+              height={48}
+              className="rounded-xl shadow-md"
+              priority
+            />
             <span className="font-bold text-2xl text-foreground tracking-tight">Tamazight Siwa</span>
           </Link>
 

@@ -123,14 +123,11 @@ export function generateAdvancedMetadata(config: SEOConfig): Metadata {
     manifest: '/manifest.json',
     icons: {
       icon: [
-        { url: '/favicon.ico', sizes: '32x32' },
-        { url: '/icon.svg', type: 'image/svg+xml' }
+        { url: '/logo.png?v=2', sizes: '32x32', type: 'image/png' },
+        { url: '/logo.png?v=2', sizes: '16x16', type: 'image/png' }
       ],
       apple: [
-        { url: '/apple-touch-icon.png', sizes: '180x180' }
-      ],
-      other: [
-        { rel: 'mask-icon', url: '/safari-pinned-tab.svg', color: '#D4A574' }
+        { url: '/logo.png?v=2', sizes: '180x180', type: 'image/png' }
       ]
     },
     appleWebApp: {

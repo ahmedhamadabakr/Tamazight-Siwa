@@ -59,9 +59,14 @@ export default function LoginPage() {
         />
         <div className="relative z-20 flex items-center text-lg font-medium">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center shadow-md">
-              <span className="text-primary-foreground font-bold text-lg">TS</span>
-            </div>
+            <Image
+              src="/logo.png"
+              alt="Tamazight Siwa logo"
+              width={40}
+              height={40}
+              className="rounded-xl shadow-md"
+              priority
+            />
             <span className="font-semibold text-xl tracking-tight">Tamazight Siwa</span>
           </Link>
         </div>

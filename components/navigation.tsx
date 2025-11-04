@@ -127,9 +127,14 @@ const NavigationComponent = memo(function Navigation() {
         <div className="flex justify-between items-center h-18">
           {/* Logo */}
           <Link href="/" prefetch={false} className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center text-white font-bold shadow-lg group-hover:shadow-xl transition-all">
-              TS
-            </div>
+            <Image
+              src="/logo.png"
+              alt="Tamazight Siwa logo"
+              width={40}
+              height={40}
+              className="rounded-xl shadow-lg group-hover:shadow-xl transition-all"
+              priority
+            />
             <div>
               <span className="font-bold text-xl text-gray-900 group-hover:text-primary transition-colors">
                 Tamazight Siwa

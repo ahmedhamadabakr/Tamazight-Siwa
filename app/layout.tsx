@@ -85,7 +85,10 @@ export default function RootLayout({
         }} />
 
         {/* Favicon and app icons */}
-        <link rel="icon" href="/icon.svg" type="image/svg+xml" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/logo.png?v=2" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/logo.png?v=2" />
+        <link rel="shortcut icon" href="/logo.png?v=2" type="image/png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/logo.png?v=2" />
         <link rel="manifest" href="/manifest.json" />
 
         {/* Theme and viewport */}
@@ -128,7 +131,7 @@ export default function RootLayout({
         <meta name="business:contact_data:phone_number" content="+201552624123" />
 
         {/* Preload critical resources */}
-        <link rel="prefetch" href="/placeholder-logo.png" as="image" />
+        <link rel="prefetch" href="/logo.png" as="image" />
 
         {/* Canonical and alternate languages */}
         <link rel="canonical" href="https://siwa-with-us.com" />
@@ -141,7 +144,7 @@ export default function RootLayout({
             "@type": "Organization",
             "name": "Tamazight Siwa",
             "url": "https://siwa-with-us.com",
-            "logo": "https://siwa-with-us.com/placeholder-logo.png",
+            "logo": "https://siwa-with-us.com/logo.png",
             "sameAs": [
               "https://www.facebook.com/tamazight.siwa/",
               "https://www.instagram.com/tamazight_siwa/",

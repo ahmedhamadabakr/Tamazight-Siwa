@@ -139,9 +139,14 @@ export const FastNavigation = memo(function FastNavigation() {
           <div className="flex justify-between items-center h-18">
             {/* Logo - Always visible */}
             <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary via-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg">
-                <span className="text-white font-bold text-lg">TS</span>
-              </div>
+              <Image
+                src="/logo.png"
+                alt="Tamazight Siwa logo"
+                width={40}
+                height={40}
+                className="rounded-xl shadow-lg"
+                priority
+              />
               <div className="flex flex-col">
                 <span className="font-bold text-xl text-gray-900">Tamazight Siwa</span>
                 <span className="text-xs text-gray-500 -mt-1">Authentic Experiences</span>
@@ -190,9 +195,14 @@ export const FastNavigation = memo(function FastNavigation() {
         <div className="flex justify-between items-center h-18">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary via-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-200">
-              <span className="text-white font-bold text-lg">TS</span>
-            </div>
+            <Image
+              src="/logo.png"
+              alt="Tamazight Siwa logo"
+              width={40}
+              height={40}
+              className="rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-200"
+              priority
+            />
             <div className="flex flex-col">
               <span className="font-bold text-xl text-gray-900 group-hover:text-primary transition-colors duration-200">Tamazight Siwa</span>
               <span className="text-xs text-gray-500 -mt-1">Authentic Experiences</span>
@@ -372,7 +382,7 @@ export const FastNavigation = memo(function FastNavigation() {
                     {(userRole === 'manager' || userRole === 'admin') ? 'Dashboard' : 'Profile'}
                   </Link>
                   <button
-                    onClick={handleSignOutClick}
+                    onClick={handleSignOut}
                     className="w-full text-left px-3 py-2 rounded-md text-base font-medium text-red-600 hover:bg-red-50"
                   >
                     Logout

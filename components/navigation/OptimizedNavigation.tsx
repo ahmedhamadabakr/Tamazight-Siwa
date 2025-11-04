@@ -58,9 +58,14 @@ export function OptimizedNavigation() {
         <div className="flex justify-between items-center h-18">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
-            <div className="w-10 h-10 bg-gradient-to-br from-primary via-primary to-primary/80 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-all duration-300">
-              <span className="text-white font-bold text-lg">TS</span>
-            </div>
+            <Image
+              src="/logo.png"
+              alt="Tamazight Siwa logo"
+              width={40}
+              height={40}
+              className="rounded-xl shadow-lg group-hover:shadow-xl transition-all duration-300"
+              priority
+            />
             <div className="flex flex-col">
               <span className="font-bold text-xl text-gray-900 group-hover:text-primary transition-colors duration-300">Tamazight Siwa</span>
               <span className="text-xs text-gray-500 -mt-1">Authentic Experiences</span>
