@@ -5,8 +5,6 @@ import dbConnect from './mongodb';
 export interface IRefreshToken {
   token: string;
   expiresAt: Date;
-  deviceInfo?: string;
-  ipAddress?: string;
   createdAt: Date;
 }
 
@@ -28,7 +26,6 @@ export interface IUser {
   loginAttempts: number;
   lockoutUntil?: Date;
   lastLogin?: Date;
-  lastLoginIP?: string;
   
   // Token management
   refreshTokens: IRefreshToken[];
@@ -252,10 +249,18 @@ export class Database {
   // Refresh token operations
   async addRefreshToken(userId: ObjectId, refreshToken: IRefreshToken): Promise<void> {
     const db = await this.getDb();
+
+    // Sanitize the token to ensure only allowed fields are stored
+    const sanitizedToken: IRefreshToken = {
+      token: refreshToken.token,
+      expiresAt: refreshToken.expiresAt,
+      createdAt: refreshToken.createdAt,
+    };
+
     await db.collection('users').updateOne(
       { _id: userId },
       { 
-        $push: { refreshTokens: refreshToken },
+        $push: { refreshTokens: sanitizedToken },
         $set: { updatedAt: new Date() }
       }
     );
@@ -338,16 +343,16 @@ export class Database {
     );
   }
 
-  async updateLastLogin(userId: ObjectId, ipAddress?: string): Promise<void> {
+  async updateLastLogin(userId: ObjectId): Promise<void> {
     const db = await this.getDb();
     await db.collection('users').updateOne(
       { _id: userId },
       { 
         $set: { 
           lastLogin: new Date(),
-          lastLoginIP: ipAddress,
           updatedAt: new Date()
-        }
+        },
+        $unset: { lastLoginIP: "" } // Remove the lastLoginIP field
       }
     );
   }
@@ -421,7 +426,7 @@ export class Database {
   }
 
   // Security event logging
-  async logSecurityEvent(eventData: Omit<ISecurityEvent, '_id' | 'timestamp'>): Promise<void> {
+  async logSecurityEvent(eventData: Omit<ISecurityEvent, '_id' | 'timestamp' | 'ipAddress' | 'userAgent'>): Promise<void> {
     const db = await this.getDb();
     await db.collection('securityevents').insertOne({
       ...eventData,
@@ -528,8 +533,8 @@ export const database = {
     return this.getInstance().resetLoginAttempts(email);
   },
   
-  async updateLastLogin(userId: Parameters<Database['updateLastLogin']>[0], ipAddress?: string) {
-    return this.getInstance().updateLastLogin(userId, ipAddress);
+  async updateLastLogin(userId: Parameters<Database['updateLastLogin']>[0]) {
+    return this.getInstance().updateLastLogin(userId);
   },
   
   async setEmailVerificationToken(email: string, token: string, expiresAt: Date) {
