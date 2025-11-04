@@ -4,6 +4,7 @@ import type { Metadata } from "next"
 import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Suspense } from "react"
+import Script from "next/script"
 import { cairo } from "./fonts"
 
 import "./globals.css"
@@ -36,15 +37,13 @@ export default function RootLayout({
       <head>
         {/* DNS Prefetch for external domains */}
         <link rel="dns-prefetch" href="//res.cloudinary.com" />
-        <link rel="dns-prefetch" href="//images.unsplash.com" />
 
         {/* Preconnect for critical resources */}
         <link rel="preconnect" href="https://res.cloudinary.com" />
-        <link rel="preconnect" href="https://images.unsplash.com" />
 
-        {/* Optimize JavaScript loading */}
-        <script dangerouslySetInnerHTML={{
-          __html: `
+        {/* Optimize JavaScript loading without blocking rendering */}
+        <Script id="app-init" strategy="afterInteractive">
+          {`
             // Preload critical resources
             if ('requestIdleCallback' in window) {
               requestIdleCallback(() => {
@@ -54,17 +53,17 @@ export default function RootLayout({
                 document.head.appendChild(link);
               });
             }
-            
+
             // Register service worker
             if ('serviceWorker' in navigator) {
               window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/sw.js')
-                  .then(registration => console.log('SW registered'))
-                  .catch(error => console.log('SW registration failed'));
+                  .then(() => console.log('SW registered'))
+                  .catch(() => console.log('SW registration failed'));
               });
             }
-          `
-        }} />
+          `}
+        </Script>
 
         {/* Critical CSS for above-the-fold content */}
         <style dangerouslySetInnerHTML={{
@@ -85,10 +84,10 @@ export default function RootLayout({
         }} />
 
         {/* Favicon and app icons */}
-        <link rel="icon" type="image/png" sizes="32x32" href="/logo.png?v=2" />
-        <link rel="icon" type="image/png" sizes="16x16" href="/logo.png?v=2" />
-        <link rel="shortcut icon" href="/logo.png?v=2" type="image/png" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/logo.png?v=2" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+        <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+        <link rel="shortcut icon" href="/favicon-32.png" type="image/png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
         <link rel="manifest" href="/manifest.json" />
 
         {/* Theme and viewport */}

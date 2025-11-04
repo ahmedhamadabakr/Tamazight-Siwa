@@ -96,6 +96,42 @@ const nextConfig = {
         { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
       ],
     },
+    // Long-term caching for image assets served from public root
+    {
+      source: '/:slug*\\.(png|jpg|jpeg|webp|avif|svg|ico)',
+      headers: [
+        { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+      ],
+    },
+    // Long-term caching for video assets served from public root
+    {
+      source: '/:slug*\\.(mp4|webm)',
+      headers: [
+        { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+      ],
+    },
+    // Long-term caching for web fonts served from public root
+    {
+      source: '/:slug*\\.(woff2|woff|ttf|otf)',
+      headers: [
+        { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+      ],
+    },
+    // Long-term caching for captions and media text tracks
+    {
+      source: '/:slug*\\.(vtt)',
+      headers: [
+        { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+      ],
+    },
+    // Reasonable caching for public root text/json/xml assets
+    // e.g., robots.txt, sitemap.xml, manifest.json
+    {
+      source: '/:slug*\\.(json|xml|txt)',
+      headers: [
+        { key: 'Cache-Control', value: 'public, max-age=86400' },
+      ],
+    },
     {
       source: '/images/(.*)',
       headers: [
