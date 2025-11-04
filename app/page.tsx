@@ -26,7 +26,9 @@ export default function HomePage() {
       {/* Essential optimizations handled in root layout */}
       
       <main className="min-h-screen">
-        <ClientOnlyNavigation />
+        <div className="h-14 md:h-16">
+          <ClientOnlyNavigation />
+        </div>
         <HeroSection />
         <FeaturedTours />
         <StatsSection />

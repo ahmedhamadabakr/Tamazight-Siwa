@@ -54,7 +54,7 @@ export default function LoginPage() {
           src="/siwa-oasis-traditional-berber-architecture-at-suns.jpg"
           alt="Siwa Oasis"
           fill
-          style={{objectFit: "cover"}}
+          style={{ objectFit: "cover" }}
           className="opacity-20"
         />
         <div className="relative z-20 flex items-center text-lg font-medium">
@@ -77,12 +77,12 @@ export default function LoginPage() {
       <div className="flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
         <div className="mx-auto grid w-[350px] gap-6">
           <div className="grid gap-2 text-center">
-            <h1 className="text-3xl font-bold">Login</h1>
-            <p className="text-balance text-muted-foreground">
+            <h1 className="text-3xl font-bold text-primary dark:text-primary-foreground lg:text-4xl md:text-3xl sm:text-2xl py-2">Login</h1>
+            <p className="text-balance text-muted-foreground my-2">
               Enter your email below to login to your account
             </p>
             {(urlError || error) && (
-              <p className="mt-2 text-sm text-red-600">
+              <p className="my-2 text-sm text-red-600">
                 {error || 'Sign-in error. Please try again.'}
               </p>
             )}
@@ -114,24 +114,10 @@ export default function LoginPage() {
               {loading ? 'Signing in...' : 'Login'}
             </Button>
           </form>
-          <div className="relative my-4">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-background px-2 text-muted-foreground">
-                Or continue with
-              </span>
-            </div>
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <Button variant="outline">
-              <FaGoogle className="mr-2 h-4 w-4" />
-              Google
-            </Button>
-          </div>
+
+
           <div className="mt-4 text-center text-sm">
-            Don&apos;t have an account?{" "}
+            Don&apos;t have an account?{" "}  
             <Link href="/register" className="underline">
               Sign up
             </Link>
