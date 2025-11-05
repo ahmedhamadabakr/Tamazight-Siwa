@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth/next';
-import { authOptions } from '@/lib/auth';
+import { getServerAuthSession } from '@/lib/server-auth';
 import dbConnect from '@/lib/mongodb';
 import { database } from '@/lib/models';
 
 export async function GET(req: NextRequest) {
-  const session = await getServerSession(authOptions);
+  const session = await getServerAuthSession();
 
   if (!session || !session.user) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -14,7 +13,11 @@ export async function GET(req: NextRequest) {
   try {
     await dbConnect();
     // The user id from the session is in session.user.id
-    const user = await database.findUserById(session.user.id);
+    const userId = (session.user as any)?.id;
+    if (!userId) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const user = await database.findUserById(userId);
 
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
