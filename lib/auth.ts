@@ -13,7 +13,6 @@ export const authOptions = {
         rememberMe: { label: 'Remember Me', type: 'checkbox' }
       },
       async authorize(credentials, req) {
-        const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress;
         try {
           
 
@@ -53,7 +52,6 @@ export const authOptions = {
             // Log the error and re-throw it to be handled by NextAuth
             console.error('Credentials provider error:', {
                 message: error.message,
-                ip,
                 email: credentials?.email,
             });
             throw error;

@@ -1,8 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
-import { database } from '@/lib/models';
-import { SecurityErrorCodes } from '@/lib/security';
-import { rateLimitService } from '@/lib/security/rate-limit';
 
 export async function DELETE(
   request: NextRequest,

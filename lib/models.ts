@@ -23,7 +23,6 @@ export interface IUser {
   role: "user" | "manager" | "admin";
   
   // Security fields
-  loginAttempts: number;
   lockoutUntil?: Date;
   lastLogin?: Date;
   
@@ -155,7 +154,6 @@ export class Database {
       updatedAt: now,
       role: userData.role || "user",
       country: userData.country || "",
-      loginAttempts: 0,
       refreshTokens: [],
       isActive: false, // Require email verification by default
     };

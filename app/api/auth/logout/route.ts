@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
-import { getToken } from 'next-auth/jwt';
-import { database } from '@/lib/models';
-import { rateLimitService } from '@/lib/security/rate-limit';
-import { SecurityErrorCodes } from '@/lib/security';
 
 function isSecureCookie(): boolean {
   try {
