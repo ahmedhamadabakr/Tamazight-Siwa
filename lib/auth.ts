@@ -13,10 +13,12 @@ export const authOptions = {
         rememberMe: { label: 'Remember Me', type: 'checkbox' }
       },
       async authorize(credentials, req) {
+        console.log('Attempting to authorize user...');
         try {
           
 
           if (!credentials?.email || !credentials?.password) {
+            console.log('Authorization failed: Missing email or password.');
             return null;
           }
 
@@ -25,20 +27,22 @@ export const authOptions = {
 
           const user = await database.findUserByEmail(email);
           if (!user) {
+            console.log(`Authorization failed: User with email ${email} not found.`);
             return null;
           }
 
           if (!user.isActive) {
+            console.log(`Authorization failed: User ${email} account is not activated.`);
             throw new Error('Your account is not activated. Please check your email.');
           }
 
           const isPasswordValid = await comparePassword(password, user.password);
           if (!isPasswordValid) {
+            console.log(`Authorization failed: Invalid password for user ${email}.`);
             return null;
           }
 
-          
-
+          console.log(`User ${email} authorized successfully.`);
           return {
             id: user._id!.toString(),
             name: user.name,
@@ -94,8 +98,18 @@ export const authOptions = {
     },
 
     async redirect({ url, baseUrl }: any) {
-      if (url.startsWith('/')) return `${baseUrl}${url}`;
-      else if (new URL(url).origin === baseUrl) return url;
+      console.log('Redirecting...');
+      console.log('URL:', url);
+      console.log('Base URL:', baseUrl);
+      if (url.startsWith('/')) {
+        console.log('Redirecting to absolute path:', `${baseUrl}${url}`);
+        return `${baseUrl}${url}`;
+      }
+      else if (new URL(url).origin === baseUrl) {
+        console.log('Redirecting to same origin URL:', url);
+        return url;
+      }
+      console.log('Redirecting to base URL:', baseUrl);
       return baseUrl;
     }
   },

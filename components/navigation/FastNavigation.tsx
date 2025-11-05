@@ -24,7 +24,7 @@ const preloadRoutes = ['/tours', '/gallery', '/about', '/login', '/register'];
 export const FastNavigation = memo(function FastNavigation() {
   const [isOpen, setIsOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-  const { data: session, status, update } = useSession();
+  const { data: session, status } = useSession();
   const { logout, subscribeToAuthChanges } = useAuth();
   const [localUser, setLocalUser] = useState<SessionUser | undefined>();
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -37,22 +37,13 @@ export const FastNavigation = memo(function FastNavigation() {
   // Subscribe to auth changes
   useEffect(() => {
     const unsubscribe = subscribeToAuthChanges(() => {
-      // Force update the session when auth state changes
-      update().then((updatedSession) => {
-        // Clear local state if user is not authenticated
-        if (!updatedSession) {
-          setLocalUser(undefined);
-        } else {
-          setLocalUser(updatedSession.user as SessionUser | undefined);
-        }
-        // Close any open dropdowns
-        setIsDropdownOpen(false);
-        setIsOpen(false);
-      });
+      // Close any open dropdowns (avoid forcing session updates here to prevent loops)
+      setIsDropdownOpen(false);
+      setIsOpen(false);
     });
     
     return () => unsubscribe();
-  }, [subscribeToAuthChanges, update]);
+  }, [subscribeToAuthChanges]);
   
   const userRole = localUser?.role;
 

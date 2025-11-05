@@ -71,7 +71,6 @@ export default function LoginPage() {
         } else {
           router.replace('/');
         }
-        router.refresh();
       } else {
         const message = mapAuthError(res?.error ?? null);
         setError(message);

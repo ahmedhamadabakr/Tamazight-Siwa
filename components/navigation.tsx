@@ -38,14 +38,12 @@ const NavigationComponent = memo(function Navigation() {
   // Subscribe to auth changes
   useEffect(() => {
     const unsubscribe = subscribeToAuthChanges(() => {
-      // Force update the session when auth state changes
-      updateSession();
-      // Close any open dropdowns
+      // Close any open dropdowns (avoid forcing session updates here to prevent loops)
       setIsOpen(false);
     });
     
     return () => unsubscribe();
-  }, [subscribeToAuthChanges, updateSession]);
+  }, [subscribeToAuthChanges]);
 
   const userRole = localUser?.role;
 
