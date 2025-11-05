@@ -39,13 +39,22 @@ export const authOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: false,
+      authorization: {
+        params: {
+          prompt: 'consent',
+          access_type: 'offline',
+          response_type: 'code',
+          scope: 'openid email profile',
+        },
+      },
       profile(profile) {
         return {
-          id: profile.sub || profile.id,
+          id: profile.sub,
           name: profile.name,
           email: profile.email,
           image: profile.picture,
+          role: 'user', // Default role for Google sign-ups
+          fullName: profile.name,
         } as any;
       }
     })
