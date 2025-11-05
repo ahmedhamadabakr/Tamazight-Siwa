@@ -77,7 +77,7 @@ export function useAuth(): UseAuthReturn {
   // Notify subscribers when auth state changes
   useEffect(() => {
     authChangeCallbacks.forEach(callback => callback());
-  }, [isAuthenticated, user?.id]); // إزالة authChangeCallbacks من dependencies
+  }, [isAuthenticated, user?.id, authChangeCallbacks]);
 
   const logout = useCallback(async (options?: {
     redirect?: boolean;
@@ -89,7 +89,10 @@ export function useAuth(): UseAuthReturn {
         router.push(options?.callbackUrl || '/login');
         return;
       }
-      await signOut({ callbackUrl: options?.callbackUrl || '/login' });
+      await signOut({ 
+        callbackUrl: options?.callbackUrl || '/login',
+        redirect: true 
+      });
     } catch (error) {
       console.error('Logout error:', error);
       router.push('/login');

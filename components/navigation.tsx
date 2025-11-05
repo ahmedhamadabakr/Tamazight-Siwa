@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback, useMemo, memo } from "react";
 import Link from "next/link";
 import { useSession, signOut } from "next-auth/react";
 import { useAuth } from "@/hooks/useAuth";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Phone, User, LogOut, Settings, Shield } from "lucide-react";
 import Image from "next/image";
@@ -27,6 +27,7 @@ const NavigationComponent = memo(function Navigation() {
   const { data: session, status, update: updateSession } = useSession();
   const { logout, subscribeToAuthChanges } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
   const [localUser, setLocalUser] = useState<SessionUser | null>(null);
 
   // Keep local user state in sync with session
@@ -102,18 +103,19 @@ const NavigationComponent = memo(function Navigation() {
     setIsOpen(false);
 
     try {
-      // Sign out without a redirect to handle it manually
-      await logout({ redirect: false });
-
-      // Manually force a full page reload to the home page to clear all state
-      window.location.href = '/';
+      // Perform the actual logout with proper redirect handling
+      await logout({ 
+        callbackUrl: '/login',
+        redirect: true 
+      });
     } catch (error) {
       console.error("Sign out error:", error);
-      // If signout fails, still force a redirect to clear state
-      window.location.href = `/?error=logout_failed&t=${Date.now()}`;
+      // Fallback: try to redirect to login page
+      router.push('/login');
+    } finally {
+      setIsSigningOut(false);
     }
-    // The page will reload, so no need to set isSigningOut back to false
-  }, [isSigningOut, logout]);
+  }, [isSigningOut, logout, router]);
 
   const navClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
     scrolled

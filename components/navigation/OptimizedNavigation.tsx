@@ -41,7 +41,10 @@ export function OptimizedNavigation() {
   // Handle sign out
   const handleSignOutClick = async () => {
     try {
-      await logout({ callbackUrl: '/' });
+      await logout({ 
+        callbackUrl: '/login',
+        redirect: true 
+      });
     } finally {
       setIsOpen(false);
     }

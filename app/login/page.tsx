@@ -61,7 +61,16 @@ export default function LoginPage() {
       if (res?.ok) {
         // Ensure session is up-to-date for navbar and other listeners
         await update();
-        router.replace(callbackUrl);
+        
+        // Small delay to ensure session state is properly updated
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        // Only redirect if callbackUrl is not the login page itself
+        if (callbackUrl !== '/login') {
+          router.replace(callbackUrl);
+        } else {
+          router.replace('/');
+        }
         router.refresh();
       } else {
         const message = mapAuthError(res?.error ?? null);

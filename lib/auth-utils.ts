@@ -1,6 +1,6 @@
 import { signOut } from 'next-auth/react';
 
-export const handleSignOut = async (redirectPath: string = '/') => {
+export const handleSignOut = async (redirectPath: string = '/login') => {
   // Clear all NextAuth cookies
   await signOut({ 
     callbackUrl: redirectPath,

@@ -74,38 +74,17 @@ export const FastNavigation = memo(function FastNavigation() {
       setIsDropdownOpen(false);
       setIsOpen(false);
       
-      // Clear all auth-related data from client storage
-      if (typeof window !== 'undefined') {
-        // Clear all auth-related data
-        const authKeys = Object.keys(localStorage).filter(key => 
-          key.startsWith('next-auth.') || 
-          key.startsWith('auth.') ||
-          key.startsWith('token')
-        );
-        
-        authKeys.forEach(key => localStorage.removeItem(key));
-        sessionStorage.clear();
-        
-        // Clear any service worker caches that might contain auth data
-        if ('caches' in window) {
-          caches.keys().then(cacheNames => {
-            cacheNames.forEach(cacheName => caches.delete(cacheName));
-          });
-        }
-      }
-      
-      // Perform the actual logout
+      // Perform the actual logout with proper redirect handling
       await logout({ 
-        callbackUrl: '/',
-        redirect: false // We'll handle the redirect manually
+        callbackUrl: '/login',
+        redirect: true 
       });
-      
-      // Force a hard redirect with cache busting
-      window.location.href = `/?logout=${Date.now()}`;
     } catch (error) {
       console.error("Sign out error:", error);
-      // Force redirect on error with cache busting
-      window.location.href = `/?error=logout_failed&t=${Date.now()}`;
+      // Fallback: try to redirect to login page
+      window.location.href = '/login';
+    } finally {
+      setIsSigningOut(false);
     }
   }, [isSigningOut, logout]);
 
