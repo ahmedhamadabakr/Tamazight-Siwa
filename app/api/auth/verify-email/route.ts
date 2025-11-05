@@ -1,48 +1,25 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { database } from '@/lib/models';
 import { SecurityErrorCodes } from '@/lib/security';
-import { rateLimitService } from '@/lib/security/rate-limit';
+
+// Simple function to get client IP
+function getClientIP(request: NextRequest): string {
+  return request.headers.get('x-forwarded-for') || 
+         request.headers.get('x-real-ip') || 
+         '127.0.0.1';
+}
 
 export async function POST(request: NextRequest) {
   try {
-    // Get client IP for rate limiting and logging
-    const clientIP = rateLimitService.getClientIP(request);
+    // Get client IP for logging
+    const clientIP = getClientIP(request);
     const userAgent = request.headers.get('user-agent') || 'Unknown';
 
-    // Check rate limiting for email verification (5 attempts per hour per IP)
-    /* const ipRateLimit = await rateLimitService.checkLoginAttempts(`verify_${clientIP}`);
-    if (!ipRateLimit.allowed) {
-      await database.logSecurityEvent({
-        eventType: 'RATE_LIMIT_EXCEEDED',
-        ipAddress: clientIP,
-        userAgent,
-        details: { identifier: `verify_${clientIP}`, type: 'email_verification', retryAfter: ipRateLimit.retryAfter }
-      });
-
-      return NextResponse.json(
-        { 
-          success: false, 
-          error: {
-            code: SecurityErrorCodes.RATE_LIMIT_EXCEEDED,
-            message: `Too many verification attempts. Try again in ${ipRateLimit.retryAfter} seconds.`,
-            details: { retryAfter: ipRateLimit.retryAfter }
-          }
-        },
-        { 
-          status: 429,
-          headers: {
-            'Retry-After': ipRateLimit.retryAfter?.toString() || '3600'
-          }
-        }
-      );
-    }
- */
     // Parse request body
     const body = await request.json();
     const { token } = body;
 
     if (!token) {
-      // await rateLimitService.recordLoginAttempt(`verify_${clientIP}`, false);
       return NextResponse.json(
         { 
           success: false, 
@@ -59,7 +36,6 @@ export async function POST(request: NextRequest) {
     const verifiedUser = await database.verifyEmail(token);
 
     if (!verifiedUser) {
-      // await rateLimitService.recordLoginAttempt(`verify_${clientIP}`, false);
       await database.logSecurityEvent({
         eventType: 'LOGIN_FAILED',
         ipAddress: clientIP,
@@ -80,7 +56,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Record successful verification
-    // await rateLimitService.recordLoginAttempt(`verify_${clientIP}`, true);
     await database.logSecurityEvent({
       userId: verifiedUser._id,
       eventType: 'LOGIN_SUCCESS',
@@ -110,7 +85,7 @@ export async function POST(request: NextRequest) {
     
     // Log security event for unexpected errors
     try {
-      const clientIP = rateLimitService.getClientIP(request);
+      const clientIP = getClientIP(request);
       await database.logSecurityEvent({
         eventType: 'LOGIN_FAILED',
         ipAddress: clientIP,
@@ -144,7 +119,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get client IP for logging
-    const clientIP = rateLimitService.getClientIP(request);
+    const clientIP = getClientIP(request);
     const userAgent = request.headers.get('user-agent') || 'Unknown';
 
     // Verify email using the token

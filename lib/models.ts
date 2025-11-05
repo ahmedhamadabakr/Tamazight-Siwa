@@ -23,7 +23,6 @@ export interface IUser {
   role: "user" | "manager" | "admin";
   
   // Security fields
-  lockoutUntil?: Date;
   lastLogin?: Date;
   
   // Token management
@@ -62,21 +61,11 @@ export interface IVerificationCode {
   createdAt?: Date;
 }
 
-// Rate limiting interface
-export interface IRateLimit {
-  _id?: ObjectId;
-  identifier: string; // IP address or email
-  attempts: number;
-  lastAttempt: Date;
-  resetTime: Date;
-  createdAt?: Date;
-}
-
 // Security event logging interface
 export interface ISecurityEvent {
   _id?: ObjectId;
   userId?: ObjectId;
-  eventType: 'LOGIN_SUCCESS' | 'LOGIN_FAILED' | 'ACCOUNT_LOCKED' | 'TOKEN_REFRESH' | 'PERMISSION_DENIED' | 'RATE_LIMIT_EXCEEDED';
+  eventType: 'LOGIN_SUCCESS' | 'LOGIN_FAILED' | 'TOKEN_REFRESH' | 'PERMISSION_DENIED';
   ipAddress?: string;
   userAgent?: string;
   details?: any;
@@ -116,7 +105,6 @@ export class Database {
       await Promise.allSettled([
         db.collection('users').createIndex({ email: 1 }, { unique: true, background: true }),
         db.collection('users').createIndex({ 'refreshTokens.token': 1 }, { background: true }),
-        db.collection('ratelimits').createIndex({ identifier: 1 }, { unique: true, background: true }),
         db.collection('securityevents').createIndex({ userId: 1, timestamp: -1 }, { background: true }),
       ]);
     } catch (error) {
@@ -278,36 +266,6 @@ export class Database {
     return result.value;
   }
 
-  // Rate limiting operations
-  async getRateLimit(identifier: string): Promise<IRateLimit | null> {
-    const db = await this.getDb();
-    return await db.collection('ratelimits').findOne({ identifier });
-  }
-
-  async createOrUpdateRateLimit(rateLimitData: Omit<IRateLimit, '_id'>): Promise<void> {
-    const db = await this.getDb();
-    await db.collection('ratelimits').updateOne(
-      { identifier: rateLimitData.identifier },
-      { 
-        $set: rateLimitData,
-        $setOnInsert: { createdAt: new Date() }
-      },
-      { upsert: true }
-    );
-  }
-
-  async resetRateLimit(identifier: string): Promise<void> {
-    const db = await this.getDb();
-    await db.collection('ratelimits').deleteOne({ identifier });
-  }
-
-  async cleanExpiredRateLimits(): Promise<void> {
-    const db = await this.getDb();
-    await db.collection('ratelimits').deleteMany({
-      resetTime: { $lt: new Date() }
-    });
-  }
-
   // Security event logging
   async logSecurityEvent(eventData: Omit<ISecurityEvent, '_id' | 'timestamp' | 'ipAddress' | 'userAgent'>): Promise<void> {
     const db = await this.getDb();
@@ -376,22 +334,6 @@ export const database = {
   
   async verifyEmail(token: string) {
     return this.getInstance().verifyEmail(token);
-  },
-  
-  async getRateLimit(identifier: string) {
-    return this.getInstance().getRateLimit(identifier);
-  },
-  
-  async createOrUpdateRateLimit(rateLimitData: Parameters<Database['createOrUpdateRateLimit']>[0]) {
-    return this.getInstance().createOrUpdateRateLimit(rateLimitData);
-  },
-  
-  async resetRateLimit(identifier: string) {
-    return this.getInstance().resetRateLimit(identifier);
-  },
-  
-  async cleanExpiredRateLimits() {
-    return this.getInstance().cleanExpiredRateLimits();
   },
   
   async logSecurityEvent(eventData: Parameters<Database['logSecurityEvent']>[0]) {

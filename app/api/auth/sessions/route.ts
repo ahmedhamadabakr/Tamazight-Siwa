@@ -1,7 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
-import { database } from '@/lib/models';
-import { SecurityErrorCodes } from '@/lib/security';
 
 export async function GET(request: NextRequest) {
   return NextResponse.json(

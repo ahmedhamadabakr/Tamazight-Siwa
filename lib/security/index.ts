@@ -3,13 +3,13 @@ export * from './config';
 export * from './password';
 export * from './tokens';
 export * from './validation';
-export * from './rate-limit';
 export * from './cleanup';
-export * from './constants';
 
 // Re-export commonly used types
 export type {
   PasswordStrength,
+} from './password';
+export type {
   JWTPayload,
   TokenPair,
   RefreshTokenData,
@@ -18,12 +18,10 @@ export type {
 // Security error types
 export enum SecurityErrorCodes {
   INVALID_CREDENTIALS = 'INVALID_CREDENTIALS',
-  ACCOUNT_LOCKED = 'ACCOUNT_LOCKED',
   EMAIL_NOT_VERIFIED = 'EMAIL_NOT_VERIFIED',
   TOKEN_EXPIRED = 'TOKEN_EXPIRED',
   TOKEN_INVALID = 'TOKEN_INVALID',
   INSUFFICIENT_PERMISSIONS = 'INSUFFICIENT_PERMISSIONS',
-  RATE_LIMIT_EXCEEDED = 'RATE_LIMIT_EXCEEDED',
   WEAK_PASSWORD = 'WEAK_PASSWORD',
   INVALID_INPUT = 'INVALID_INPUT',
 }

@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { database } from '@/lib/models';
-import { 
-  generateAccessToken,
-  generateRefreshToken,
-  SecurityErrorCodes 
-} from '@/lib/security';
-import { rateLimitService } from '@/lib/security/rate-limit';
+
 
 export async function POST(request: NextRequest) {
   return NextResponse.json(

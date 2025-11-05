@@ -62,8 +62,6 @@ export class SecurityCleanupService {
       // Run cleanup tasks in parallel
       await Promise.allSettled([
         this.cleanupExpiredRefreshTokens(),
-        this.cleanupExpiredRateLimits(),
-        this.cleanupOldSecurityEvents(),
       ]);
 
       const duration = Date.now() - startTime;
@@ -84,49 +82,6 @@ export class SecurityCleanupService {
     } catch (error) {
       console.error('Error cleaning up expired refresh tokens:', error);
     }
-  }
-
-  /**
-   * Clean up expired rate limits
-   */
-  private async cleanupExpiredRateLimits(): Promise<void> {
-    try {
-      await database.cleanExpiredRateLimits();
-      console.log('Cleaned up expired rate limits');
-    } catch (error) {
-      console.error('Error cleaning up expired rate limits:', error);
-    }
-  }
-
-  /**
-   * Clean up old security events (keep last 1000 per user, or events older than 90 days)
-   */
-  private async cleanupOldSecurityEvents(): Promise<void> {
-    try {
-      // This would require a new database method
-      // For now, we'll just log that this cleanup is needed
-      console.log('Security events cleanup - implementation needed');
-    } catch (error) {
-      console.error('Error cleaning up old security events:', error);
-    }
-  }
-
-  /**
-   * Manual cleanup trigger
-   */
-  async runManualCleanup(): Promise<void> {
-    console.log('Running manual security cleanup...');
-    await this.runCleanup();
-  }
-
-  /**
-   * Get cleanup service status
-   */
-  getStatus(): { isRunning: boolean; intervalSet: boolean } {
-    return {
-      isRunning: this.isRunning,
-      intervalSet: this.cleanupInterval !== null,
-    };
   }
 }
 

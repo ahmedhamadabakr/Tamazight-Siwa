@@ -101,7 +101,7 @@ export const authOptions = {
   },
 
   events: {
-    async signIn({ user, account, profile, isNewUser }: any) {
+    async signIn({ user}: any) {
       console.log('User signed in:', { userId: user.id, email: user.email });
     },
 
