@@ -102,18 +102,20 @@ const NavigationComponent = memo(function Navigation() {
 
     try {
       // Perform the actual logout with proper redirect handling
+      const cb = `/login?callbackUrl=${encodeURIComponent(pathname || '/')}`;
       await logout({ 
-        callbackUrl: '/login',
+        callbackUrl: cb,
         redirect: true 
       });
     } catch (error) {
       console.error("Sign out error:", error);
       // Fallback: try to redirect to login page
-      router.push('/login');
+      const cb = `/login?callbackUrl=${encodeURIComponent(pathname || '/')}`;
+      router.push(cb);
     } finally {
       setIsSigningOut(false);
     }
-  }, [isSigningOut, logout, router]);
+  }, [isSigningOut, logout, router, pathname]);
 
   const navClasses = `fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
     scrolled

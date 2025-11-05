@@ -61,16 +61,35 @@ export default function LoginPage() {
       if (res?.ok) {
         // Ensure session is up-to-date for navbar and other listeners
         await update();
-        
-        // Small delay to ensure session state is properly updated
-        await new Promise(resolve => setTimeout(resolve, 100));
-        
-        // Only redirect if callbackUrl is not the login page itself
-        if (callbackUrl !== '/login') {
-          router.replace(callbackUrl);
-        } else {
-          router.replace('/');
+
+        // Wait briefly until session cookie is readable by middleware
+        for (let i = 0; i < 10; i++) {
+          try {
+            const s = await fetch('/api/auth/session', { cache: 'no-store' });
+            const json = await s.json();
+            if (json?.user?.id) break;
+          } catch {}
+          await new Promise(r => setTimeout(r, 100));
         }
+
+        // Determine safe redirect target
+        let target = '/';
+        if (callbackUrl && callbackUrl !== '/login') {
+          target = callbackUrl;
+        } else {
+          try {
+            const uRes = await fetch('/api/user/fetch_user', { cache: 'no-store' });
+            if (uRes.ok) {
+              const u = await uRes.json();
+              const id = u?._id || u?.id;
+              const role = u?.role;
+              if (id && (role === 'admin' || role === 'manager')) target = `/dashboard/${id}`;
+              else if (id) target = `/user/${id}`;
+            }
+          } catch {}
+        }
+
+        router.replace(target);
       } else {
         const message = mapAuthError(res?.error ?? null);
         setError(message);

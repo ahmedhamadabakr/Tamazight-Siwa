@@ -84,18 +84,26 @@ export function useAuth(): UseAuthReturn {
     callbackUrl?: string;
   }) => {
     try {
-      if (options?.redirect === false) {
-        await signOut({ redirect: false });
-        router.push(options?.callbackUrl || '/login');
-        return;
+      // Always perform client-side navigation to avoid redirect races
+      await signOut({ redirect: false });
+
+      // Clear client storages
+      if (typeof window !== 'undefined') {
+        try {
+          localStorage.clear();
+        } catch {}
+        try {
+          sessionStorage.clear();
+        } catch {}
       }
-      await signOut({ 
-        callbackUrl: options?.callbackUrl || '/login',
-        redirect: true 
-      });
+
+      router.replace(options?.callbackUrl || '/login');
+      // Ensure UI reads new auth state
+      router.refresh();
     } catch (error) {
       console.error('Logout error:', error);
-      router.push('/login');
+      router.replace('/login');
+      router.refresh();
     }
   }, [router]);
 
