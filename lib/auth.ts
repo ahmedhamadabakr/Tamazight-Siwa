@@ -8,7 +8,7 @@ import { comparePassword } from '@/lib/security/password';
 // A more robust solution would use a database or a service like Redis.
 const loginAttempts: { [ip: string]: { count: number; lastAttempt: number } } = {};
 
-const handleFailedAttempt = (ip: string | undefined | null) => {
+/* const handleFailedAttempt = (ip: string | undefined | null) => {
     if (!ip) return;
     const now = Date.now();
     const attempts = loginAttempts[ip] || { count: 0, lastAttempt: now };
@@ -17,7 +17,7 @@ const handleFailedAttempt = (ip: string | undefined | null) => {
     } else {
         loginAttempts[ip] = { count: attempts.count + 1, lastAttempt: now };
     }
-};
+}; */
 
 export const authOptions = {
   providers: [
@@ -48,7 +48,7 @@ export const authOptions = {
 
           const user = await database.findUserByEmail(email);
           if (!user) {
-            handleFailedAttempt(ip);
+         /*    handleFailedAttempt(ip); */
             return null;
           }
 
@@ -58,7 +58,7 @@ export const authOptions = {
 
           const isPasswordValid = await comparePassword(password, user.password);
           if (!isPasswordValid) {
-            handleFailedAttempt(ip);
+            // handleFailedAttempt(ip);
             return null;
           }
 

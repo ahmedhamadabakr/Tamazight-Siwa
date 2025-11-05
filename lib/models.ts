@@ -246,55 +246,6 @@ export class Database {
     return result.value;
   }
 
-  // Refresh token operations
-  async addRefreshToken(userId: ObjectId, refreshToken: IRefreshToken): Promise<void> {
-    const db = await this.getDb();
-
-    // Sanitize the token to ensure only allowed fields are stored
-    const sanitizedToken: IRefreshToken = {
-      token: refreshToken.token,
-      expiresAt: refreshToken.expiresAt,
-      createdAt: refreshToken.createdAt,
-    };
-
-    await db.collection('users').updateOne(
-      { _id: userId },
-      { 
-        $push: { refreshTokens: sanitizedToken },
-        $set: { updatedAt: new Date() }
-      }
-    );
-  }
-
-  async removeRefreshToken(userId: ObjectId, token: string): Promise<void> {
-    const db = await this.getDb();
-    await db.collection('users').updateOne(
-      { _id: userId },
-      { 
-        $pull: { refreshTokens: { token } },
-        $set: { updatedAt: new Date() }
-      }
-    );
-  }
-
-  async removeAllRefreshTokens(userId: ObjectId): Promise<void> {
-    const db = await this.getDb();
-    await db.collection('users').updateOne(
-      { _id: userId },
-      { 
-        $set: { refreshTokens: [], updatedAt: new Date() }
-      }
-    );
-  }
-
-  async findUserByRefreshToken(token: string): Promise<IUser | null> {
-    const db = await this.getDb();
-    return await db.collection('users').findOne({
-      'refreshTokens.token': token,
-      'refreshTokens.expiresAt': { $gt: new Date() }
-    });
-  }
-
   async cleanExpiredRefreshTokens(): Promise<void> {
     const db = await this.getDb();
     await db.collection('users').updateMany(
@@ -302,72 +253,6 @@ export class Database {
       { 
         $pull: { refreshTokens: { expiresAt: { $lt: new Date() } } },
         $set: { updatedAt: new Date() }
-      }
-    );
-  }
-
-  // Security operations
-  async incrementLoginAttempts(email: string): Promise<void> {
-    const db = await this.getDb();
-    await db.collection('users').updateOne(
-      { email },
-      { 
-        $inc: { loginAttempts: 1 },
-        $set: { updatedAt: new Date() }
-      }
-    );
-  }
-
-  async lockAccount(email: string, lockoutDuration: number): Promise<void> {
-    const db = await this.getDb();
-    const lockoutUntil = new Date(Date.now() + lockoutDuration);
-    await db.collection('users').updateOne(
-      { email },
-      { 
-        $set: { 
-          lockoutUntil,
-          updatedAt: new Date()
-        }
-      }
-    );
-  }
-
-  async resetLoginAttempts(email: string): Promise<void> {
-    const db = await this.getDb();
-    await db.collection('users').updateOne(
-      { email },
-      { 
-        $unset: { loginAttempts: 1, lockoutUntil: 1 },
-        $set: { updatedAt: new Date() }
-      }
-    );
-  }
-
-  async updateLastLogin(userId: ObjectId): Promise<void> {
-    const db = await this.getDb();
-    await db.collection('users').updateOne(
-      { _id: userId },
-      { 
-        $set: { 
-          lastLogin: new Date(),
-          updatedAt: new Date()
-        },
-        $unset: { lastLoginIP: "" } // Remove the lastLoginIP field
-      }
-    );
-  }
-
-  // Email verification operations
-  async setEmailVerificationToken(email: string, token: string, expiresAt: Date): Promise<void> {
-    const db = await this.getDb();
-    await db.collection('users').updateOne(
-      { email },
-      { 
-        $set: { 
-          emailVerificationToken: token,
-          emailVerificationExpiry: expiresAt,
-          updatedAt: new Date()
-        }
       }
     );
   }
@@ -433,16 +318,6 @@ export class Database {
       timestamp: new Date()
     });
   }
-
-  async getSecurityEvents(userId?: ObjectId, limit: number = 100): Promise<ISecurityEvent[]> {
-    const db = await this.getDb();
-    const query = userId ? { userId } : {};
-    return await db.collection('securityevents')
-      .find(query)
-      .sort({ timestamp: -1 })
-      .limit(limit)
-      .toArray();
-  }
 }
 
 // Export a singleton instance with lazy initialization
@@ -473,10 +348,6 @@ export const database = {
     return this.getInstance().updateUser(id, updateData);
   },
   
-  async migrateUsersAddFullName() {
-    return this.getInstance().migrateUsersAddFullName();
-  },
-  
   async createVerificationToken(tokenData: Parameters<Database['createVerificationToken']>[0]) {
     return this.getInstance().createVerificationToken(tokenData);
   },
@@ -501,44 +372,8 @@ export const database = {
     return this.getInstance().updateVerificationCode(code, updateData);
   },
   
-  async addRefreshToken(userId: Parameters<Database['addRefreshToken']>[0], refreshToken: Parameters<Database['addRefreshToken']>[1]) {
-    return this.getInstance().addRefreshToken(userId, refreshToken);
-  },
-  
-  async removeRefreshToken(userId: Parameters<Database['removeRefreshToken']>[0], token: string) {
-    return this.getInstance().removeRefreshToken(userId, token);
-  },
-  
-  async removeAllRefreshTokens(userId: Parameters<Database['removeAllRefreshTokens']>[0]) {
-    return this.getInstance().removeAllRefreshTokens(userId);
-  },
-  
-  async findUserByRefreshToken(token: string) {
-    return this.getInstance().findUserByRefreshToken(token);
-  },
-  
   async cleanExpiredRefreshTokens() {
     return this.getInstance().cleanExpiredRefreshTokens();
-  },
-  
-  async incrementLoginAttempts(email: string) {
-    return this.getInstance().incrementLoginAttempts(email);
-  },
-  
-  async lockAccount(email: string, lockoutDuration: number) {
-    return this.getInstance().lockAccount(email, lockoutDuration);
-  },
-  
-  async resetLoginAttempts(email: string) {
-    return this.getInstance().resetLoginAttempts(email);
-  },
-  
-  async updateLastLogin(userId: Parameters<Database['updateLastLogin']>[0]) {
-    return this.getInstance().updateLastLogin(userId);
-  },
-  
-  async setEmailVerificationToken(email: string, token: string, expiresAt: Date) {
-    return this.getInstance().setEmailVerificationToken(email, token, expiresAt);
   },
   
   async verifyEmail(token: string) {
@@ -563,9 +398,5 @@ export const database = {
   
   async logSecurityEvent(eventData: Parameters<Database['logSecurityEvent']>[0]) {
     return this.getInstance().logSecurityEvent(eventData);
-  },
-  
-  async getSecurityEvents(userId?: Parameters<Database['getSecurityEvents']>[0], limit?: number) {
-    return this.getInstance().getSecurityEvents(userId, limit);
   }
 };

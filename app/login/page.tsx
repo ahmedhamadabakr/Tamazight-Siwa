@@ -8,9 +8,8 @@ import { signIn, useSession } from 'next-auth/react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { LogIn, Mail, Lock } from 'lucide-react';
-import { FaGoogle, FaFacebook } from 'react-icons/fa';
+import { Mail, Lock } from 'lucide-react';
+
 
 export default function LoginPage() {
   const router = useRouter();
@@ -21,7 +20,8 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const callbackUrl = searchParams.get('callbackUrl') || '/';
+  const rawCallback = searchParams.get('callbackUrl');
+  const callbackUrl = rawCallback && rawCallback.startsWith('/') ? rawCallback : '/';
   const urlError = searchParams.get('error');
 
   const mapAuthError = (code?: string | null) => {
