@@ -3,22 +3,6 @@ import CredentialsProvider from 'next-auth/providers/credentials';
 import { database } from '@/lib/models';
 import { comparePassword } from '@/lib/security/password';
 
-// In-memory store for login attempts.
-// NOTE: This is not suitable for production at scale.
-// A more robust solution would use a database or a service like Redis.
-// const loginAttempts: { [ip: string]: { count: number; lastAttempt: number } } = {};
-
-/* const handleFailedAttempt = (ip: string | undefined | null) => {
-    if (!ip) return;
-    const now = Date.now();
-    const attempts = loginAttempts[ip] || { count: 0, lastAttempt: now };
-    if ((now - attempts.lastAttempt) > 60 * 1000 * 5) { // Reset after 5 minutes
-        loginAttempts[ip] = { count: 1, lastAttempt: now };
-    } else {
-        loginAttempts[ip] = { count: attempts.count + 1, lastAttempt: now };
-    }
-}; */
-
 export const authOptions = {
   providers: [
     CredentialsProvider({
@@ -31,13 +15,7 @@ export const authOptions = {
       async authorize(credentials, req) {
         const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress;
         try {
-          // if (ip) {
-          //   const now = Date.now();
-          //   const attempts = loginAttempts[ip];
-          //   if (attempts && attempts.count > 5 && (now - attempts.lastAttempt) < 60 * 1000 * 5) { // 5 attempts in 5 minutes
-          //       throw new Error('Too many login attempts. Please try again in 5 minutes.');
-          //   }
-          // }
+          
 
           if (!credentials?.email || !credentials?.password) {
             return null;
@@ -48,7 +26,6 @@ export const authOptions = {
 
           const user = await database.findUserByEmail(email);
           if (!user) {
-         /*    handleFailedAttempt(ip); */
             return null;
           }
 
@@ -58,13 +35,10 @@ export const authOptions = {
 
           const isPasswordValid = await comparePassword(password, user.password);
           if (!isPasswordValid) {
-            // handleFailedAttempt(ip);
             return null;
           }
 
-          if (ip) {
-            delete loginAttempts[ip];
-          }
+          
 
           return {
             id: user._id!.toString(),
