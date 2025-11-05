@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Menu, X, User, LogOut } from "lucide-react";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 type UserRole = 'user' | 'manager' | 'admin';
 
@@ -26,6 +27,7 @@ export const FastNavigation = memo(function FastNavigation() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const { data: session, status } = useSession();
   const { logout, subscribeToAuthChanges } = useAuth();
+  const pathname = usePathname();
   const [localUser, setLocalUser] = useState<SessionUser | undefined>();
   const [isSigningOut, setIsSigningOut] = useState(false);
   
@@ -66,18 +68,20 @@ export const FastNavigation = memo(function FastNavigation() {
       setIsOpen(false);
       
       // Perform the actual logout with proper redirect handling
+      const cb = `/login?callbackUrl=${encodeURIComponent(pathname || '/')}`;
       await logout({ 
-        callbackUrl: '/login',
+        callbackUrl: cb,
         redirect: true 
       });
     } catch (error) {
       console.error("Sign out error:", error);
       // Fallback: try to redirect to login page
-      window.location.href = '/login';
+      const cb = `/login?callbackUrl=${encodeURIComponent(pathname || '/')}`;
+      window.location.href = cb;
     } finally {
       setIsSigningOut(false);
     }
-  }, [isSigningOut, logout]);
+  }, [isSigningOut, logout, pathname]);
 
   const toggleMobileMenu = useCallback(() => {
     setIsOpen(prev => !prev);

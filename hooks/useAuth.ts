@@ -97,13 +97,21 @@ export function useAuth(): UseAuthReturn {
         } catch {}
       }
 
-      router.replace(options?.callbackUrl || '/login');
-      // Ensure UI reads new auth state
-      router.refresh();
+      const to = options?.callbackUrl || '/login';
+      if (typeof window !== 'undefined') {
+        window.location.assign(to);
+      } else {
+        router.replace(to);
+        router.refresh();
+      }
     } catch (error) {
       console.error('Logout error:', error);
-      router.replace('/login');
-      router.refresh();
+      if (typeof window !== 'undefined') {
+        window.location.assign('/login');
+      } else {
+        router.replace('/login');
+        router.refresh();
+      }
     }
   }, [router]);
 

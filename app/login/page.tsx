@@ -62,8 +62,8 @@ export default function LoginPage() {
         // Ensure session is up-to-date for navbar and other listeners
         await update();
 
-        // Wait briefly until session cookie is readable by middleware
-        for (let i = 0; i < 10; i++) {
+        // Wait until session cookie is readable by middleware (up to ~5s)
+        for (let i = 0; i < 50; i++) {
           try {
             const s = await fetch('/api/auth/session', { cache: 'no-store' });
             const json = await s.json();
@@ -89,7 +89,11 @@ export default function LoginPage() {
           } catch {}
         }
 
-        router.replace(target);
+        if (typeof window !== 'undefined') {
+          window.location.assign(target);
+        } else {
+          router.replace(target);
+        }
       } else {
         const message = mapAuthError(res?.error ?? null);
         setError(message);
