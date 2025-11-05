@@ -73,7 +73,7 @@ async function dbConnect(): Promise<Db> {
 let mongoClient: MongoClient;
 let clientPromise: Promise<MongoClient>;
 
-async function getMongoClient(): Promise<MongoClient> {
+export async function getMongoClient(): Promise<MongoClient> {
   // Check if we're in build time and return a mock client
   const isBuildTime = process.env.NEXT_PHASE === 'phase-production-build' ||
     (process.env.NODE_ENV === 'production' && !process.env.VERCEL_ENV && !process.env.MONGODB_URI);
@@ -103,4 +103,3 @@ async function getMongoClient(): Promise<MongoClient> {
 }
 
 export default dbConnect;
-export { getMongoClient };

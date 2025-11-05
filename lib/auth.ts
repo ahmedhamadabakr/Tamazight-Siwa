@@ -1,9 +1,12 @@
 // Import NextAuth types
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { MongoDBAdapter } from '@auth/mongodb-adapter';
+import { getMongoClient } from '@/lib/mongodb';
 import { database } from '@/lib/models';
 import { comparePassword } from '@/lib/security/password';
 
 export const authOptions = {
+  adapter: MongoDBAdapter(getMongoClient() as any),
   providers: [
     CredentialsProvider({
       name: 'credentials',
@@ -70,29 +73,23 @@ export const authOptions = {
   },
 
   session: {
-    strategy: 'jwt' as const,
-    maxAge: 30 * 24 * 60 * 60, // 30 days
-  },
-
-  jwt: {
+    strategy: 'database' as const,
     maxAge: 30 * 24 * 60 * 60, // 30 days
   },
 
   callbacks: {
-    async jwt({ token, user }: any) {
-      if (user) {
-        token.id = user.id;
-        token.role = user.role;
-        token.fullName = user.fullName;
-      }
-      return token;
-    },
-
-    async session({ session, token }: any) {
-      if (token && session.user) {
-        session.user.id = token.id;
-        session.user.role = token.role;
-        session.user.fullName = token.fullName;
+    async session({ session }: any) {
+      try {
+        if (session?.user?.email) {
+          const user = await database.findUserByEmail(session.user.email);
+          if (user && session.user) {
+            (session.user as any).id = user._id?.toString();
+            (session.user as any).role = user.role;
+            (session.user as any).fullName = user.fullName;
+          }
+        }
+      } catch (e) {
+        // noop
       }
       return session;
     },
@@ -131,10 +128,6 @@ export const authOptions = {
 
 if (!process.env.NEXTAUTH_SECRET) {
   console.warn('Warning: NEXTAUTH_SECRET is not defined');
-}
-
-if (!process.env.JWT_SECRET) {
-  console.warn('Warning: JWT_SECRET is not defined');
 }
 
 export async function getAuthOptions() {

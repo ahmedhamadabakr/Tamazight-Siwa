@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getToken } from 'next-auth/jwt';
 
 
 
@@ -69,15 +68,6 @@ function hasRequiredRole(userRole: string, requiredRole: string): boolean {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Get secret from environment
-  const secret = process.env.NEXTAUTH_SECRET;
-
-  // Retrieve token (let NextAuth detect cookie name automatically)
-  const token = await getToken({
-    req: request,
-    secret,
-  });
-
   // Add security headers
   const response = NextResponse.next();
 
@@ -105,38 +95,8 @@ export async function middleware(request: NextRequest) {
     response.headers.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
   }
 
-  // Skip auth checks for public routes
-  if (isPublicRoute(pathname)) {
-    return response;
-  }
-
-  // Check if route requires authentication
-  const requiredRole = getRequiredRole(pathname);
-
-  if (requiredRole && !token) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/login';
-    const callbackUrl = `${pathname}${request.nextUrl.search || ''}`;
-    url.searchParams.set('callbackUrl', callbackUrl);
-    url.searchParams.set('error', 'authentication_required');
-    return NextResponse.redirect(url);
-  }
-
-  if (requiredRole && token) {
-    const userRole = token.role as string;
-    console.log('Middleware - Checking role:', { userRole, requiredRole, hasAccess: hasRequiredRole(userRole, requiredRole) });
-
-    if (!hasRequiredRole(userRole, requiredRole)) {
-      console.log('Middleware - Access denied, redirecting to unauthorized');
-      const url = request.nextUrl.clone();
-      url.pathname = '/unauthorized';
-      url.searchParams.set('required', requiredRole);
-      url.searchParams.set('current', userRole);
-      return NextResponse.redirect(url);
-    }
-
-    console.log('Middleware - Access granted for:', pathname);
-  }
+  // With database sessions, auth checks should be performed in server components/route handlers
+  // using getServerSession(). Middleware remains for security headers and public asset handling.
 
   return response;
 }
