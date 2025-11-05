@@ -24,24 +24,52 @@ export default function LoginPage() {
   const callbackUrl = searchParams.get('callbackUrl') || '/';
   const urlError = searchParams.get('error');
 
+  const mapAuthError = (code?: string | null) => {
+    switch (code) {
+      case 'CredentialsSignin':
+        return 'Invalid email or password.';
+      case 'AccessDenied':
+        return 'Access denied.';
+      case 'OAuthSignin':
+      case 'OAuthCallback':
+      case 'OAuthCreateAccount':
+      case 'EmailCreateAccount':
+      case 'CallbackRouteError':
+      case 'Configuration':
+      case 'AdapterError':
+      case 'OAuthAccountNotLinked':
+      case 'SessionRequired':
+      case 'Default':
+        return 'Sign-in error. Please try again.';
+      default:
+        return code || 'Sign-in error. Please try again.';
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
     setLoading(true);
     setError(null);
-    const res = await signIn('credentials', {
-      email,
-      password,
-      redirect: false,
-      callbackUrl,
-    });
-    if (res?.ok) {
-      // Ensure session is up-to-date for navbar and other listeners
-      await update();
-      router.replace(callbackUrl);
-      router.refresh();
-    } else {
-      setError(res?.error || 'Invalid credentials');
+    try {
+      const res = await signIn('credentials', {
+        email,
+        password,
+        redirect: false,
+        callbackUrl,
+      });
+      if (res?.ok) {
+        // Ensure session is up-to-date for navbar and other listeners
+        await update();
+        router.replace(callbackUrl);
+        router.refresh();
+      } else {
+        const message = mapAuthError(res?.error ?? null);
+        setError(message);
+        setLoading(false);
+      }
+    } catch (err) {
+      setError('Sign-in error. Please try again.');
       setLoading(false);
     }
   };
@@ -88,7 +116,7 @@ export default function LoginPage() {
             </p>
             {(urlError || error) && (
               <p className="my-2 text-sm text-red-600">
-                {error || 'Sign-in error. Please try again.'}
+                {error || mapAuthError(urlError)}
               </p>
             )}
           </div>

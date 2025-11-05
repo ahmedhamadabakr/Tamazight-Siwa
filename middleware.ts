@@ -20,6 +20,17 @@ const publicRoutes = [
   '/unauthorized',
   '/test-auth',
   '/api/auth',
+  // Static app assets that must remain public
+  '/manifest.json',
+  '/site.webmanifest',
+  '/robots.txt',
+  '/sitemap.xml',
+  '/apple-touch-icon.png',
+  '/favicon-16.png',
+  '/favicon-32.png',
+  '/icon-192.png',
+  '/icon-512.png',
+  '/icon.svg',
 ];
 
 function isPublicRoute(pathname: string): boolean {
@@ -66,8 +77,6 @@ export async function middleware(request: NextRequest) {
     req: request,
     secret,
   });
-
-
 
   // Add security headers
   const response = NextResponse.next();
@@ -134,6 +143,7 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    // Exclude Next.js internals and common static assets from middleware
+    '/((?!_next/static|_next/image|favicon.ico|manifest.json|site.webmanifest|robots.txt|sitemap.xml|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|json)$).*)',
   ],
 };
