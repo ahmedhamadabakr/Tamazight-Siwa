@@ -37,13 +37,22 @@ const nextConfig = {
       '@radix-ui/react-accordion',
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
-      '@radix-ui/react-navigation-menu'
+      '@radix-ui/react-navigation-menu',
+      'react-select',
+      'react-hook-form',
+      'zod',
+      'clsx',
+      'tailwind-merge'
     ],
     webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'TTFB'],
     serverComponentsExternalPackages: ['mongodb', 'bcryptjs'],
     optimizeCss: true,
     scrollRestoration: true,
     largePageDataBytes: 128 * 1000, // 128KB
+    optimizeServerReact: true,
+    workerThreads: false,
+    serverMinification: true,
+    swcMinify: true,
   },
   
   // Production optimizations
@@ -179,6 +188,8 @@ const nextConfig = {
       // Enhanced chunk splitting for better caching
       config.optimization.splitChunks = {
         chunks: 'all',
+        minSize: 20000,
+        maxSize: 244000,
         cacheGroups: {
           default: false,
           vendors: false,
@@ -193,7 +204,11 @@ const nextConfig = {
             test(module) {
               return module.size() > 160000 && /node_modules[/\\]/.test(module.identifier())
             },
-            name: 'lib',
+            name(module) {
+              const identifier = module.identifier()
+              const match = identifier.match(/node_modules[\\/]([^\\]+)/)
+              return match && match[1] ? match[1] : 'lib'
+            },
             priority: 30,
             minChunks: 1,
             reuseExistingChunk: true,
@@ -202,10 +217,33 @@ const nextConfig = {
             name: 'commons',
             minChunks: 2,
             priority: 20,
+            reuseExistingChunk: true,
+          },
+          ui: {
+            test: /[\\/]node_modules[\\/](@radix-ui|lucide-react)[\\/]/,
+            name: 'ui',
+            priority: 25,
+            minChunks: 1,
+            reuseExistingChunk: true,
+          },
+          auth: {
+            test: /[\\/]node_modules[\\/](next-auth|@auth)[\\/]/,
+            name: 'auth',
+            priority: 25,
+            minChunks: 1,
+            reuseExistingChunk: true,
           },
         },
       }
+      
+      // Enable module concatenation
+      config.optimization.concatenateModules = true
+      
+      // Better tree shaking
+      config.optimization.usedExports = true
+      config.optimization.sideEffects = false
     }
+    
     return config
   },
 }

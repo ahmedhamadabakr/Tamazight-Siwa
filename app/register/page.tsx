@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -11,7 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Eye, EyeOff, UserPlus } from 'lucide-react';
 import Select from 'react-select';
-import {countriesByContinent} from '@/data/countries';
+import type { Country } from '@/data/countries-optimized';
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -26,7 +26,24 @@ export default function RegisterPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [countries, setCountries] = useState<Country[]>([]);
+  const [countriesLoading, setCountriesLoading] = useState(true);
   const router = useRouter();
+
+  // Lazy load countries data
+  useEffect(() => {
+    const loadCountries = async () => {
+      try {
+        const { countriesByContinent } = await import('@/data/countries-optimized');
+        setCountries(countriesByContinent);
+      } catch (err) {
+        console.error('Failed to load countries:', err);
+      } finally {
+        setCountriesLoading(false);
+      }
+    };
+    loadCountries();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -171,10 +188,12 @@ export default function RegisterPage() {
               <div>
                 <Label>Country</Label>
                 <Select
-                  options={countriesByContinent}
+                  options={countries}
                   onChange={handleCountryChange}
-                  placeholder="Select your country"
+                  placeholder={countriesLoading ? "Loading countries..." : "Select your country"}
                   className="mt-1"
+                  isLoading={countriesLoading}
+                  isDisabled={countriesLoading}
                 />
               </div>
 

@@ -10,7 +10,14 @@
     "start": "next start",
     "optimize": "set NEXT_PUBLIC_ENV=production && set NODE_ENV=production && next build && next start",
     "optimize:analyze": "set NEXT_PUBLIC_ENV=production && set NODE_ENV=production && set ANALYZE=true && next build",
-    "img:optimize": "node scripts/optimize-images.mjs"
+    "img:optimize": "node scripts/optimize-images.mjs",
+    "build:production": "NODE_ENV=production next build",
+    "build:optimized": "NODE_ENV=production ANALYZE=true next build",
+    "start:production": "NODE_ENV=production next start",
+    "perf:audit": "npm run build:optimized && npx lighthouse http://localhost:3000 --output=json --output-path=./lighthouse-report.json",
+    "perf:bundle": "npm run build:analyze",
+    "perf:images": "node scripts/optimize-images.mjs",
+    "perf:full": "npm run perf:images && npm run build:optimized && npm run perf:audit"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.10.0",
