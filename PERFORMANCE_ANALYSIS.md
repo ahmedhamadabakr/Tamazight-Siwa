@@ -86,7 +86,7 @@ cacheGroups: {
 ### Countries Data Optimization
 ```typescript
 // Before: 195 countries loaded immediately
-import { countriesByContinent } from '@/data/countries';
+import { countriesByContinent } from '@/data/countries-optimized';
 
 // After: Lazy loaded on demand
 const loadCountries = async () => {
