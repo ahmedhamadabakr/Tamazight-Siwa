@@ -198,12 +198,12 @@ export default function LoginPage() {
               </svg>
             )}
             {loading ? 'Signing in with Google...' : 'Continue with Google'}
-          </Button> */}
+          </Button> 
 
           <div className="relative flex items-center justify-center">
             <span className="px-2 text-xs text-muted-foreground bg-background">or</span>
             <div className="absolute inset-x-0 h-px bg-muted" />
-          </div>
+          </div>*/}
           <form onSubmit={handleSubmit} className="grid gap-4">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
