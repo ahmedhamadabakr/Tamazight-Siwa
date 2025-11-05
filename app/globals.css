@@ -2,6 +2,43 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* Mobile-first critical CSS */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Geist Sans', system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeSpeed;
+}
+
+/* Mobile performance optimizations */
+@media (max-width: 768px) {
+  * {
+    animation-duration: 0.2s !important;
+    transition-duration: 0.2s !important;
+  }
+  
+  .hero-section {
+    height: 100svh; /* Use small viewport height for mobile */
+  }
+  
+  .mobile-optimized {
+    will-change: auto;
+    transform: none;
+  }
+}
+
 :root {
   /* Updated theme to warm desert colors for Tamazight Siwa */
   --background: oklch(0.98 0.01 85); /* Warm off-white */

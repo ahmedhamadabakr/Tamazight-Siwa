@@ -38,17 +38,33 @@ const nextConfig = {
       'react-hook-form',
       'zod',
       'clsx',
-      'tailwind-merge'
+      'tailwind-merge',
+      'react-icons',
+      'sonner',
+      'class-variance-authority'
     ],
     webVitalsAttribution: ['CLS', 'LCP', 'FCP', 'FID', 'TTFB'],
-    serverComponentsExternalPackages: ['mongodb', 'bcryptjs'],
+    serverComponentsExternalPackages: ['mongodb', 'bcryptjs', 'sharp'],
     optimizeCss: true,
     scrollRestoration: true,
-    largePageDataBytes: 128 * 1000, // 128KB
+    largePageDataBytes: 64 * 1000, // 64KB - reduced for mobile
     optimizeServerReact: true,
     workerThreads: false,
     serverMinification: true,
     swcMinify: true,
+    turbo: {
+      rules: {
+        '*.svg': {
+          loaders: ['@svgr/webpack'],
+          as: '*.js',
+        },
+      },
+    },
+    esmExternals: 'loose',
+    serverSourceMaps: false,
+    clientRouterFilter: true,
+    clientRouterFilterRedirects: true,
+    optimisticClientCache: true,
   },
   
   // Production optimizations
@@ -152,12 +168,12 @@ const nextConfig = {
     ignoreBuildErrors: true,
   },
   
-  // Enhanced image optimization
+  // Enhanced image optimization for mobile + web
   images: {
     formats: ['image/avif', 'image/webp'],
-    minimumCacheTTL: 86400,
-    deviceSizes: [640, 750, 828, 1080, 1200, 1920, 2048, 3840],
-    imageSizes: [16, 32, 48, 64, 96, 128, 256, 384],
+    minimumCacheTTL: 31536000, // 1 year
+    deviceSizes: [640, 750, 828, 1080, 1200, 1920], // Optimized for mobile-first
+    imageSizes: [16, 32, 48, 64, 96, 128, 256], // Reduced sizes
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
     remotePatterns: [
@@ -172,27 +188,31 @@ const nextConfig = {
       },
     ],
     loader: 'default',
-    loaderFile: './lib/imageLoader.js',
+    unoptimized: false,
   },
   
   // Output optimization - removed standalone for development
   // output: 'standalone', // Enable only for production deployment
   
-  // Webpack optimizations - simplified to avoid casing conflicts
+  // Advanced webpack optimizations for mobile + web performance
   webpack: (config, { dev, isServer }) => {
-    // Add path alias resolution with absolute path
+    // Add path alias resolution
     config.resolve.alias = {
       ...config.resolve.alias,
       '@': path.resolve(process.cwd()),
     }
     
-    // Basic optimizations only
+    // Production optimizations
     if (!dev && !isServer) {
+      // Enhanced chunk splitting for better caching
       config.optimization.splitChunks = {
         chunks: 'all',
+        minSize: 20000,
+        maxSize: 200000, // 200KB max chunks for mobile
         cacheGroups: {
           default: false,
           vendors: false,
+          // React framework chunk
           framework: {
             chunks: 'all',
             name: 'framework',
@@ -200,15 +220,56 @@ const nextConfig = {
             priority: 40,
             enforce: true,
           },
+          // UI libraries chunk
+          ui: {
+            name: 'ui',
+            test: /[\\/]node_modules[\\/](@radix-ui|lucide-react|framer-motion)[\\/]/,
+            chunks: 'all',
+            priority: 30,
+            enforce: true,
+          },
+          // Form libraries chunk
+          forms: {
+            name: 'forms',
+            test: /[\\/]node_modules[\\/](react-hook-form|zod|@hookform)[\\/]/,
+            chunks: 'all',
+            priority: 25,
+            enforce: true,
+          },
+          // Common utilities
+          lib: {
+            name: 'lib',
+            test: /[\\/]node_modules[\\/](clsx|tailwind-merge|class-variance-authority)[\\/]/,
+            chunks: 'all',
+            priority: 20,
+            enforce: true,
+          },
+          // Default vendor chunk
+          vendor: {
+            name: 'vendor',
+            test: /[\\/]node_modules[\\/]/,
+            chunks: 'all',
+            priority: 10,
+            reuseExistingChunk: true,
+          },
+          // Common app code
           commons: {
             name: 'commons',
             minChunks: 2,
-            priority: 20,
+            priority: 5,
             reuseExistingChunk: true,
           },
         },
       }
+      
+      // Tree shaking optimization
+      config.optimization.usedExports = true
+      config.optimization.sideEffects = false
+      
+      // Module concatenation
+      config.optimization.concatenateModules = true
     }
+    
     return config
   },
 }

@@ -8,16 +8,17 @@
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start",
-    "optimize": "set NEXT_PUBLIC_ENV=production && set NODE_ENV=production && next build && next start",
-    "optimize:analyze": "set NEXT_PUBLIC_ENV=production && set NODE_ENV=production && set ANALYZE=true && next build",
-    "img:optimize": "node scripts/optimize-images.mjs",
+    "build:mobile": "NEXT_PUBLIC_MOBILE_OPTIMIZED=true next build",
     "build:production": "NODE_ENV=production next build",
     "build:optimized": "NODE_ENV=production ANALYZE=true next build",
     "start:production": "NODE_ENV=production next start",
-    "perf:audit": "npm run build:optimized && npx lighthouse http://localhost:3000 --output=json --output-path=./lighthouse-report.json",
+    "perf:mobile": "npm run build:mobile && npx lighthouse http://localhost:3000 --preset=mobile --output=json --output-path=./mobile-lighthouse.json",
+    "perf:desktop": "npm run build:optimized && npx lighthouse http://localhost:3000 --preset=desktop --output=json --output-path=./desktop-lighthouse.json",
     "perf:bundle": "npm run build:analyze",
     "perf:images": "node scripts/optimize-images.mjs",
-    "perf:full": "npm run perf:images && npm run build:optimized && npm run perf:audit"
+    "perf:full": "npm run perf:images && npm run build:optimized && npm run perf:mobile && npm run perf:desktop",
+    "clean": "rm -rf .next out node_modules/.cache",
+    "clean:build": "npm run clean && npm install && npm run build"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.10.0",

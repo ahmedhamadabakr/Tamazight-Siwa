@@ -41,45 +41,79 @@ export default function RootLayout({
         {/* Preconnect for critical resources */}
         <link rel="preconnect" href="https://res.cloudinary.com" />
 
-        {/* Optimize JavaScript loading without blocking rendering */}
-        <Script id="app-init" strategy="afterInteractive">
+        {/* Mobile-optimized JavaScript loading */}
+        <Script id="mobile-performance-init" strategy="afterInteractive">
           {`
-            // Preload critical resources
-            if ('requestIdleCallback' in window) {
-              requestIdleCallback(() => {
-                const link = document.createElement('link');
-                link.rel = 'prefetch';
-                link.href = '/tours';
-                document.head.appendChild(link);
-              });
-            }
+            // Mobile performance optimizations
+            (function() {
+              const isMobile = window.innerWidth <= 768;
+              
+              // Optimize for mobile
+              if (isMobile) {
+                document.documentElement.classList.add('mobile-optimized');
+                document.body.style.overscrollBehavior = 'none';
+                
+                // Disable hover effects on mobile
+                const style = document.createElement('style');
+                style.textContent = '@media (hover: none) { .hover\\\\:scale-105:hover { transform: none; } .hover\\\\:shadow-lg:hover { box-shadow: none; } }';
+                document.head.appendChild(style);
+              }
+              
+              // Preload critical resources
+              if ('requestIdleCallback' in window) {
+                requestIdleCallback(() => {
+                  const criticalRoutes = ['/tours', '/gallery', '/contact'];
+                  criticalRoutes.forEach(route => {
+                    const link = document.createElement('link');
+                    link.rel = 'prefetch';
+                    link.href = route;
+                    document.head.appendChild(link);
+                  });
+                });
+              }
 
-            // Register service worker
-            if ('serviceWorker' in navigator) {
-              window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                  .then(() => console.log('SW registered'))
-                  .catch(() => console.log('SW registration failed'));
-              });
-            }
+              // Network-aware optimizations
+              if (navigator.connection) {
+                const connection = navigator.connection;
+                const isSlowConnection = connection.effectiveType === 'slow-2g' || 
+                                        connection.effectiveType === '2g' ||
+                                        connection.saveData;
+                
+                if (isSlowConnection) {
+                  document.documentElement.classList.add('reduce-animations');
+                }
+              }
+
+              // Register service worker
+              if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                  navigator.serviceWorker.register('/sw.js')
+                    .then(() => console.log('SW registered'))
+                    .catch(() => console.log('SW registration failed'));
+                });
+              }
+            })();
           `}
         </Script>
 
-        {/* Critical CSS for above-the-fold content */}
+        {/* Critical CSS for above-the-fold content - Mobile optimized */}
         <style dangerouslySetInnerHTML={{
           __html: `
-            *{box-sizing:border-box}
-            body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;background:#f8f5f0;color:#3d2914;font-display:swap;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}
-            .hero-section{height:100vh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;contain:layout style paint}
-            h1{font-size:2.5rem;font-weight:700;line-height:1.1;margin:0 0 1rem 0;contain:layout style paint;text-rendering:optimizeSpeed}
-            @media(min-width:768px){h1{font-size:3.75rem}}
-            @media(min-width:1024px){h1{font-size:4.5rem}}
+            *{box-sizing:border-box;margin:0;padding:0}
+            html{-webkit-text-size-adjust:100%;-webkit-tap-highlight-color:transparent;scroll-behavior:smooth}
+            body{font-family:system-ui,-apple-system,sans-serif;background:#f8f5f0;color:#3d2914;font-display:swap;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;text-rendering:optimizeSpeed;line-height:1.6}
+            .hero-section{height:100svh;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;contain:layout style paint}
+            h1{font-size:clamp(2rem,8vw,4.5rem);font-weight:700;line-height:1.1;margin:0 0 1rem 0;contain:layout style paint;text-rendering:optimizeSpeed}
             .gpu-accelerated{transform:translateZ(0);will-change:transform;backface-visibility:hidden}
-            img{max-width:100%;height:auto;display:block}
+            img{max-width:100%;height:auto;display:block;loading:lazy}
             .loading-skeleton{background:linear-gradient(90deg,#f0f0f0 25%,#e0e0e0 50%,#f0f0f0 75%);background-size:200% 100%;animation:loading 1.5s infinite}
             @keyframes loading{0%{background-position:-200% 0}100%{background-position:200% 0}}
             .animate-fade-in-up{animation:fadeInUp 0.6s ease-out forwards}
             @keyframes fadeInUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+            @media(max-width:768px){*{animation-duration:0.2s!important;transition-duration:0.2s!important}.mobile-optimized{will-change:auto;transform:none}}
+            @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+            .mobile-btn{min-height:44px;min-width:44px;touch-action:manipulation}
+            .content-visibility-auto{content-visibility:auto;contain-intrinsic-size:0 500px}
           `
         }} />
 
