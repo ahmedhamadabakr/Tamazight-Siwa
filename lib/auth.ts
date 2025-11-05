@@ -6,7 +6,7 @@ import { comparePassword } from '@/lib/security/password';
 // In-memory store for login attempts.
 // NOTE: This is not suitable for production at scale.
 // A more robust solution would use a database or a service like Redis.
-const loginAttempts: { [ip: string]: { count: number; lastAttempt: number } } = {};
+// const loginAttempts: { [ip: string]: { count: number; lastAttempt: number } } = {};
 
 /* const handleFailedAttempt = (ip: string | undefined | null) => {
     if (!ip) return;
@@ -31,13 +31,13 @@ export const authOptions = {
       async authorize(credentials, req) {
         const ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress;
         try {
-          if (ip) {
-            const now = Date.now();
-            const attempts = loginAttempts[ip];
-            if (attempts && attempts.count > 5 && (now - attempts.lastAttempt) < 60 * 1000 * 5) { // 5 attempts in 5 minutes
-                throw new Error('Too many login attempts. Please try again in 5 minutes.');
-            }
-          }
+          // if (ip) {
+          //   const now = Date.now();
+          //   const attempts = loginAttempts[ip];
+          //   if (attempts && attempts.count > 5 && (now - attempts.lastAttempt) < 60 * 1000 * 5) { // 5 attempts in 5 minutes
+          //       throw new Error('Too many login attempts. Please try again in 5 minutes.');
+          //   }
+          // }
 
           if (!credentials?.email || !credentials?.password) {
             return null;
