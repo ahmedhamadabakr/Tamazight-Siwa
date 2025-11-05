@@ -68,8 +68,13 @@ export default function RegisterPage() {
       if (data.success) {
         router.push(`/verify-code?email=${encodeURIComponent(formData.email)}`);
       } else {
-        const serverMessage = typeof data.error === 'string' ? data.error : data.error?.message;
-        setError(serverMessage || 'Failed to register');
+        if (data.error?.code === 'WEAK_PASSWORD') {
+          const suggestions = data.error.details?.suggestions?.join(' ') || '';
+          setError(`Password is too weak. ${data.error.details?.warning}. ${suggestions}`);
+        } else {
+          const serverMessage = typeof data.error === 'string' ? data.error : data.error?.message;
+          setError(serverMessage || 'Failed to register');
+        }
       }
     } catch (error) {
       setError('Network error. Please try again.');
