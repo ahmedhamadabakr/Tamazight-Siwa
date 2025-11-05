@@ -10,7 +10,6 @@ import {
   ProtectedComponent,
   UserRole 
 } from '@/lib/auth/withAuth';
-import SessionManager from '@/components/auth/SessionManager';
 
 // 1. حماية صفحة كاملة بـ HOC
 const AdminDashboard = withAdminAuth(() => {
@@ -40,9 +39,6 @@ const CustomProtectedComponent = withAuth(() => {
       <p>only manager and admin can access this page</p>
     </div>
   );
-}, {
-  allowedRoles: [UserRole.MANAGER, UserRole.ADMIN],
-  redirectTo: '/login'
 });
 
 // 4. استخدام hooks للتحقق من الأدوار
@@ -63,11 +59,11 @@ function RoleBasedUI() {
         <button>manager panel</button>
       )}
       
-      {hasRole(UserRole.USER) && (
+      {hasRole() && (
         <button>user profile</button>
       )}
       
-      {canAccess(UserRole.ADMIN, [UserRole.ADMIN]) && (
+      {canAccess() && (
         <button>admin settings</button>
       )}
     </div>
@@ -97,7 +93,7 @@ function ConditionalContent() {
       <ProtectedComponent requiredRole={UserRole.ADMIN}>
         <div>
           <h3>admin panel</h3>
-          <SessionManager />
+          <p>Admin-only content here</p>
         </div>
       </ProtectedComponent>
     </div>

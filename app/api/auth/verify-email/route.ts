@@ -38,8 +38,6 @@ export async function POST(request: NextRequest) {
     if (!verifiedUser) {
       await database.logSecurityEvent({
         eventType: 'LOGIN_FAILED',
-        ipAddress: clientIP,
-        userAgent,
         details: { action: 'email_verification', reason: 'invalid_or_expired_token' }
       });
 
@@ -59,8 +57,6 @@ export async function POST(request: NextRequest) {
     await database.logSecurityEvent({
       userId: verifiedUser._id,
       eventType: 'LOGIN_SUCCESS',
-      ipAddress: clientIP,
-      userAgent,
       details: { action: 'email_verification', success: true }
     });
 
@@ -88,7 +84,6 @@ export async function POST(request: NextRequest) {
       const clientIP = getClientIP(request);
       await database.logSecurityEvent({
         eventType: 'LOGIN_FAILED',
-        ipAddress: clientIP,
         details: { action: 'email_verification', reason: 'server_error', error: error instanceof Error ? error.message : 'Unknown error' }
       });
     } catch (logError) {
@@ -128,8 +123,6 @@ export async function GET(request: NextRequest) {
     if (!verifiedUser) {
       await database.logSecurityEvent({
         eventType: 'LOGIN_FAILED',
-        ipAddress: clientIP,
-        userAgent,
         details: { action: 'email_verification_get', reason: 'invalid_or_expired_token' }
       });
 
@@ -140,8 +133,6 @@ export async function GET(request: NextRequest) {
     await database.logSecurityEvent({
       userId: verifiedUser._id,
       eventType: 'LOGIN_SUCCESS',
-      ipAddress: clientIP,
-      userAgent,
       details: { action: 'email_verification_get', success: true }
     });
 

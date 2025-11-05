@@ -18,13 +18,13 @@ export default function ReviewsPage({ params }: { params: { id: string } }) {
       return
     }
 
-    if (session.user?.role !== 'manager') {
+    if (!session.user || (session.user as any)?.role !== 'manager') {
       router.push('/')
       return
     }
 
-    if (session.user.id !== params.id) {
-      router.push(`/dashboard/${session.user.id}`)
+    if (!session.user || (session.user as any)?.id !== params.id) {
+      router.push(`/dashboard/${(session.user as any)?.id}`)
       return
     }
   }, [session, status, router, params.id])
@@ -33,7 +33,7 @@ export default function ReviewsPage({ params }: { params: { id: string } }) {
     return <div>Loading...</div>
   }
 
-  if (!session || session.user?.role !== 'manager') {
+  if (!session || (session.user as any)?.role !== 'manager') {
     return null
   }
 

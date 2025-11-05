@@ -13,7 +13,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
-    const session = await getServerSession(await getAuthOptions()) as any
+    const session = await getServerAuthSession() as any
 
     if (!session?.user?.id) {
       return NextResponse.json(

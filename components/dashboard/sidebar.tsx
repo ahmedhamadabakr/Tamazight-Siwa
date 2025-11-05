@@ -79,13 +79,13 @@ export function DashboardLayout({ children }: SidebarProps) {
 
   // 🧩 عناصر القائمة الجانبية
   const menuItems = useMemo(() => {
-    if (!session?.user?.id) return [];
+    if (!(session?.user as any)?.id) return [];
     return [
-      { href: `/dashboard/${session.user.id}`, label: 'Overview', icon: BarChart3 },
-      { href: `/dashboard/${session.user.id}/users`, label: 'Users Management', icon: Users },
-      { href: `/dashboard/${session.user.id}/tours`, label: 'Tours Management', icon: MapPin },
-      { href: `/dashboard/${session.user.id}/reviews`, label: 'Reviews Management', icon: Star },
-      { href: `/dashboard/${session.user.id}/gallery`, label: 'Gallery Management', icon: Image },
+      { href: `/dashboard/${(session?.user as any)?.id}`, label: 'Overview', icon: BarChart3 },
+      { href: `/dashboard/${(session?.user as any)?.id}/users`, label: 'Users Management', icon: Users },
+      { href: `/dashboard/${(session?.user as any)?.id}/tours`, label: 'Tours Management', icon: MapPin },
+      { href: `/dashboard/${(session?.user as any)?.id}/reviews`, label: 'Reviews Management', icon: Star },
+      { href: `/dashboard/${(session?.user as any)?.id}/gallery`, label: 'Gallery Management', icon: Image },
     ];
   }, [session]);
 

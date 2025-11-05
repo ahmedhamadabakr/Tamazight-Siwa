@@ -47,7 +47,7 @@ export default function NewTrip() {
   const { data: session } = useSession();
 
   useEffect(() => {
-    if (!session || session.user?.role !== 'manager') {
+    if (!session || (session.user as any)?.role !== 'manager') {
       router.push('/');
     }
   }, [session, router]);

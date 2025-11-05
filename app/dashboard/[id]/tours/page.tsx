@@ -49,7 +49,7 @@ export default function ToursPage({ params }: ToursPageProps) {
     useEffect(() => {
         if (sessionStatus === 'loading') return; // Wait for session to load
 
-        if (!session || session.user?.role !== 'manager') {
+        if (!session || (session.user as any)?.role !== 'manager') {
             // Redirect to home or an unauthorized page
             router.push('/');
         } else {
@@ -64,8 +64,8 @@ export default function ToursPage({ params }: ToursPageProps) {
             const res = await fetch('/api/tours', {
                 headers: {
                     'Content-Type': 'application/json',
-                    ...(session?.user?.accessToken && {
-                        'Authorization': `Bearer ${session.user.accessToken}`
+                    ...((session?.user as any)?.accessToken && {
+                        'Authorization': `Bearer ${(session?.user as any).accessToken}`
                     })
                 }
             });
@@ -95,7 +95,7 @@ export default function ToursPage({ params }: ToursPageProps) {
             const res = await fetch(`/api/tours/${tourId}`, {
                 method: 'DELETE',
                 headers: {
-                    'Authorization': `Bearer ${session?.user?.accessToken}`
+                    'Authorization': `Bearer ${(session?.user as any).accessToken}`
                 }
             });
 

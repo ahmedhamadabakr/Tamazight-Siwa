@@ -9,7 +9,7 @@ export default function UnauthorizedPage() {
   const { data: session } = useSession();
   
   const requiredRole = searchParams.get('required') || 'unknown';
-  const currentRole = searchParams.get('current') || session?.user?.role || 'guest';
+  const currentRole = searchParams.get('current') || (session?.user as any)?.role || 'guest';
 
   const getRoleDisplayName = (role: string) => {
     switch (role) {

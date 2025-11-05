@@ -69,7 +69,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
     const [mainImageIndex, setMainImageIndex] = useState(0);
 
     useEffect(() => {
-        if (!session || session.user?.role !== 'manager') {
+        if (!session || (session.user as any)?.role !== 'manager') {
             router.push('/');
         }
     }, [session, router]);
@@ -82,8 +82,8 @@ export default function EditTourPage({ params }: EditTourPageProps) {
             const res = await fetch(`/api/tours/${params.tourId}`, {
                 headers: {
                     'Content-Type': 'application/json',
-                    ...(session?.user?.accessToken && {
-                        'Authorization': `Bearer ${session.user.accessToken}`
+                    ...((session?.user as any)?.accessToken && {
+                        'Authorization': `Bearer ${(session?.user as any).accessToken}`
                     })
                 },
                 cache: 'no-store'
@@ -102,7 +102,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                     if (tourData.images) {
                         if (Array.isArray(tourData.images)) {
                             // إذا كانت مصفوفة، أضف الصور الصالحة فقط
-                            processedImages = tourData.images.filter(img =>
+                            processedImages = tourData.images.filter((img: string | null | undefined) => 
                                 img && typeof img === 'string' && img.trim() !== ''
                             );
                         } else if (typeof tourData.images === 'string') {
@@ -147,7 +147,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
         } finally {
             setLoading(false);
         }
-    }, [params.tourId, session?.user?.accessToken]);
+    }, [params.tourId, (session?.user as any)?.accessToken]);
 
     useEffect(() => {
         if (params.tourId) {
@@ -203,8 +203,8 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                     const res = await fetch('/api/tours/upload', {
                         method: 'POST',
                         headers: {
-                            ...(session?.user?.accessToken && {
-                                'Authorization': `Bearer ${session.user.accessToken}`
+                            ...((session?.user as any)?.accessToken && {
+                                'Authorization': `Bearer ${(session?.user as any).accessToken}`
                             })
                         },
                         body: formData,
@@ -271,7 +271,7 @@ export default function EditTourPage({ params }: EditTourPageProps) {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${session.user.accessToken}`
+                    'Authorization': `Bearer ${(session.user as any).accessToken}`
                 },
                 body: JSON.stringify({
                     ...tour,

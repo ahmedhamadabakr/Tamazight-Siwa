@@ -23,8 +23,7 @@ export async function POST(
   { params }: { params: { id: string } }
 ) {
   try {
-    const authOptions = await getAuthOptions()
-    const session = await getServerSession(authOptions) as CustomSession
+    const session = await getServerAuthSession() as CustomSession
 
     if (!session?.user) {
       return NextResponse.json(
@@ -77,7 +76,7 @@ export async function POST(
 
     const result = await collection.updateOne(
       { _id: ObjectId.createFromHexString(params.id) },
-      updateOperation
+      updateOperation as any
     )
 
     if (result.matchedCount === 0) {

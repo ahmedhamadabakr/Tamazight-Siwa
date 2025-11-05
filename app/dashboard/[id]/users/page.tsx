@@ -33,7 +33,7 @@ export default function Users() {
   useEffect(() => {
     if (sessionStatus === 'loading') return;
 
-    if (!session || session.user?.role !== 'manager') {
+    if (!session || (session.user as any)?.role !== 'manager') {
       router.push('/');
     } else {
       fetchUsers();

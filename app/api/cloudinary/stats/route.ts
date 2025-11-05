@@ -28,8 +28,7 @@ export async function GET(request: NextRequest) {
       }, { status: 503 });
     }
 
-    const authOptions = await getAuthOptions()
-    const session = await getServerSession(authOptions) as any
+    const session = await getServerAuthSession() as any
     
     if (!session?.user || session.user.role !== 'manager') {
       return NextResponse.json(

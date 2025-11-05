@@ -69,7 +69,7 @@ export async function GET(
         .find({ tourId: params.id, status: 'approved' })
         .toArray()
       
-      response.data.stats = calculateReviewStats(allReviews)
+      response.data.stats = calculateReviewStats(allReviews as any[])
     }
 
     return NextResponse.json(response)
