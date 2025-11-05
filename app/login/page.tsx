@@ -46,6 +46,11 @@ export default function LoginPage() {
     }
   };
 
+  const handleGoogleSignIn = async () => {
+    const target = callbackUrl && callbackUrl !== '/login' ? callbackUrl : '/';
+    await signIn('google', { callbackUrl: target });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (loading) return;
@@ -150,6 +155,16 @@ export default function LoginPage() {
                 {error || mapAuthError(urlError)}
               </p>
             )}
+          </div>
+
+          <Button type="button" onClick={handleGoogleSignIn} className="w-full flex items-center justify-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" className="w-5 h-5"><path fill="#FFC107" d="M43.611 20.083H42V20H24v8h11.303C33.602 32.915 29.197 36 24 36c-6.627 0-12-5.373-12-12s5.373-12 12-12c3.059 0 5.842 1.155 7.961 3.039l5.657-5.657C34.847 6.053 29.69 4 24 4 12.954 4 4 12.954 4 24s8.954 20 20 20 20-8.954 20-20c0-1.341-.138-2.651-.389-3.917z"/><path fill="#FF3D00" d="M6.306 14.691l6.571 4.818C14.655 16.108 18.961 14 24 14c3.059 0 5.842 1.155 7.961 3.039l5.657-5.657C34.847 6.053 29.69 4 24 4 16.318 4 9.656 8.337 6.306 14.691z"/><path fill="#4CAF50" d="M24 44c5.132 0 9.797-1.969 13.304-5.182l-6.147-5.196C29.074 35.755 26.671 36 24 36c-5.176 0-9.567-3.062-11.291-7.447l-6.542 5.036C9.466 39.556 16.227 44 24 44z"/><path fill="#1976D2" d="M43.611 20.083H42V20H24v8h11.303c-1.358 3.832-5.004 6.667-9.303 6.667-5.176 0-9.567-3.062-11.291-7.447l-6.542 5.036C9.466 39.556 16.227 44 24 44c11.046 0 20-8.954 20-20 0-1.341-.138-2.651-.389-3.917z"/></svg>
+            Continue with Google
+          </Button>
+
+          <div className="relative flex items-center justify-center">
+            <span className="px-2 text-xs text-muted-foreground bg-background">or</span>
+            <div className="absolute inset-x-0 h-px bg-muted" />
           </div>
           <form onSubmit={handleSubmit} className="grid gap-4">
             <div className="grid gap-2">

@@ -106,6 +106,8 @@ export class Database {
         db.collection('users').createIndex({ email: 1 }, { unique: true, background: true }),
         db.collection('users').createIndex({ 'refreshTokens.token': 1 }, { background: true }),
         db.collection('securityevents').createIndex({ userId: 1, timestamp: -1 }, { background: true }),
+        db.collection('customsessions').createIndex({ userId: 1, createdAt: -1 }, { background: true }),
+        db.collection('customsessions').createIndex({ tokenId: 1 }, { background: true }),
       ]);
     } catch (error) {
       // Ignore index creation errors in production
@@ -274,6 +276,38 @@ export class Database {
       timestamp: new Date()
     });
   }
+
+  // Hybrid custom session persistence
+  async createCustomSession(session: {
+    userId: string;
+    provider: string;
+    tokenId?: string | null;
+    issuedAt: Date;
+    expiresAt: Date;
+    userAgent?: string | null;
+    ip?: string | null;
+  }): Promise<void> {
+    const db = await this.getDb();
+    await db.collection('customsessions').insertOne({
+      ...session,
+      createdAt: new Date(),
+    });
+  }
+
+  async deleteCustomSessionsByUser(userId: string): Promise<number> {
+    const db = await this.getDb();
+    const res = await db.collection('customsessions').deleteMany({ userId });
+    return res.deletedCount || 0;
+  }
+
+  async listCustomSessionsByUser(userId: string): Promise<any[]> {
+    const db = await this.getDb();
+    return db.collection('customsessions')
+      .find({ userId })
+      .sort({ createdAt: -1 })
+      .limit(50)
+      .toArray();
+  }
 }
 
 // Export a singleton instance with lazy initialization
@@ -338,5 +372,15 @@ export const database = {
   
   async logSecurityEvent(eventData: Parameters<Database['logSecurityEvent']>[0]) {
     return this.getInstance().logSecurityEvent(eventData);
+  }
+  ,
+  async createCustomSession(data: Parameters<Database['createCustomSession']>[0]) {
+    return this.getInstance().createCustomSession(data);
+  },
+  async deleteCustomSessionsByUser(userId: string) {
+    return this.getInstance().deleteCustomSessionsByUser(userId);
+  },
+  async listCustomSessionsByUser(userId: string) {
+    return this.getInstance().listCustomSessionsByUser(userId);
   }
 };
